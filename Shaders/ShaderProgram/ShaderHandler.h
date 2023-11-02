@@ -17,6 +17,7 @@
 #include "../../Model/Material.h"
 #include "../../Model/Abstract/RenderableObject.h"
 #include "../Lighting/Uniforms/LightsArrayPointUniform.h"
+#include "../Lighting/Uniforms/LightArrayDirectionalUniform.h"
 #include "ShaderBase/ShaderBase.h"
 
 
@@ -42,15 +43,19 @@ private:
     void RenderPhongLight(Material objectMaterial) const;
 
 
-    // GLSL Shaders GLint locations
-    //Base
+    /** GLSL Shaders GLint locations **/
+    /*Base*/
     GLint ModelMatrixLocation{};
     GLint ViewMatrixLocation{};
     GLint ProjectionMatrixLocation{};
     GLint CameraLocationLocation{};
-    //Lights
-    GLint LightsArraySizeLocation{};
-    std::vector<LightsArrayPointUniform> LightsArrayUniformLocation;
+    /* Lights */
+    //Point Lights
+    GLint LightsArrayPoint_SizeLocation{};
+    std::vector<LightsArrayPointUniform> LightsArrayPoint_UniformLocation;
+    //Directional Lights
+    GLint LightsArrayDirectional_SizeLocation{};
+    std::vector<LightArrayDirectionalUniform> LightsArrayDirectional_UniformLocation;
 
     //Object Material
     GLint AmbientColorLocation{};

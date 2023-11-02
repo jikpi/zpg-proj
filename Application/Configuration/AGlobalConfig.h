@@ -26,6 +26,9 @@ inline constexpr const char *DEF_SHADER_CAMERA_LOCATION_NAME = "cameraLocation";
 inline constexpr const int DEF_SHADER_LIGHTS_ARRAY_LOCATION_ARRAY_SIZE = 16;
 inline constexpr const char *DEF_SHADER_LIGHTS_POINT_ARRAY_LOCATION_SIZE_NAME = "LightPointSize";
 inline constexpr const char *DEF_SHADER_LIGHTS_POINT_ARRAY_LOCATION_NAME = "LightPointArray";
+inline constexpr const char *DEF_SHADER_LIGHTS_DIRECTIONAL_ARRAY_LOCATION_SIZE_NAME = "LightDirectionalSize";
+inline constexpr const char *DEF_SHADER_LIGHTS_DIRECTIONAL_ARRAY_LOCATION_NAME = "LightDirectionalArray";
+inline constexpr const char *DEF_SHADER_LIGHTS_ARRAY_LOCATION_DIRECTION_NAME = "direction";
 inline constexpr const char *DEF_SHADER_LIGHTS_ARRAY_LOCATION_POSITION_NAME = "position";
 inline constexpr const char *DEF_SHADER_LIGHTS_ARRAY_LOCATION_COLOR_NAME = "color";
 inline constexpr const char *DEF_SHADER_LIGHTS_ARRAY_LOCATION_INTENSITY_NAME = "intensity";
@@ -45,6 +48,6 @@ inline constexpr const float DEF_LIGHT_CONSTANT = 1.0f;
 inline constexpr const float DEF_LIGHT_LINEAR = 0.09f;
 inline constexpr const float DEF_LIGHT_QUADRATIC = 0.1f;
 inline constexpr const glm::vec3 DEF_LIGHT_COLOR = glm::vec3(1.0f, 1.0f, 1.0f);
-inline constexpr const glm::vec3 DEF_LIGHT_DIRECTIONAL_DIRECTION = glm::vec3(0.0f, 0.0f, 1.0f);
+inline constexpr const glm::vec3 DEF_LIGHT_DIRECTIONAL_DIRECTION = glm::vec3(0.0f, -1.0f, 0.0f);
 
 #endif //ZPG_TEST_AGLOBALCONFIG_H

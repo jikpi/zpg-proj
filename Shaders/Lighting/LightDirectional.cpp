@@ -4,26 +4,30 @@
 
 #include "LightDirectional.h"
 #include "../../Application/Configuration/AGlobalConfig.h"
+#include "glm/geometric.hpp"
 
 LightDirectional::LightDirectional(const glm::vec3 &direction, const glm::vec3 &color, float intensity)
         : RenderableLight(LIGHT_TYPE_DIRECTIONAL, color, intensity),
-          Direction(direction) {
+          Direction(glm::normalize(direction)) {
 
 }
 
-LightDirectional::LightDirectional(const glm::vec3 &direction, const glm::vec3 &color)
-        : RenderableLight(LIGHT_TYPE_DIRECTIONAL, color),
-          Direction(direction) {
+LightDirectional::LightDirectional(const glm::vec3 &direction, const glm::vec3 &color) :
+        LightDirectional(direction,
+                         color,
+                         DEF_LIGHT_INTENSITY) {
 
 }
 
-LightDirectional::LightDirectional(const glm::vec3 &direction) : RenderableLight(LIGHT_TYPE_DIRECTIONAL),
-                                                                 Direction(direction) {
+LightDirectional::LightDirectional(const glm::vec3 &direction) :
+        LightDirectional(direction, DEF_LIGHT_COLOR,
+                         DEF_LIGHT_INTENSITY) {
 
 }
 
-LightDirectional::LightDirectional() : RenderableLight(LIGHT_TYPE_DIRECTIONAL),
-                                       Direction(DEF_LIGHT_DIRECTIONAL_DIRECTION) {
+LightDirectional::LightDirectional() : LightDirectional(DEF_LIGHT_DIRECTIONAL_DIRECTION,
+                                                        DEF_LIGHT_COLOR,
+                                                        DEF_LIGHT_INTENSITY) {
 
 }
 

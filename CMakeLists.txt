@@ -85,5 +85,7 @@ add_executable(zpg_test main.cpp
         Shaders/Lighting/LightDirectional.h
         Shaders/Lighting/LightSpot.cpp
         Shaders/Lighting/LightSpot.h
+        Shaders/Lighting/Uniforms/LightArrayDirectionalUniform.cpp
+        Shaders/Lighting/Uniforms/LightArrayDirectionalUniform.h
 )
 target_link_libraries(zpg_test ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw glm::glm)

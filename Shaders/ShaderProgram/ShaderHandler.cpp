@@ -8,6 +8,7 @@
 #include <iostream>
 #include "ShaderHandler.h"
 #include "../../Application/Configuration/AGlobalConfig.h"
+#include "../Lighting/LightDirectional.h"
 
 
 ShaderHandler::ShaderHandler() : ShaderBase(),
@@ -19,7 +20,8 @@ ShaderHandler::ShaderHandler() : ShaderBase(),
 
                                  NormalMatrixLocation(-2),
 
-                                 LightsArraySizeLocation(-2),
+                                 LightsArrayPoint_SizeLocation(-2),
+                                 LightsArrayDirectional_SizeLocation(-2),
 
                                  AmbientColorLocation(-2),
                                  DiffuseColorLocation(-2),
@@ -41,11 +43,13 @@ ShaderHandler::ShaderHandler(ShaderHandler &&other) noexcept {
     Name = std::move(other.Name);
     AmbientColorLocation = other.AmbientColorLocation;
     DiffuseColorLocation = other.DiffuseColorLocation;
-    LightsArrayUniformLocation = other.LightsArrayUniformLocation;
+    LightsArrayPoint_UniformLocation = other.LightsArrayPoint_UniformLocation;
     HaveLightsChanged = other.HaveLightsChanged;
+    LightsArrayDirectional_SizeLocation = other.LightsArrayDirectional_SizeLocation;
+    LightsArrayDirectional_UniformLocation = other.LightsArrayDirectional_UniformLocation;
 
 
-    other.LightsArrayUniformLocation = {};
+    other.LightsArrayPoint_UniformLocation = {};
     other.ModelMatrixLocation = 0;
     other.ViewMatrixLocation = 0;
     other.ProjectionMatrixLocation = 0;
@@ -70,10 +74,12 @@ ShaderHandler &ShaderHandler::operator=(ShaderHandler &&other) noexcept {
     Name = std::move(other.Name);
     AmbientColorLocation = other.AmbientColorLocation;
     DiffuseColorLocation = other.DiffuseColorLocation;
-    LightsArrayUniformLocation = other.LightsArrayUniformLocation;
+    LightsArrayPoint_UniformLocation = other.LightsArrayPoint_UniformLocation;
     HaveLightsChanged = other.HaveLightsChanged;
+    LightsArrayDirectional_SizeLocation = other.LightsArrayDirectional_SizeLocation;
+    LightsArrayDirectional_UniformLocation = other.LightsArrayDirectional_UniformLocation;
 
-    other.LightsArrayUniformLocation = {};
+    other.LightsArrayPoint_UniformLocation = {};
     other.ModelMatrixLocation = 0;
     other.ViewMatrixLocation = 0;
     other.ProjectionMatrixLocation = 0;
@@ -125,10 +131,10 @@ ShaderHandler &ShaderHandler::SaveObjectMaterialLocation() {
 
 ShaderHandler &ShaderHandler::SaveLightingLocation() {
 
-    this->LightsArraySizeLocation = GetUniformLocation(DEF_SHADER_LIGHTS_POINT_ARRAY_LOCATION_SIZE_NAME);
-
-    if (LightsArraySizeLocation == -1) {
-        std::cerr << "SHADER ERROR: LIGHTS ARRAY NOT FOUND IN SHADER CODE, BUT WAS EXPECTED." << std::endl;
+    //Point Lights
+    this->LightsArrayPoint_SizeLocation = GetUniformLocation(DEF_SHADER_LIGHTS_POINT_ARRAY_LOCATION_SIZE_NAME);
+    if (LightsArrayPoint_SizeLocation == -1) {
+        std::cerr << "SHADER ERROR: *POINT* LIGHTS ARRAY NOT FOUND IN SHADER CODE, BUT WAS EXPECTED." << std::endl;
         this->PrintName();
     } else {
         std::string lightsArrayBaseName = DEF_SHADER_LIGHTS_POINT_ARRAY_LOCATION_NAME;
@@ -148,7 +154,45 @@ ShaderHandler &ShaderHandler::SaveLightingLocation() {
             locations.quadratic = GetUniformLocation((lightName +
                                                       DEF_SHADER_LIGHTS_ARRAY_LOCATION_ATTN_QUADRATIC_NAME).c_str());
 
-            LightsArrayUniformLocation.push_back(locations);
+            if (locations.position == -1 || locations.color == -1 || locations.intensity == -1 ||
+                locations.constant == -1 || locations.linear == -1 || locations.quadratic == -1) {
+                std::cerr
+                        << "SHADER ERROR: *POINT* LIGHTS ARRAY *ELEMENTS* NOT FOUND IN SHADER CODE, BUT WERE EXPECTED."
+                        << std::endl;
+                this->PrintName();
+            } else {
+                LightsArrayPoint_UniformLocation.push_back(locations);
+            }
+        }
+    }
+
+    //Directional Lights
+    this->LightsArrayDirectional_SizeLocation = GetUniformLocation(
+            DEF_SHADER_LIGHTS_DIRECTIONAL_ARRAY_LOCATION_SIZE_NAME);
+    if (LightsArrayDirectional_SizeLocation == -1) {
+        std::cerr << "SHADER ERROR: *DIRECTIONAL* LIGHTS ARRAY NOT FOUND IN SHADER CODE, BUT WAS EXPECTED."
+                  << std::endl;
+        this->PrintName();
+    } else {
+        std::string lightsArrayBaseName = DEF_SHADER_LIGHTS_DIRECTIONAL_ARRAY_LOCATION_NAME;
+        for (int i = 0; i < DEF_SHADER_LIGHTS_ARRAY_LOCATION_ARRAY_SIZE; i++) {
+            std::string lightName = lightsArrayBaseName + "[" + std::to_string(i) + "].";
+            LightArrayDirectionalUniform locations{};
+            locations.direction = GetUniformLocation((lightName +
+                                                      DEF_SHADER_LIGHTS_ARRAY_LOCATION_DIRECTION_NAME).c_str());
+            locations.color = GetUniformLocation((lightName +
+                                                  DEF_SHADER_LIGHTS_ARRAY_LOCATION_COLOR_NAME).c_str());
+            locations.intensity = GetUniformLocation((lightName +
+                                                      DEF_SHADER_LIGHTS_ARRAY_LOCATION_INTENSITY_NAME).c_str());
+
+            if (locations.direction == -1 || locations.color == -1 || locations.intensity == -1) {
+                std::cerr
+                        << "SHADER ERROR: *DIRECTIONAL* LIGHTS ARRAY *ELEMENTS* NOT FOUND IN SHADER CODE, BUT WERE EXPECTED."
+                        << std::endl;
+                this->PrintName();
+            } else {
+                LightsArrayDirectional_UniformLocation.push_back(locations);
+            }
         }
     }
 
@@ -196,19 +240,58 @@ void ShaderHandler::RenderNormalMatrix(const glm::mat4 &modelMatrix) const {
 
 void ShaderHandler::RenderLightsArray(
         const std::shared_ptr<std::vector<std::shared_ptr<RenderableLight>>> &lightsVector) const {
-    SendToShader(LightsArraySizeLocation, static_cast<int>(lightsVector->size()));
 
-    for (int i = 0; i < lightsVector->size(); i++) {
-        const auto *light = static_cast<const LightPoint *>(lightsVector->at(i).get());
-        const auto &lightArrayIndexlocation = LightsArrayUniformLocation.at(i);
+    int pointLightsCount = 0;
+    int directionalLightsCount = 0;
+    int spotLightsCount = 0;
+    for (auto &i: *lightsVector) {
+        switch (i->GetType()) {
+            case LIGHT_TYPE_POINT: {
+                const auto *light = static_cast<const LightPoint *>(i.get());
 
-        SendToShader(lightArrayIndexlocation.position, light->GetPosition());
-        SendToShader(lightArrayIndexlocation.color, light->GetColor());
-        SendToShader(lightArrayIndexlocation.intensity, light->GetIntensity());
-        SendToShader(lightArrayIndexlocation.constant, light->GetConstant());
-        SendToShader(lightArrayIndexlocation.linear, light->GetLinear());
-        SendToShader(lightArrayIndexlocation.quadratic, light->GetQuadratic());
+                if (pointLightsCount >= LightsArrayPoint_UniformLocation.size()) {
+                    std::cerr << "SHADER ERROR: POINT LIGHTS ARRAY SIZE IS SMALLER THAN LIGHTS VECTOR SIZE"
+                              << std::endl;
+                    this->PrintName();
+                    continue;
+                }
+
+                const auto &lightArrayIndexlocation = LightsArrayPoint_UniformLocation.at(pointLightsCount++);
+
+                SendToShader(lightArrayIndexlocation.position, light->GetPosition());
+                SendToShader(lightArrayIndexlocation.color, light->GetColor());
+                SendToShader(lightArrayIndexlocation.intensity, light->GetIntensity());
+                SendToShader(lightArrayIndexlocation.constant, light->GetConstant());
+                SendToShader(lightArrayIndexlocation.linear, light->GetLinear());
+                SendToShader(lightArrayIndexlocation.quadratic, light->GetQuadratic());
+                break;
+            }
+            case LIGHT_TYPE_DIRECTIONAL: {
+                const auto *light = static_cast<const LightDirectional *>(i.get());
+
+                if (directionalLightsCount >= LightsArrayDirectional_UniformLocation.size()) {
+                    std::cerr << "SHADER ERROR: DIRECTIONAL LIGHTS ARRAY SIZE IS SMALLER THAN LIGHTS VECTOR SIZE"
+                              << std::endl;
+                    this->PrintName();
+                    continue;
+                }
+
+                const auto &lightArrayIndexlocation = LightsArrayDirectional_UniformLocation.at(
+                        directionalLightsCount++);
+
+                SendToShader(lightArrayIndexlocation.direction, light->GetDirection());
+                SendToShader(lightArrayIndexlocation.color, light->GetColor());
+                SendToShader(lightArrayIndexlocation.intensity, light->GetIntensity());
+                break;
+            }
+            case LIGHT_TYPE_SPOT:
+                break;
+        }
+
     }
+
+    SendToShader(LightsArrayPoint_SizeLocation, pointLightsCount);
+    SendToShader(LightsArrayDirectional_SizeLocation, directionalLightsCount);
 }
 
 #pragma clang diagnostic pop
@@ -228,7 +311,7 @@ void ShaderHandler::RenderCameraLocation() const {
 }
 
 void ShaderHandler::RequestRenderBaseLightsArray() {
-    if (LightsArraySizeLocation != -2) {
+    if (LightsArrayPoint_SizeLocation != -2 && LightsArrayDirectional_SizeLocation != -2) {
         std::shared_ptr<std::vector<std::shared_ptr<RenderableLight>>> lightsVectorPtr = this->SelectedLightsFromMap.lock();
         if (lightsVectorPtr == nullptr) {
             std::cerr << "SHADER ERROR: LIGHTS ARRAY FROM MAP NOT LINKED" << std::endl;

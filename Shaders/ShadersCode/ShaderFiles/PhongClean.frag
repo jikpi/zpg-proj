@@ -24,6 +24,15 @@ struct LightPoint {
 uniform LightPoint LightPointArray[LIGHTS_SIZE_MAX];
 uniform int LightPointSize;
 
+struct LightDirectional {
+    vec3 direction;
+    vec3 color;
+    float intensity;
+};
+
+uniform LightDirectional LightDirectionalArray[LIGHTS_SIZE_MAX];
+uniform int LightDirectionalSize;
+
 void main () {
     //(n) for Idiffuse, normalised normal
     vec3 n_ = normalize(toFrag_worldNormal);
@@ -34,6 +43,7 @@ void main () {
     // (c) for Ispecular, direction from fragment to camera
     vec3 c_ = normalize(toFrag_eyePosition - toFrag_worldPosition.xyz);
 
+    // Point lights
     for (int i = 0; i < LightPointSize; i++) {
         // (l) for Idiffuse, normalized direction from the surface point to the light source
         vec3 l_ = normalize(LightPointArray[i].position - toFrag_worldPosition.xyz);
@@ -49,7 +59,7 @@ void main () {
         // (r_) for Ispecular, reflection direction.
         vec3 r_;
 
-        //check if the light is behind the fragment
+        // Check if the light is behind the fragment
         if(diffuse_dotp_nonmaxd < 0.0)
         {
             r_ = vec3(0.0, 0.0, 0.0);
@@ -68,8 +78,38 @@ void main () {
         // ### Ispecular  Is *       rs     *     max(0,r_ x c_)^shineValue
         vec3 Ispecular = Is * specularColor * pow(max(dot(r_,c_), 0.0), shineValue);
 
-        //sum the diffuse and specular components, ambient is added once
+        // Sum the diffuse and specular components, ambient is added once
         combinedColor += (Idiffuse + Ispecular) * attn;
+    }
+
+    // Directional lights
+    for (int i = 0; i < LightDirectionalSize; i++) {
+        // (l) for Idiffuse, the direction from the light source
+        vec3 l_ = normalize(-LightDirectionalArray[i].direction);//negated direction
+
+        float diffuse_dotp_nonmaxd = dot(n_, l_);
+        float diffuse_dotp_maxd = max(diffuse_dotp_nonmaxd, 0.0);  //how strong the light is based on the angle
+
+        // (r_) for Ispecular, reflection direction.
+        vec3 r_;
+        if(diffuse_dotp_nonmaxd < 0.0) {
+            r_ = vec3(0.0, 0.0, 0.0);
+        } else {
+            r_ = reflect(-l_, n_);
+        }
+
+        // ### Idiffuse             Id                 *       rd     *     max(0,n_ x l_)
+        vec3 Idiffuse = LightDirectionalArray[i].color * diffuseColor * diffuse_dotp_maxd;
+        Idiffuse *= LightDirectionalArray[i].intensity;
+
+        // Is
+        vec3 Is = LightDirectionalArray[i].color * LightDirectionalArray[i].intensity;
+
+        // ### Ispecular  Is *       rs     *     max(0,r_ x c_)^shineValue
+        vec3 Ispecular = Is * specularColor * pow(max(dot(r_,c_), 0.0), shineValue);
+
+        // Sum the diffuse and specular components, ambient is added once
+        combinedColor += (Idiffuse + Ispecular);
     }
 
     out_frag_Color = vec4(combinedColor, 1.0);

@@ -23,6 +23,7 @@
 
 //Models
 #include "../ExtResources/LessonResources/InclLessonModels.h"
+#include "../Shaders/Lighting/LightDirectional.h"
 
 
 Engine::Engine() = default;
@@ -196,14 +197,14 @@ void Engine::TestLaunch() {
     this->EngineMapManager.SetFallbackShader(SelectShader("Phong"));
     this->CameraMain->RegisterCameraObserver(Shaders.at(0));
 
-    this->Shaders.push_back(ShaderHandlerFactory::Lambert());
-    this->CameraMain->RegisterCameraObserver(Shaders.at(1));
-
-    this->Shaders.push_back(ShaderHandlerFactory::ConstantColored());
-    this->CameraMain->RegisterCameraObserver(Shaders.at(2));
-
-    this->Shaders.push_back(ShaderHandlerFactory::BlinnPhong());
-    this->CameraMain->RegisterCameraObserver(Shaders.at(3));
+//    this->Shaders.push_back(ShaderHandlerFactory::Lambert());
+//    this->CameraMain->RegisterCameraObserver(Shaders.at(1));
+//
+//    this->Shaders.push_back(ShaderHandlerFactory::ConstantColored());
+//    this->CameraMain->RegisterCameraObserver(Shaders.at(2));
+//
+//    this->Shaders.push_back(ShaderHandlerFactory::BlinnPhong());
+//    this->CameraMain->RegisterCameraObserver(Shaders.at(3));
 
     //Models
 
@@ -255,7 +256,7 @@ void Engine::TestLaunch() {
     objectSphere4->SetShaderProgram(PhongShader);
     this->EngineMapManager.AddObjectToMap(0, objectSphere4);
 
-    this->EngineMapManager.AddLightToMap(0, std::make_shared<LightPoint>(glm::vec3(0.0f, 0.0f, 0.0f)));
+    EngineMapManager.AddLightToMap(0, std::make_shared<LightPoint>(glm::vec3(0.0f, 0.0f, 0.0f)));
     EngineMapManager.GetMapByIndex(0)->GetObject(0)->InsertTransfMove(glm::vec3(-2.0f, 0.0f, 0.0f)).ConsolidateTransf();
     EngineMapManager.GetMapByIndex(0)->GetObject(1)->InsertTransfMove(glm::vec3(0.0f, 0.0f, 2.0f)).ConsolidateTransf();
     EngineMapManager.GetMapByIndex(0)->GetObject(2)->InsertTransfMove(glm::vec3(2.0f, 0.0f, 0.0f)).ConsolidateTransf();
@@ -397,6 +398,8 @@ void Engine::TestLaunch() {
         material.ShineValue = (float) rand() / RAND_MAX * 245 + 10;
         return material;
     };
+
+
 
     this->EngineMapManager.CreateNewMap("Many objects");
     EngineMapManager.AddLightToMap("Many objects", std::make_shared<LightPoint>(glm::vec3(0.0f, 3.0f, 0.0f)));
