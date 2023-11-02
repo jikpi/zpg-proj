@@ -56,8 +56,8 @@ add_executable(zpg_test main.cpp
         Application/Configuration/AGlobalConfig.cpp
         Shaders/ShadersCode/Loader/ShaderFileLoader.cpp
         Shaders/ShadersCode/Loader/ShaderFileLoader.h
-        Shaders/Lighting/Light.cpp
-        Shaders/Lighting/Light.h
+        Shaders/Lighting/LightPoint.cpp
+        Shaders/Lighting/LightPoint.h
         Application/ObjectsManager/ShaderLinking/MapToShaderLinker.cpp
         Application/ObjectsManager/ShaderLinking/MapToShaderLinker.h
         Application/ObjectsManager/ShaderLinking/ShaderObjectSet/ShaderObjectSet.cpp
@@ -78,5 +78,8 @@ add_executable(zpg_test main.cpp
         Application/ObjectsManager/Map/PremadeMaps/PremadeMapsFactory.cpp
         Application/ObjectsManager/Map/PremadeMaps/PremadeMapsFactory.h
         ExtResources/LessonResources/InclLessonModels.h
+        Shaders/Lighting/Abstract/RenderableLight.cpp
+        Shaders/Lighting/Abstract/RenderableLight.h
+        Shaders/Lighting/Abstract/LightType.h
 )
 target_link_libraries(zpg_test ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw glm::glm)

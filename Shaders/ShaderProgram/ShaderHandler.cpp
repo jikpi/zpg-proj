@@ -191,19 +191,19 @@ void ShaderHandler::RenderNormalMatrix(const glm::mat4 &modelMatrix) const {
     SendToShader(NormalMatrixLocation, normalMatrix);
 }
 
-void ShaderHandler::RenderLightsArray(const std::shared_ptr<std::vector<std::shared_ptr<Light>>> &lightsVector) const {
+void ShaderHandler::RenderLightsArray(const std::shared_ptr<std::vector<std::shared_ptr<LightPoint>>> &lightsVector) const {
     SendToShader(LightsArraySizeLocation, static_cast<int>(lightsVector->size()));
 
     for (int i = 0; i < lightsVector->size(); i++) {
         const auto &light = lightsVector->at(i);
         const auto &lightArrayIndexlocation = LightsArrayUniformLocation.at(i);
 
-        SendToShader(lightArrayIndexlocation.position, light->getPosition());
-        SendToShader(lightArrayIndexlocation.color, light->getColor());
-        SendToShader(lightArrayIndexlocation.intensity, light->getIntensity());
-        SendToShader(lightArrayIndexlocation.constant, light->getConstant());
-        SendToShader(lightArrayIndexlocation.linear, light->getLinear());
-        SendToShader(lightArrayIndexlocation.quadratic, light->getQuadratic());
+        SendToShader(lightArrayIndexlocation.position, light->GetPosition());
+        SendToShader(lightArrayIndexlocation.color, light->GetColor());
+        SendToShader(lightArrayIndexlocation.intensity, light->GetIntensity());
+        SendToShader(lightArrayIndexlocation.constant, light->GetConstant());
+        SendToShader(lightArrayIndexlocation.linear, light->GetLinear());
+        SendToShader(lightArrayIndexlocation.quadratic, light->GetQuadratic());
     }
 }
 
@@ -223,7 +223,7 @@ void ShaderHandler::RenderCameraLocation() const {
 
 void ShaderHandler::RequestRenderBaseLightsArray() {
     if (LightsArraySizeLocation != -2) {
-        std::shared_ptr<std::vector<std::shared_ptr<Light>>> lightsVectorPtr = this->SelectedLightsFromMap.lock();
+        std::shared_ptr<std::vector<std::shared_ptr<LightPoint>>> lightsVectorPtr = this->SelectedLightsFromMap.lock();
         if (lightsVectorPtr == nullptr) {
             std::cerr << "SHADER ERROR: LIGHTS ARRAY FROM MAP NOT LINKED" << std::endl;
             this->PrintName();
@@ -272,7 +272,7 @@ void ShaderHandler::PrintName() const {
     ShaderBase::PrintName();
 }
 
-void ShaderHandler::SetLights(std::shared_ptr<std::vector<std::shared_ptr<Light>>> &lights) {
+void ShaderHandler::SetLights(std::shared_ptr<std::vector<std::shared_ptr<LightPoint>>> &lights) {
     this->SelectedLightsFromMap = lights;
     HaveLightsChanged = true;
 }

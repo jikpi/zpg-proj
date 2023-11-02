@@ -255,7 +255,7 @@ void Engine::TestLaunch() {
     objectSphere4->SetShaderProgram(PhongShader);
     this->EngineMapManager.AddObjectToMap(0, objectSphere4);
 
-    this->EngineMapManager.AddLightToMap(0, std::make_shared<Light>(glm::vec3(0.0f, 0.0f, 0.0f)));
+    this->EngineMapManager.AddLightToMap(0, std::make_shared<LightPoint>(glm::vec3(0.0f, 0.0f, 0.0f)));
     EngineMapManager.GetMapByIndex(0)->GetObject(0)->InsertTransfMove(glm::vec3(-2.0f, 0.0f, 0.0f)).ConsolidateTransf();
     EngineMapManager.GetMapByIndex(0)->GetObject(1)->InsertTransfMove(glm::vec3(0.0f, 0.0f, 2.0f)).ConsolidateTransf();
     EngineMapManager.GetMapByIndex(0)->GetObject(2)->InsertTransfMove(glm::vec3(2.0f, 0.0f, 0.0f)).ConsolidateTransf();
@@ -270,7 +270,7 @@ void Engine::TestLaunch() {
 
     this->EngineMapManager.CreateNewMap("Solar system");
 
-    this->EngineMapManager.AddLightToMap(1, std::make_shared<Light>(glm::vec3(0.0f, 0.0f, 0.0f)));
+    this->EngineMapManager.AddLightToMap(1, std::make_shared<LightPoint>(glm::vec3(0.0f, 0.0f, 0.0f)));
 
     //Sun
     std::shared_ptr<StandardisedModel> objectSun = ModelFactory::PositionNormal(rawmodel1_sphere, size,
@@ -353,7 +353,7 @@ void Engine::TestLaunch() {
     preparedModelSingleSphere->SetShaderProgram(PhongShader);
     this->EngineMapManager.AddObjectToMap(EngineMapManager.GetMapByName("1 sphere"), preparedModelSingleSphere);
 
-    this->EngineMapManager.AddLightToMap("1 sphere", std::make_shared<Light>(glm::vec3(0.0f, 0.0f, -3.0f)));
+    this->EngineMapManager.AddLightToMap("1 sphere", std::make_shared<LightPoint>(glm::vec3(0.0f, 0.0f, -3.0f)));
 
     //Map 4 - Screen aspect ratio test
     this->EngineMapManager.CreateNewMap("Aspect");
@@ -372,7 +372,7 @@ void Engine::TestLaunch() {
     preparedModelAspectGift->InsertTransfMove(glm::vec3(-3.0f, 0.0f, 0.0f)).ConsolidateTransf();
     this->EngineMapManager.AddObjectToMap("Aspect", preparedModelAspectGift);
 
-    this->EngineMapManager.AddLightToMap("Aspect", std::make_shared<Light>(glm::vec3(0.0f, 0.0f, -3.0f)));
+    this->EngineMapManager.AddLightToMap("Aspect", std::make_shared<LightPoint>(glm::vec3(0.0f, 0.0f, -3.0f)));
 
     //Map 5 - many objects
 
@@ -399,9 +399,9 @@ void Engine::TestLaunch() {
     };
 
     this->EngineMapManager.CreateNewMap("Many objects");
-    EngineMapManager.AddLightToMap("Many objects", std::make_shared<Light>(glm::vec3(0.0f, 3.0f, 0.0f)));
-    EngineMapManager.GetMapByName("Many objects")->GetLight(0)->setLinear(0.01f);
-    EngineMapManager.GetMapByName("Many objects")->GetLight(0)->setQuadratic(0.01f);
+    EngineMapManager.AddLightToMap("Many objects", std::make_shared<LightPoint>(glm::vec3(0.0f, 3.0f, 0.0f)));
+    EngineMapManager.GetMapByName("Many objects")->GetLight(0)->SetLinear(0.01f);
+    EngineMapManager.GetMapByName("Many objects")->GetLight(0)->SetQuadratic(0.01f);
 
     std::shared_ptr<StandardisedModel> preparedModelGround = ModelFactory::PositionNormal(rawmodel6_plain, size6,
                                                                                           "Ground");

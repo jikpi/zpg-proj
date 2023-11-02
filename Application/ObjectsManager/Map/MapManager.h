@@ -16,7 +16,7 @@ private:
 
 
     void MasterAddObjectToMap(std::shared_ptr<Map> &map, const std::shared_ptr<StandardisedModel>& object);
-    void MasterAddLightToMap(std::shared_ptr<Map> &map, const std::shared_ptr<Light>& light);
+    void MasterAddLightToMap(std::shared_ptr<Map> &map, const std::shared_ptr<LightPoint>& light);
     std::shared_ptr<Map> ActiveMap;
     std::vector<std::shared_ptr<Map>> Maps;
 public:
@@ -37,13 +37,13 @@ public:
     void AddObjectToMap(const std::string &mapName, const std::shared_ptr<StandardisedModel>& object);
     void AddObjectToCurrentMap(const std::shared_ptr<StandardisedModel>& object);
 
-    void AddLightToMap(int index, const std::shared_ptr<Light>& light);
-    void AddLightToMap(std::shared_ptr<Map> &map, const std::shared_ptr<Light>& light);
-    void AddLightToMap(const std::string &name, const std::shared_ptr<Light>& light);
-    void AddLightToCurrentMap(const std::shared_ptr<Light>& light);
+    void AddLightToMap(int index, const std::shared_ptr<LightPoint>& light);
+    void AddLightToMap(std::shared_ptr<Map> &map, const std::shared_ptr<LightPoint>& light);
+    void AddLightToMap(const std::string &name, const std::shared_ptr<LightPoint>& light);
+    void AddLightToCurrentMap(const std::shared_ptr<LightPoint>& light);
 
-    std::shared_ptr<Light> & GetLightOnMap(int mapIndex, int lightIndex);
-    void ChangeLightOnMap(int mapIndex, int lightIndex, const std::shared_ptr<Light>& light);
+    std::shared_ptr<LightPoint> & GetLightOnMap(int mapIndex, int lightIndex);
+    void ChangeLightOnMap(int mapIndex, int lightIndex, const std::shared_ptr<LightPoint>& light);
 
     void ChangeMap(std::shared_ptr<Map> &map);
     void ChangeMap(int index);

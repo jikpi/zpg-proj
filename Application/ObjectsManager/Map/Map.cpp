@@ -9,7 +9,7 @@
 
 Map::Map(std::string name) {
     this->Name = std::move(name);
-    Lights = std::make_shared<std::vector<std::shared_ptr<Light>>>();
+    Lights = std::make_shared<std::vector<std::shared_ptr<LightPoint>>>();
 }
 
 std::string Map::GetName() const {
@@ -39,7 +39,7 @@ unsigned long Map::GetObjectCount() {
     return Objects.size();
 }
 
-void Map::InsertLight(const std::shared_ptr<Light> &light) {
+void Map::InsertLight(const std::shared_ptr<LightPoint> &light) {
     Lights->push_back(light);
 
 }
@@ -48,10 +48,10 @@ unsigned long Map::GetLightCount() {
     return Lights->size();
 }
 
-std::shared_ptr<Light> &Map::GetLight(int index) {
+std::shared_ptr<LightPoint> &Map::GetLight(int index) {
     return Lights->at(index);
 }
 
-void Map::ChangeLight(int index, const std::shared_ptr<Light> &light) {
+void Map::ChangeLight(int index, const std::shared_ptr<LightPoint> &light) {
     Lights->at(index) = light;
 }

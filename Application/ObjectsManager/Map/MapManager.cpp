@@ -101,33 +101,33 @@ void MapManager::AddObjectToCurrentMap(const std::shared_ptr<StandardisedModel> 
 
 // Lights ############################################################################################################
 
-void MapManager::MasterAddLightToMap(std::shared_ptr<Map> &map, const std::shared_ptr<Light> &light) {
+void MapManager::MasterAddLightToMap(std::shared_ptr<Map> &map, const std::shared_ptr<LightPoint> &light) {
     map->InsertLight(light);
     if (map == this->ActiveMap) {
         ShaderLinker.NotifyLightsOnCurrentMapChanged();
     }
 }
 
-void MapManager::AddLightToMap(std::shared_ptr<Map> &map, const std::shared_ptr<Light> &light) {
+void MapManager::AddLightToMap(std::shared_ptr<Map> &map, const std::shared_ptr<LightPoint> &light) {
     this->MasterAddLightToMap(map, light);
 }
 
-void MapManager::AddLightToMap(int index, const std::shared_ptr<Light> &light) {
+void MapManager::AddLightToMap(int index, const std::shared_ptr<LightPoint> &light) {
     this->MasterAddLightToMap(GetMapByIndex(index), light);
 }
 
-void MapManager::AddLightToCurrentMap(const std::shared_ptr<Light> &light) {
+void MapManager::AddLightToCurrentMap(const std::shared_ptr<LightPoint> &light) {
     this->MasterAddLightToMap(this->ActiveMap, light);
 }
 
-void MapManager::AddLightToMap(const std::string &name, const std::shared_ptr<Light> &light) {
+void MapManager::AddLightToMap(const std::string &name, const std::shared_ptr<LightPoint> &light) {
     std::shared_ptr<Map> &map = this->GetMapByName(name);
     this->MasterAddLightToMap(map, light);
 }
 
-std::shared_ptr<Light> & MapManager::GetLightOnMap(int mapIndex, int lightIndex) {
+std::shared_ptr<LightPoint> & MapManager::GetLightOnMap(int mapIndex, int lightIndex) {
     std::shared_ptr<Map> &map = this->GetMapByIndex(mapIndex);
-    std::shared_ptr<Light> &light = map->GetLight(lightIndex);
+    std::shared_ptr<LightPoint> &light = map->GetLight(lightIndex);
 
     if(map == this->ActiveMap)
     {
@@ -137,7 +137,7 @@ std::shared_ptr<Light> & MapManager::GetLightOnMap(int mapIndex, int lightIndex)
     return light;
 }
 
-void MapManager::ChangeLightOnMap(int mapIndex, int lightIndex, const std::shared_ptr<Light> &light) {
+void MapManager::ChangeLightOnMap(int mapIndex, int lightIndex, const std::shared_ptr<LightPoint> &light) {
     std::shared_ptr<Map> &map = this->GetMapByIndex(mapIndex);
     map->ChangeLight(lightIndex, light);
 

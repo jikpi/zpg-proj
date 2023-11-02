@@ -1,0 +1,14 @@
+//
+// Created by KOP0269 on 11/2/23.
+//
+
+#ifndef ZPG_TEST_LIGHTTYPE_H
+#define ZPG_TEST_LIGHTTYPE_H
+
+enum LightType {
+    LIGHT_TYPE_POINT,
+    LIGHT_TYPE_DIRECTIONAL,
+    LIGHT_TYPE_SPOT
+};
+
+#endif //ZPG_TEST_LIGHTTYPE_H
