@@ -16,7 +16,7 @@
 #include "../Lighting/Light.h"
 #include "../../Model/Material.h"
 #include "../../Model/Abstract/RenderableObject.h"
-#include "../Lighting/LightsArrayUniform.h"
+#include "../Lighting/Uniforms/LightsArrayPointUniform.h"
 #include "ShaderBase/ShaderBase.h"
 
 
@@ -50,7 +50,7 @@ private:
     GLint CameraLocationLocation{};
     //Lights
     GLint LightsArraySizeLocation{};
-    std::vector<LightsArrayUniform> LightsArrayUniformLocation;
+    std::vector<LightsArrayPointUniform> LightsArrayUniformLocation;
 
     //Object Material
     GLint AmbientColorLocation{};

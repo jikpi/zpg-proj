@@ -12,7 +12,7 @@ uniform vec3 ambientColor = vec3(0.1, 0.1, 0.1);// ambient color
 uniform vec3 specularColor = vec3(1.0, 1.0, 1.0);// spec color
 uniform float shineValue = 255;//10 - 256, more shine
 
-struct Light {
+struct LightPoint {
     vec3 position;
     vec3 color;
     float intensity;
@@ -21,8 +21,8 @@ struct Light {
     float quadratic;
 };
 
-uniform Light lightsArray[LIGHTS_SIZE_MAX];
-uniform int lightsArraySize;
+uniform LightPoint LightPointArray[LIGHTS_SIZE_MAX];
+uniform int LightPointSize;
 
 void main () {
     //(n) for Idiffuse, normalised normal
@@ -34,13 +34,13 @@ void main () {
     // (c) for Ispecular, direction from fragment to camera
     vec3 c_ = normalize(toFrag_eyePosition - toFrag_worldPosition.xyz);
 
-    for (int i = 0; i < lightsArraySize; i++) {
+    for (int i = 0; i < LightPointSize; i++) {
         // (l) for Idiffuse, normalized direction from the surface point to the light source
-        vec3 l_ = normalize(lightsArray[i].position - toFrag_worldPosition.xyz);
+        vec3 l_ = normalize(LightPointArray[i].position - toFrag_worldPosition.xyz);
 
-        float distance = length(lightsArray[i].position - toFrag_worldPosition.xyz);//distance from light to fragment
-        float attn = 1.0 / (lightsArray[i].constant + lightsArray[i].linear *
-        distance + lightsArray[i].quadratic * distance * distance);//attenuation
+        float distance = length(LightPointArray[i].position - toFrag_worldPosition.xyz);//distance from light to fragment
+        float attn = 1.0 / (LightPointArray[i].constant + LightPointArray[i].linear *
+        distance + LightPointArray[i].quadratic * distance * distance);//attenuation
 
         float diffuse_dotp_nonmaxd = dot(n_, l_);
         float diffuse_dotp_maxd = max(diffuse_dotp_nonmaxd, 0.0);//how strong the light is based on the angle
@@ -60,10 +60,10 @@ void main () {
         }
 
         // ### Idiffuse             Id       *      rd     *     max(0,n_ x l_)
-        vec3 Idiffuse = lightsArray[i].color * diffuseColor * diffuse_dotp_maxd;
+        vec3 Idiffuse = LightPointArray[i].color * diffuseColor * diffuse_dotp_maxd;
 
         // Is
-        vec3 Is = lightsArray[i].color * lightsArray[i].intensity;
+        vec3 Is = LightPointArray[i].color * LightPointArray[i].intensity;
 
         // ### Ispecular  Is *       rs     *     max(0,r_ x c_)^shineValue
         vec3 Ispecular = Is * specularColor * pow(max(dot(r_,c_), 0.0), shineValue);

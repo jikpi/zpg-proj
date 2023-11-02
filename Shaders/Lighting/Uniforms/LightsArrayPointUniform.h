@@ -2,13 +2,13 @@
 // Created by KOP0269 on 10/27/23.
 //
 
-#ifndef ZPG_TEST_LIGHTSARRAYUNIFORM_H
-#define ZPG_TEST_LIGHTSARRAYUNIFORM_H
+#ifndef ZPG_TEST_LIGHTSARRAYPOINTUNIFORM_H
+#define ZPG_TEST_LIGHTSARRAYPOINTUNIFORM_H
 
 
 #include <GL/glew.h>
 
-class LightsArrayUniform {
+class LightsArrayPointUniform {
 public:
     GLint position;
     GLint color;
@@ -19,4 +19,4 @@ public:
 };
 
 
-#endif //ZPG_TEST_LIGHTSARRAYUNIFORM_H
+#endif //ZPG_TEST_LIGHTSARRAYPOINTUNIFORM_H

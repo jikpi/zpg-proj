@@ -24,8 +24,8 @@ inline constexpr const char *DEF_SHADER_NORMAL_MATRIX_NAME = "normalMatrix";
 inline constexpr const char *DEF_SHADER_CAMERA_LOCATION_NAME = "cameraLocation";
 //Lights array
 inline constexpr const int DEF_SHADER_LIGHTS_ARRAY_LOCATION_ARRAY_SIZE = 16;
-inline constexpr const char *DEF_SHADER_LIGHTS_ARRAY_LOCATION_SIZE_NAME = "lightsArraySize";
-inline constexpr const char *DEF_SHADER_LIGHTS_ARRAY_LOCATION_NAME = "lightsArray";
+inline constexpr const char *DEF_SHADER_LIGHTS_POINT_ARRAY_LOCATION_SIZE_NAME = "LightPointSize";
+inline constexpr const char *DEF_SHADER_LIGHTS_POINT_ARRAY_LOCATION_NAME = "LightPointArray";
 inline constexpr const char *DEF_SHADER_LIGHTS_ARRAY_LOCATION_POSITION_NAME = "position";
 inline constexpr const char *DEF_SHADER_LIGHTS_ARRAY_LOCATION_COLOR_NAME = "color";
 inline constexpr const char *DEF_SHADER_LIGHTS_ARRAY_LOCATION_INTENSITY_NAME = "intensity";

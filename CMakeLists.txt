@@ -69,8 +69,8 @@ add_executable(zpg_test main.cpp
         Model/Abstract/RenderableObject.h
         Shaders/ShaderProgram/ShaderHandlerFactory/ShaderHandlerFactory.cpp
         Shaders/ShaderProgram/ShaderHandlerFactory/ShaderHandlerFactory.h
-        Shaders/Lighting/LightsArrayUniform.cpp
-        Shaders/Lighting/LightsArrayUniform.h
+        Shaders/Lighting/Uniforms/LightsArrayPointUniform.cpp
+        Shaders/Lighting/Uniforms/LightsArrayPointUniform.h
         Shaders/ShaderProgram/ShaderBase/ShaderBase.cpp
         Shaders/ShaderProgram/ShaderBase/ShaderBase.h
         Application/ObjectsManager/Map/MapManager.cpp

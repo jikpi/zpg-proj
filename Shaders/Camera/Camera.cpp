@@ -13,7 +13,7 @@ Camera::Camera(float alpha, float fi, float fov, float aspectRatio,
         ViewMatrix(glm::mat4(1.0f)),
         ProjectionMatrix(glm::perspective(fov, aspectRatio, minRender, maxRender)),
         IsPerspective(true),
-        FollowYDirection(true),
+        FollowYDirection(false),
         IsUnlocked(false),
 
         Alpha(alpha),

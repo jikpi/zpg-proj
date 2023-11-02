@@ -125,16 +125,16 @@ ShaderHandler &ShaderHandler::SaveObjectMaterialLocation() {
 
 ShaderHandler &ShaderHandler::SaveLightingLocation() {
 
-    this->LightsArraySizeLocation = GetUniformLocation(DEF_SHADER_LIGHTS_ARRAY_LOCATION_SIZE_NAME);
+    this->LightsArraySizeLocation = GetUniformLocation(DEF_SHADER_LIGHTS_POINT_ARRAY_LOCATION_SIZE_NAME);
 
     if (LightsArraySizeLocation == -1) {
         std::cerr << "SHADER ERROR: LIGHTS ARRAY NOT FOUND IN SHADER CODE, BUT WAS EXPECTED." << std::endl;
         this->PrintName();
     } else {
-        std::string lightsArrayBaseName = DEF_SHADER_LIGHTS_ARRAY_LOCATION_NAME;
+        std::string lightsArrayBaseName = DEF_SHADER_LIGHTS_POINT_ARRAY_LOCATION_NAME;
         for (int i = 0; i < DEF_SHADER_LIGHTS_ARRAY_LOCATION_ARRAY_SIZE; i++) {
             std::string lightName = lightsArrayBaseName + "[" + std::to_string(i) + "].";
-            LightsArrayUniform locations{};
+            LightsArrayPointUniform locations{};
             locations.position = GetUniformLocation((lightName +
                                                      DEF_SHADER_LIGHTS_ARRAY_LOCATION_POSITION_NAME).c_str());
             locations.color = GetUniformLocation((lightName +
