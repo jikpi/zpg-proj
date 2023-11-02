@@ -30,14 +30,14 @@ private:
     glm::mat4 ProjectionMatrix{};
     glm::vec3 CameraLocation{};
 
-    std::weak_ptr<std::vector<std::shared_ptr<LightPoint>>> SelectedLightsFromMap;
+    std::weak_ptr<std::vector<std::shared_ptr<RenderableLight>>> SelectedLightsFromMap;
 
     void RequestRenderBaseLightsArray();
 
     void RenderBase(const glm::mat4 &modelMatrix);
     void RenderCameraLocation() const;
     void RenderNormalMatrix(const glm::mat4 &modelMatrix) const;
-    void RenderLightsArray(const std::shared_ptr<std::vector<std::shared_ptr<LightPoint>>> &lightsVector) const;
+    void RenderLightsArray(const std::shared_ptr<std::vector<std::shared_ptr<RenderableLight>>> &lightsVector) const;
     void RenderObjectMaterial(Material objectMaterial) const;
     void RenderPhongLight(Material objectMaterial) const;
 
@@ -74,7 +74,7 @@ public:
 
     void PrintName() const override;
 
-    void SetLights(std::shared_ptr<std::vector<std::shared_ptr<LightPoint>>> &lights);
+    void SetLights(std::shared_ptr<std::vector<std::shared_ptr<RenderableLight>>> &lights);
     void NotifyLightsChanged();
 
     void RequestRender(RenderableObject &object);

@@ -191,11 +191,15 @@ void ShaderHandler::RenderNormalMatrix(const glm::mat4 &modelMatrix) const {
     SendToShader(NormalMatrixLocation, normalMatrix);
 }
 
-void ShaderHandler::RenderLightsArray(const std::shared_ptr<std::vector<std::shared_ptr<LightPoint>>> &lightsVector) const {
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cppcoreguidelines-pro-type-static-cast-downcast"
+
+void ShaderHandler::RenderLightsArray(
+        const std::shared_ptr<std::vector<std::shared_ptr<RenderableLight>>> &lightsVector) const {
     SendToShader(LightsArraySizeLocation, static_cast<int>(lightsVector->size()));
 
     for (int i = 0; i < lightsVector->size(); i++) {
-        const auto &light = lightsVector->at(i);
+        const auto *light = static_cast<const LightPoint *>(lightsVector->at(i).get());
         const auto &lightArrayIndexlocation = LightsArrayUniformLocation.at(i);
 
         SendToShader(lightArrayIndexlocation.position, light->GetPosition());
@@ -206,6 +210,8 @@ void ShaderHandler::RenderLightsArray(const std::shared_ptr<std::vector<std::sha
         SendToShader(lightArrayIndexlocation.quadratic, light->GetQuadratic());
     }
 }
+
+#pragma clang diagnostic pop
 
 void ShaderHandler::RenderObjectMaterial(const Material objectMaterial) const {
     SendToShader(AmbientColorLocation, objectMaterial.AmbientColor);
@@ -223,7 +229,7 @@ void ShaderHandler::RenderCameraLocation() const {
 
 void ShaderHandler::RequestRenderBaseLightsArray() {
     if (LightsArraySizeLocation != -2) {
-        std::shared_ptr<std::vector<std::shared_ptr<LightPoint>>> lightsVectorPtr = this->SelectedLightsFromMap.lock();
+        std::shared_ptr<std::vector<std::shared_ptr<RenderableLight>>> lightsVectorPtr = this->SelectedLightsFromMap.lock();
         if (lightsVectorPtr == nullptr) {
             std::cerr << "SHADER ERROR: LIGHTS ARRAY FROM MAP NOT LINKED" << std::endl;
             this->PrintName();
@@ -272,7 +278,7 @@ void ShaderHandler::PrintName() const {
     ShaderBase::PrintName();
 }
 
-void ShaderHandler::SetLights(std::shared_ptr<std::vector<std::shared_ptr<LightPoint>>> &lights) {
+void ShaderHandler::SetLights(std::shared_ptr<std::vector<std::shared_ptr<RenderableLight>>> &lights) {
     this->SelectedLightsFromMap = lights;
     HaveLightsChanged = true;
 }

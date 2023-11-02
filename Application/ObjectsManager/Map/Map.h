@@ -16,10 +16,16 @@ class Map {
     std::string Name;
 
     std::vector<std::shared_ptr<StandardisedModel>> Objects;
-    std::shared_ptr<std::vector<std::shared_ptr<LightPoint>>> Lights;
+    std::shared_ptr<std::vector<std::shared_ptr<RenderableLight>>> Lights;
+
+    void InsertLight(const std::shared_ptr<RenderableLight>& light);
+    unsigned long GetLightCount();
+    std::shared_ptr<RenderableLight> & GetLight(int index);
+    void ChangeLight(int index, const std::shared_ptr<RenderableLight>& light);
 public:
     explicit Map(std::string name = "None");
     friend class MapToShaderLinker;
+    friend class MapManager;
 
 
 
@@ -27,11 +33,6 @@ public:
     unsigned long GetObjectCount();
     std::shared_ptr<StandardisedModel> & GetObject(int index);
     std::shared_ptr<StandardisedModel> &GetObjectByName(const std::string &name);
-
-    void InsertLight(const std::shared_ptr<LightPoint>& light);
-    unsigned long GetLightCount();
-    std::shared_ptr<LightPoint> & GetLight(int index);
-    void ChangeLight(int index, const std::shared_ptr<LightPoint>& light);
 
 
     [[nodiscard]] std::string GetName() const;

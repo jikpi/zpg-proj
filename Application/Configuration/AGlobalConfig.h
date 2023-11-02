@@ -45,5 +45,6 @@ inline constexpr const float DEF_LIGHT_CONSTANT = 1.0f;
 inline constexpr const float DEF_LIGHT_LINEAR = 0.09f;
 inline constexpr const float DEF_LIGHT_QUADRATIC = 0.1f;
 inline constexpr const glm::vec3 DEF_LIGHT_COLOR = glm::vec3(1.0f, 1.0f, 1.0f);
+inline constexpr const glm::vec3 DEF_LIGHT_DIRECTIONAL_DIRECTION = glm::vec3(0.0f, 0.0f, 1.0f);
 
 #endif //ZPG_TEST_AGLOBALCONFIG_H

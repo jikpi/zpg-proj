@@ -400,8 +400,8 @@ void Engine::TestLaunch() {
 
     this->EngineMapManager.CreateNewMap("Many objects");
     EngineMapManager.AddLightToMap("Many objects", std::make_shared<LightPoint>(glm::vec3(0.0f, 3.0f, 0.0f)));
-    EngineMapManager.GetMapByName("Many objects")->GetLight(0)->SetLinear(0.01f);
-    EngineMapManager.GetMapByName("Many objects")->GetLight(0)->SetQuadratic(0.01f);
+    EngineMapManager.GetLightOnMap("Many objects", 0)->SetLinear(0.01f);
+    EngineMapManager.GetLightOnMap("Many objects", 0)->SetQuadratic(0.01f);
 
     std::shared_ptr<StandardisedModel> preparedModelGround = ModelFactory::PositionNormal(rawmodel6_plain, size6,
                                                                                           "Ground");
