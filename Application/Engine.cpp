@@ -24,6 +24,7 @@
 //Models
 #include "../ExtResources/LessonResources/InclLessonModels.h"
 #include "../Shaders/Lighting/LightDirectional.h"
+#include "../Shaders/Lighting/LightSpot.h"
 
 
 Engine::Engine() = default;
@@ -138,7 +139,10 @@ void Engine::Run() {
     DebugErrorMessages::PrintGLErrors("Before run errors");
 
 
-    float moonAngle = 0.0f;
+    float angleChange = 0.0f;
+
+    std::shared_ptr<LightSpot> spotLight = std::dynamic_pointer_cast<LightSpot>(
+            this->EngineMapManager.GetLightOnMap("Default", 0));
 
     this->CameraMain->MoveForwardBackward(0);
     this->EngineMapManager.ForceRefresh();
@@ -158,6 +162,15 @@ void Engine::Run() {
         this->EngineMapManager.GetMapByIndex(1)->GetObjectByName("Earth")->DoTransf();
         //animate mars
         this->EngineMapManager.GetMapByIndex(1)->GetObjectByName("Mars")->DoTransf();
+
+        //animate spotlight
+        spotLight->SetDirection(glm::vec3(glm::cos(angleChange), glm::sin(angleChange), 0.0f));
+        EngineMapManager.GetLightOnMap("Default", 0);
+//        std::cout << "Spotlight direction: " << spotLight->GetDirection().x << " " << spotLight->GetDirection().y << " " << spotLight->GetDirection().z << std::endl;
+        angleChange += 0.01f;
+        if(angleChange >= 1.0f){
+            angleChange = 0.1f;
+        }
 
 
 
@@ -230,10 +243,10 @@ void Engine::TestLaunch() {
     int size7 = sizeof(gift) / sizeof(float);
 
 
-    std::shared_ptr<ShaderHandler>& ConstantShader = SelectShader("Constant");
-    std::shared_ptr<ShaderHandler>& PhongShader = SelectShader("Phong");
-    std::shared_ptr<ShaderHandler>& BlinnPhongShader = SelectShader("BlinnPhong");
-    std::shared_ptr<ShaderHandler>& LambertShader = SelectShader("Lambert");
+    std::shared_ptr<ShaderHandler> &ConstantShader = SelectShader("Constant");
+    std::shared_ptr<ShaderHandler> &PhongShader = SelectShader("Phong");
+    std::shared_ptr<ShaderHandler> &BlinnPhongShader = SelectShader("BlinnPhong");
+    std::shared_ptr<ShaderHandler> &LambertShader = SelectShader("Lambert");
 
     //Map 1 - 4 spheres and light
     std::shared_ptr<StandardisedModel> objectSphere1 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
@@ -256,11 +269,61 @@ void Engine::TestLaunch() {
     objectSphere4->SetShaderProgram(PhongShader);
     this->EngineMapManager.AddObjectToMap(0, objectSphere4);
 
-    EngineMapManager.AddLightToMap(0, std::make_shared<LightPoint>(glm::vec3(0.0f, 0.0f, 0.0f)));
+    std::shared_ptr<StandardisedModel> objectSphere5 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
+                                                                                    "Test model 5");
+    objectSphere5->SetShaderProgram(PhongShader);
+    this->EngineMapManager.AddObjectToMap(0, objectSphere5);
+
+    std::shared_ptr<StandardisedModel> objectSphere6 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
+                                                                                    "Test model 6");
+    objectSphere6->SetShaderProgram(PhongShader);
+    this->EngineMapManager.AddObjectToMap(0, objectSphere6);
+
+    std::shared_ptr<StandardisedModel> objectSphere7 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
+                                                                                    "Test model 7");
+    objectSphere7->SetShaderProgram(PhongShader);
+    this->EngineMapManager.AddObjectToMap(0, objectSphere7);
+
+    std::shared_ptr<StandardisedModel> objectSphere8 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
+                                                                                    "Test model 8");
+    objectSphere8->SetShaderProgram(PhongShader);
+    this->EngineMapManager.AddObjectToMap(0, objectSphere8);
+
+    std::shared_ptr<StandardisedModel> objectSphere9 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
+                                                                                    "Test model 9");
+    objectSphere9->SetShaderProgram(PhongShader);
+    this->EngineMapManager.AddObjectToMap(0, objectSphere9);
+
+    std::shared_ptr<StandardisedModel> objectSphere10 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
+                                                                                    "Test model 10");
+    objectSphere10->SetShaderProgram(PhongShader);
+    this->EngineMapManager.AddObjectToMap(0, objectSphere10);
+
+    std::shared_ptr<StandardisedModel> objectSphere11 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
+                                                                                    "Test model 11");
+    objectSphere11->SetShaderProgram(PhongShader);
+    this->EngineMapManager.AddObjectToMap(0, objectSphere11);
+
+    std::shared_ptr<StandardisedModel> objectSphere12 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
+                                                                                    "Test model 12");
+    objectSphere12->SetShaderProgram(PhongShader);
+    this->EngineMapManager.AddObjectToMap(0, objectSphere12);
+
+    EngineMapManager.AddLightToMap(0, std::make_shared<LightSpot>(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0, 0)));
     EngineMapManager.GetMapByIndex(0)->GetObject(0)->InsertTransfMove(glm::vec3(-2.0f, 0.0f, 0.0f)).ConsolidateTransf();
     EngineMapManager.GetMapByIndex(0)->GetObject(1)->InsertTransfMove(glm::vec3(0.0f, 0.0f, 2.0f)).ConsolidateTransf();
     EngineMapManager.GetMapByIndex(0)->GetObject(2)->InsertTransfMove(glm::vec3(2.0f, 0.0f, 0.0f)).ConsolidateTransf();
     EngineMapManager.GetMapByIndex(0)->GetObject(3)->InsertTransfMove(glm::vec3(0.0f, 0.0f, -2.0f)).ConsolidateTransf();
+
+    EngineMapManager.GetMapByIndex(0)->GetObject(4)->InsertTransfMove(glm::vec3(-2.0f, 4.0f, 0.0f)).ConsolidateTransf();
+    EngineMapManager.GetMapByIndex(0)->GetObject(5)->InsertTransfMove(glm::vec3(0.0f, 4.0f, 2.0f)).ConsolidateTransf();
+    EngineMapManager.GetMapByIndex(0)->GetObject(6)->InsertTransfMove(glm::vec3(2.0f, 4.0f, 0.0f)).ConsolidateTransf();
+    EngineMapManager.GetMapByIndex(0)->GetObject(7)->InsertTransfMove(glm::vec3(0.0f, 4.0f, -2.0f)).ConsolidateTransf();
+
+    EngineMapManager.GetMapByIndex(0)->GetObject(8)->InsertTransfMove(glm::vec3(-2.0f, -4.0f, 0.0f)).ConsolidateTransf();
+    EngineMapManager.GetMapByIndex(0)->GetObject(9)->InsertTransfMove(glm::vec3(0.0f, -4.0f, 2.0f)).ConsolidateTransf();
+    EngineMapManager.GetMapByIndex(0)->GetObject(10)->InsertTransfMove(glm::vec3(2.0f, -4.0f, 0.0f)).ConsolidateTransf();
+    EngineMapManager.GetMapByIndex(0)->GetObject(11)->InsertTransfMove(glm::vec3(0.0f, -4.0f, -2.0f)).ConsolidateTransf();
 
     //Map 2 - solar system
     float earthOrbitSpeed = 0.05f;
@@ -400,11 +463,16 @@ void Engine::TestLaunch() {
     };
 
 
-
     this->EngineMapManager.CreateNewMap("Many objects");
-    EngineMapManager.AddLightToMap("Many objects", std::make_shared<LightPoint>(glm::vec3(0.0f, 3.0f, 0.0f)));
-    EngineMapManager.GetLightOnMap("Many objects", 0)->SetLinear(0.01f);
-    EngineMapManager.GetLightOnMap("Many objects", 0)->SetQuadratic(0.01f);
+//    EngineMapManager.AddLightToMap("Many objects", std::make_shared<LightPoint>(glm::vec3(0.0f, 3.0f, 0.0f)));
+    EngineMapManager.AddLightToMap("Many objects", std::make_shared<LightSpot>(glm::vec3(0.0f, 5.0f, 10.0f),
+                                                                               glm::vec3(0.0f, -1.0f, 0.0f)));
+
+    std::dynamic_pointer_cast<LightSpot>(EngineMapManager.GetLightOnMap("Many objects", 0));
+//            ->SetOuterCutOff(100.0f)
+//            .SetIntensity(1.0f);
+//    std::dynamic_pointer_cast<LightPoint>(EngineMapManager.GetLightOnMap("Many objects", 0))->SetConstant(1.0f);
+//    std::dynamic_pointer_cast<LightPoint>(EngineMapManager.GetLightOnMap("Many objects", 0))->SetLinear(0.01f);
 
     std::shared_ptr<StandardisedModel> preparedModelGround = ModelFactory::PositionNormal(rawmodel6_plain, size6,
                                                                                           "Ground");

@@ -23,15 +23,15 @@ public:
     LightPoint(const glm::vec3 &position, const glm::vec3 &color);
     explicit LightPoint(const glm::vec3 &position);
 
-    void SetPosition(const glm::vec3 &newPosition) override;
-    void SetConstant(float newConstant) override;
-    void SetLinear(float newLinear) override;
-    void SetQuadratic(float newQuadratic) override;
+    void SetPosition(const glm::vec3 &newPosition);
+    void SetConstant(float newConstant);
+    void SetLinear(float newLinear);
+    void SetQuadratic(float newQuadratic);
 
-    [[nodiscard]] const glm::vec3 &GetPosition() const override;
-    [[nodiscard]] float GetConstant() const override;
-    [[nodiscard]] float GetLinear() const override;
-    [[nodiscard]] float GetQuadratic() const override;
+    [[nodiscard]] const glm::vec3 &GetPosition() const;
+    [[nodiscard]] float GetConstant() const;
+    [[nodiscard]] float GetLinear() const;
+    [[nodiscard]] float GetQuadratic() const;
 };
 
 

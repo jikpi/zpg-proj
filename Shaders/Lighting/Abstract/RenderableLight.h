@@ -11,9 +11,6 @@
 
 class RenderableLight {
 private:
-    static void PrintFalseImplementation_LightPoint();
-    static void PrintFalseImplementation_LightDirectional();
-    static void PrintFalseImplementation_LightSpot();
 protected:
     glm::vec3 Color{};
     float Intensity{};
@@ -31,23 +28,8 @@ public:
     [[nodiscard]] float GetIntensity() const;
     [[nodiscard]] LightType GetType() const;
 
-    void SetColor(const glm::vec3 &newColor);
-    void SetIntensity(float newIntensity);
-
-    //Virtual member methods
-    //Point light
-    virtual void SetPosition(const glm::vec3 &newPosition);
-    [[nodiscard]] virtual const glm::vec3 &GetPosition() const;
-    virtual void SetConstant(float newConstant);
-    [[nodiscard]] virtual float GetConstant() const;
-    virtual void SetLinear(float newLinear);
-    [[nodiscard]] virtual float GetLinear() const;
-    virtual void SetQuadratic(float newQuadratic);
-    [[nodiscard]] virtual float GetQuadratic() const;
-    //Directional light
-    virtual void SetDirection(const glm::vec3 &newDirection);
-    [[nodiscard]] virtual const glm::vec3 &GetDirection() const;
-    //Spot light
+    RenderableLight & SetColor(const glm::vec3 &newColor);
+    RenderableLight & SetIntensity(float newIntensity);
 };
 
 

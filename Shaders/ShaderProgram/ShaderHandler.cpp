@@ -9,6 +9,7 @@
 #include "ShaderHandler.h"
 #include "../../Application/Configuration/AGlobalConfig.h"
 #include "../Lighting/LightDirectional.h"
+#include "../Lighting/LightSpot.h"
 
 
 ShaderHandler::ShaderHandler() : ShaderBase(),
@@ -22,6 +23,7 @@ ShaderHandler::ShaderHandler() : ShaderBase(),
 
                                  LightsArrayPoint_SizeLocation(-2),
                                  LightsArrayDirectional_SizeLocation(-2),
+                                 LightsArraySpot_SizeLocation(-2),
 
                                  AmbientColorLocation(-2),
                                  DiffuseColorLocation(-2),
@@ -47,6 +49,8 @@ ShaderHandler::ShaderHandler(ShaderHandler &&other) noexcept {
     HaveLightsChanged = other.HaveLightsChanged;
     LightsArrayDirectional_SizeLocation = other.LightsArrayDirectional_SizeLocation;
     LightsArrayDirectional_UniformLocation = other.LightsArrayDirectional_UniformLocation;
+    LightsArraySpot_SizeLocation = other.LightsArraySpot_SizeLocation;
+    LightsArraySpot_UniformLocation = other.LightsArraySpot_UniformLocation;
 
 
     other.LightsArrayPoint_UniformLocation = {};
@@ -78,6 +82,8 @@ ShaderHandler &ShaderHandler::operator=(ShaderHandler &&other) noexcept {
     HaveLightsChanged = other.HaveLightsChanged;
     LightsArrayDirectional_SizeLocation = other.LightsArrayDirectional_SizeLocation;
     LightsArrayDirectional_UniformLocation = other.LightsArrayDirectional_UniformLocation;
+    LightsArraySpot_SizeLocation = other.LightsArraySpot_SizeLocation;
+    LightsArraySpot_UniformLocation = other.LightsArraySpot_UniformLocation;
 
     other.LightsArrayPoint_UniformLocation = {};
     other.ModelMatrixLocation = 0;
@@ -196,6 +202,51 @@ ShaderHandler &ShaderHandler::SaveLightingLocation() {
         }
     }
 
+    //Spot lights
+    this->LightsArraySpot_SizeLocation = GetUniformLocation(DEF_SHADER_LIGHTS_SPOT_ARRAY_LOCATION_SIZE_NAME);
+    if (LightsArraySpot_SizeLocation == -1) {
+        std::cerr << "SHADER ERROR: *SPOT* LIGHTS ARRAY NOT FOUND IN SHADER CODE, BUT WAS EXPECTED." << std::endl;
+        this->PrintName();
+    } else {
+        std::string lightsArrayBaseName = DEF_SHADER_LIGHTS_SPOT_ARRAY_LOCATION_NAME;
+        for (int i = 0; i < DEF_SHADER_LIGHTS_ARRAY_LOCATION_ARRAY_SIZE; i++) {
+            std::string lightName = lightsArrayBaseName + "[" + std::to_string(i) + "].";
+            LightsArraySpotUniform locations{};
+            locations.innerCutOff = GetUniformLocation((lightName +
+                                                        DEF_SHADER_LIGHTS_ARRAY_LOCATION_INNERCUTOFF_NAME).c_str());
+            locations.outerCutOff = GetUniformLocation((lightName +
+                                                        DEF_SHADER_LIGHTS_ARRAY_LOCATION_OUTERCUTOFF_NAME).c_str());
+            locations.direction = GetUniformLocation((lightName +
+                                                      DEF_SHADER_LIGHTS_ARRAY_LOCATION_DIRECTION_NAME).c_str());
+            locations.position = GetUniformLocation((lightName +
+                                                     DEF_SHADER_LIGHTS_ARRAY_LOCATION_POSITION_NAME).c_str());
+            locations.color = GetUniformLocation((lightName +
+                                                  DEF_SHADER_LIGHTS_ARRAY_LOCATION_COLOR_NAME).c_str());
+            locations.intensity = GetUniformLocation((lightName +
+                                                      DEF_SHADER_LIGHTS_ARRAY_LOCATION_INTENSITY_NAME).c_str());
+            locations.constant = GetUniformLocation((lightName +
+                                                     DEF_SHADER_LIGHTS_ARRAY_LOCATION_ATTN_CONST_NAME).c_str());
+            locations.linear = GetUniformLocation((lightName +
+                                                   DEF_SHADER_LIGHTS_ARRAY_LOCATION_ATTN_LINEAR_NAME).c_str());
+            locations.quadratic = GetUniformLocation((lightName +
+                                                      DEF_SHADER_LIGHTS_ARRAY_LOCATION_ATTN_QUADRATIC_NAME).c_str());
+
+            if (locations.innerCutOff == -1 || locations.outerCutOff == -1 || locations.direction == -1 ||
+                locations.position == -1 || locations.color == -1 || locations.intensity == -1 ||
+                locations.constant == -1 || locations.linear == -1 || locations.quadratic == -1) {
+                std::cerr
+                        << "SHADER ERROR: *SPOT* LIGHTS ARRAY *ELEMENTS* NOT FOUND IN SHADER CODE, BUT WERE EXPECTED."
+                        << std::endl;
+                this->PrintName();
+
+            } else {
+                LightsArraySpot_UniformLocation.push_back(locations);
+            }
+
+
+        }
+    }
+
     this->SaveObjectMaterialLocation();
     return *this;
 }
@@ -205,7 +256,8 @@ ShaderHandler &ShaderHandler::SavePhongLightLocation() {
     this->SpecularColorLocation = GetUniformLocation(DEF_SHADER_LIGHTS_BLINNPHONG_SPECCOLOR_NAME);
 
     if (this->ShineValueLocation == -1 || this->SpecularColorLocation == -1) {
-        std::cerr << "SHADER ERROR: BLINN-PHONG LIGHTING NOT FOUND IN SHADER CODE, BUT WAS EXPECTED." << std::endl;
+        std::cerr << "SHADER ERROR: BLINN-PHONG LIGHTING NOT FOUND IN SHADER CODE, BUT WAS EXPECTED."
+                  << std::endl;
         this->PrintName();
     }
 
@@ -216,7 +268,8 @@ ShaderHandler &ShaderHandler::SaveCameraLocationLocation() {
     this->CameraLocationLocation = GetUniformLocation(DEF_SHADER_CAMERA_LOCATION_NAME);
 
     if (this->CameraLocationLocation == -1) {
-        std::cerr << "SHADER ERROR: CAMERA LOCATION NOT FOUND IN SHADER CODE, BUT WAS EXPECTED." << std::endl;
+        std::cerr << "SHADER ERROR: CAMERA LOCATION NOT FOUND IN SHADER CODE, BUT WAS EXPECTED."
+                  << std::endl;
         this->PrintName();
     }
 
@@ -256,7 +309,8 @@ void ShaderHandler::RenderLightsArray(
                     continue;
                 }
 
-                const auto &lightArrayIndexlocation = LightsArrayPoint_UniformLocation.at(pointLightsCount++);
+                const auto &lightArrayIndexlocation = LightsArrayPoint_UniformLocation.at(
+                        pointLightsCount++);
 
                 SendToShader(lightArrayIndexlocation.position, light->GetPosition());
                 SendToShader(lightArrayIndexlocation.color, light->GetColor());
@@ -270,8 +324,9 @@ void ShaderHandler::RenderLightsArray(
                 const auto *light = static_cast<const LightDirectional *>(i.get());
 
                 if (directionalLightsCount >= LightsArrayDirectional_UniformLocation.size()) {
-                    std::cerr << "SHADER ERROR: DIRECTIONAL LIGHTS ARRAY SIZE IS SMALLER THAN LIGHTS VECTOR SIZE"
-                              << std::endl;
+                    std::cerr
+                            << "SHADER ERROR: DIRECTIONAL LIGHTS ARRAY SIZE IS SMALLER THAN LIGHTS VECTOR SIZE"
+                            << std::endl;
                     this->PrintName();
                     continue;
                 }
@@ -285,6 +340,40 @@ void ShaderHandler::RenderLightsArray(
                 break;
             }
             case LIGHT_TYPE_SPOT:
+                const auto *light = static_cast<const LightSpot *>(i.get());
+
+                if (spotLightsCount >= LightsArraySpot_UniformLocation.size()) {
+                    std::cerr << "SHADER ERROR: SPOT LIGHTS ARRAY SIZE IS SMALLER THAN LIGHTS VECTOR SIZE"
+                              << std::endl;
+                    this->PrintName();
+                    continue;
+                }
+
+                const auto &lightArrayIndexlocation = LightsArraySpot_UniformLocation.at(
+                        spotLightsCount++);
+
+                SendToShader(lightArrayIndexlocation.innerCutOff, light->GetInnerCutOff());
+                SendToShader(lightArrayIndexlocation.outerCutOff, light->GetOuterCutOff());
+                SendToShader(lightArrayIndexlocation.direction, light->GetDirection());
+                SendToShader(lightArrayIndexlocation.position, light->GetPosition());
+                SendToShader(lightArrayIndexlocation.color, light->GetColor());
+                SendToShader(lightArrayIndexlocation.intensity, light->GetIntensity());
+                SendToShader(lightArrayIndexlocation.constant, light->GetConstant());
+                SendToShader(lightArrayIndexlocation.linear, light->GetLinear());
+                SendToShader(lightArrayIndexlocation.quadratic, light->GetQuadratic());
+
+                //debug print
+                std::cout << "innerCutOff: " << light->GetInnerCutOff() << std::endl;
+                std::cout << "outerCutOff: " << light->GetOuterCutOff() << std::endl;
+                std::cout << "direction: " << light->GetDirection().x << " " << light->GetDirection().y << " " << light->GetDirection().z << std::endl;
+                std::cout << "position: " << light->GetPosition().x << " " << light->GetPosition().y << " " << light->GetPosition().z << std::endl;
+                std::cout << "color: " << light->GetColor().x << " " << light->GetColor().y << " " << light->GetColor().z << std::endl;
+                std::cout << "intensity: " << light->GetIntensity() << std::endl;
+                std::cout << "constant: " << light->GetConstant() << std::endl;
+                std::cout << "linear: " << light->GetLinear() << std::endl;
+                std::cout << "quadratic: " << light->GetQuadratic() << std::endl;
+                std::cout << std::endl;
+
                 break;
         }
 
@@ -292,6 +381,7 @@ void ShaderHandler::RenderLightsArray(
 
     SendToShader(LightsArrayPoint_SizeLocation, pointLightsCount);
     SendToShader(LightsArrayDirectional_SizeLocation, directionalLightsCount);
+    SendToShader(LightsArraySpot_SizeLocation, spotLightsCount);
 }
 
 #pragma clang diagnostic pop
@@ -350,8 +440,9 @@ void ShaderHandler::RequestRender(RenderableObject &object) {
 }
 
 
-void ShaderHandler::CameraChangedNotification(const glm::mat4 &viewMatrix, const glm::mat4 &projectionMatrix,
-                                              const glm::vec3 &cameraLocation) {
+void
+ShaderHandler::CameraChangedNotification(const glm::mat4 &viewMatrix, const glm::mat4 &projectionMatrix,
+                                         const glm::vec3 &cameraLocation) {
     ViewMatrix = viewMatrix;
     ProjectionMatrix = projectionMatrix;
     CameraLocation = cameraLocation;

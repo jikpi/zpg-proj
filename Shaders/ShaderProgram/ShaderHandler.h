@@ -19,6 +19,7 @@
 #include "../Lighting/Uniforms/LightsArrayPointUniform.h"
 #include "../Lighting/Uniforms/LightArrayDirectionalUniform.h"
 #include "ShaderBase/ShaderBase.h"
+#include "../Lighting/Uniforms/LightsArraySpotUniform.h"
 
 
 class ShaderHandler : public ShaderBase, public CameraObserver {
@@ -56,6 +57,10 @@ private:
     //Directional Lights
     GLint LightsArrayDirectional_SizeLocation{};
     std::vector<LightArrayDirectionalUniform> LightsArrayDirectional_UniformLocation;
+    //Spot Lights
+    GLint LightsArraySpot_SizeLocation{};
+    std::vector<LightsArraySpotUniform> LightsArraySpot_UniformLocation;
+
 
     //Object Material
     GLint AmbientColorLocation{};

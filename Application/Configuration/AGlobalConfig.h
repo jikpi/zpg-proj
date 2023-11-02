@@ -13,6 +13,9 @@ inline constexpr float DEF_CAMERA_ASPECTRATIO = 4.0f / 3.0f;
 inline constexpr float DEF_CAMERA_MINRENDER = 0.1f;
 inline constexpr float DEF_CAMERA_MAXRENDER = 1000.0f;
 
+// ### Map ###
+inline constexpr const char *DEF_MAP_NAME = "Default";
+
 // ### ShaderProgram ###
 // model matrix, view matrix, projection matrix
 inline constexpr const char *DEF_SHADER_MODEL_MATRIX_NAME = "modelMatrix";
@@ -24,10 +27,18 @@ inline constexpr const char *DEF_SHADER_NORMAL_MATRIX_NAME = "normalMatrix";
 inline constexpr const char *DEF_SHADER_CAMERA_LOCATION_NAME = "cameraLocation";
 //Lights array
 inline constexpr const int DEF_SHADER_LIGHTS_ARRAY_LOCATION_ARRAY_SIZE = 16;
+//#Point
 inline constexpr const char *DEF_SHADER_LIGHTS_POINT_ARRAY_LOCATION_SIZE_NAME = "LightPointSize";
 inline constexpr const char *DEF_SHADER_LIGHTS_POINT_ARRAY_LOCATION_NAME = "LightPointArray";
+//#Directional
 inline constexpr const char *DEF_SHADER_LIGHTS_DIRECTIONAL_ARRAY_LOCATION_SIZE_NAME = "LightDirectionalSize";
 inline constexpr const char *DEF_SHADER_LIGHTS_DIRECTIONAL_ARRAY_LOCATION_NAME = "LightDirectionalArray";
+//#Spot
+inline constexpr const char *DEF_SHADER_LIGHTS_SPOT_ARRAY_LOCATION_SIZE_NAME = "LightSpotSize";
+inline constexpr const char *DEF_SHADER_LIGHTS_SPOT_ARRAY_LOCATION_NAME = "LightSpotArray";
+//Struct fields
+inline constexpr const char *DEF_SHADER_LIGHTS_ARRAY_LOCATION_INNERCUTOFF_NAME = "innerCutOff";
+inline constexpr const char *DEF_SHADER_LIGHTS_ARRAY_LOCATION_OUTERCUTOFF_NAME = "outerCutOff";
 inline constexpr const char *DEF_SHADER_LIGHTS_ARRAY_LOCATION_DIRECTION_NAME = "direction";
 inline constexpr const char *DEF_SHADER_LIGHTS_ARRAY_LOCATION_POSITION_NAME = "position";
 inline constexpr const char *DEF_SHADER_LIGHTS_ARRAY_LOCATION_COLOR_NAME = "color";
@@ -49,5 +60,7 @@ inline constexpr const float DEF_LIGHT_LINEAR = 0.09f;
 inline constexpr const float DEF_LIGHT_QUADRATIC = 0.1f;
 inline constexpr const glm::vec3 DEF_LIGHT_COLOR = glm::vec3(1.0f, 1.0f, 1.0f);
 inline constexpr const glm::vec3 DEF_LIGHT_DIRECTIONAL_DIRECTION = glm::vec3(0.0f, -1.0f, 0.0f);
+inline constexpr const float DEF_LIGHT_INNERCUTOFF = 10.0f;
+inline constexpr const float DEF_LIGHT_OUTERCUTOFF = 20.0f;
 
 #endif //ZPG_TEST_AGLOBALCONFIG_H

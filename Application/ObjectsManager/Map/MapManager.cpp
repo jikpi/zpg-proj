@@ -4,9 +4,10 @@
 
 #include <iostream>
 #include "MapManager.h"
+#include "../../Configuration/AGlobalConfig.h"
 
 void MapManager::Initialize() {
-    this->Maps.push_back(std::make_shared<Map>("Default map"));
+    this->Maps.push_back(std::make_shared<Map>(DEF_MAP_NAME));
     this->ChangeMap(0);
 }
 

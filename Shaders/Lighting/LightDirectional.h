@@ -17,8 +17,8 @@ public:
     explicit LightDirectional(const glm::vec3 &direction);
     LightDirectional();
 
-    [[nodiscard]] const glm::vec3 &GetDirection() const override;
-    void SetDirection(const glm::vec3 &newDirection) override;
+    [[nodiscard]] const glm::vec3 &GetDirection() const;
+    void SetDirection(const glm::vec3 &newDirection);
 
 };
 
