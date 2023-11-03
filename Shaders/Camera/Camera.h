@@ -71,6 +71,9 @@ public:
     void SetTarget(glm::vec3 newTarget);
     void SetUp(glm::vec3 newUp);
 
+    [[nodiscard]] glm::vec3 GetLocation() const;
+    [[nodiscard]] glm::vec3 GetTarget() const;
+
     void LookSphericalSide(float degrees);
     void LookSphericalVertical(float degrees);
 

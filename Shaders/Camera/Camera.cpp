@@ -224,6 +224,14 @@ bool Camera::GetFollowYDirection() const {
     return FollowYDirection;
 }
 
+glm::vec3 Camera::GetLocation() const {
+    return Location;
+}
+
+glm::vec3 Camera::GetTarget() const {
+    return Target;
+}
+
 
 
 

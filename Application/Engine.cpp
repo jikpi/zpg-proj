@@ -178,7 +178,12 @@ void Engine::Run() {
         float z = radius * sin(angle);
 
         spheresSpotLight->SetDirection(glm::vec3(x, 0.0f, z));
-        manyObjectsSpotLight->SetDirection(glm::vec3(x, 0.0f, z));
+//        manyObjectsSpotLight->SetDirection(glm::vec3(x, 0.0f, z));
+
+        //set many objects spot light to camera location and target
+        manyObjectsSpotLight->SetPosition(this->CameraMain->GetLocation());
+        manyObjectsSpotLight->SetDirection(this->CameraMain->GetTarget() - this->CameraMain->GetLocation());
+
         EngineMapManager.ForceRefreshLightsOnCurrentMap();
 
 
