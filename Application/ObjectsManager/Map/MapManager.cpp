@@ -11,7 +11,7 @@ void MapManager::Initialize() {
     this->ChangeMap(0);
 }
 
-void MapManager::ForceRefresh() {
+void MapManager::ForceRefreshMaps() {
     this->ShaderLinker.BuildWithMap(this->ActiveMap);
 }
 
@@ -49,7 +49,7 @@ void MapManager::ChangeMap(std::shared_ptr<Map> &map) {
     this->ActiveMap = map;
 
     //Refresh shader linker
-    ForceRefresh();
+    ForceRefreshMaps();
 }
 
 void MapManager::ChangeMap(int index) {
@@ -62,7 +62,7 @@ void MapManager::ChangeMap(int index) {
     this->ActiveMap = this->Maps.at(index);
 
     //Refresh shader linker
-    ForceRefresh();
+    ForceRefreshMaps();
 }
 
 void MapManager::ChangeMap(const std::string &name) {
@@ -71,7 +71,7 @@ void MapManager::ChangeMap(const std::string &name) {
     this->ActiveMap = map;
 
     //Refresh shader linker
-    ForceRefresh();
+    ForceRefreshMaps();
 }
 
 // Objects ##########################################################################################################
@@ -173,4 +173,8 @@ void MapManager::ChangeLightOnMap(const std::string &mapName, int lightIndex,
     {
         ShaderLinker.NotifyLightsOnCurrentMapChanged();
     }
+}
+
+void MapManager::ForceRefreshLightsOnCurrentMap() {
+    ShaderLinker.NotifyLightsOnCurrentMapChanged();
 }

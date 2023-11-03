@@ -48,7 +48,53 @@ struct LightSpot {
 uniform LightSpot LightSpotArray[LIGHTS_SIZE_MAX];
 uniform int LightSpotSize;
 
-void main () {
+// (l) for Idiffuse, normalized direction from the surface point to the light source
+vec3 calc_l_(vec3 lightPosition, vec3 fragPosition) {
+
+    return normalize(lightPosition - fragPosition);
+}
+
+// (r_) for Ispecular, reflection direction.
+vec3 cal_r_(vec3 l, vec3 n, float diffuse_dotp_nonmaxd) {
+    // Check if the light is behind the fragment
+    if (diffuse_dotp_nonmaxd < 0.0) {
+        return vec3(0.0, 0.0, 0.0);
+    } else {
+        return reflect(-l, n);
+    }
+}
+
+// Lights attenuation
+float calc_attn(vec3 lightPosition, vec3 worldPosition, float constant, float linear, float quadratic) {
+    float distance = length(lightPosition - worldPosition); //distance from light to fragment
+    return 1.0 / (constant + linear * distance + quadratic * distance * distance);
+}
+
+// Idiffuse Id * rd * max(0,n_ x l_)
+vec3 calc_Idiffuse(vec3 lightColor, vec3 diffuseColor, float diffuse_dotp_maxd) {
+    // Idiffuse  I    *      rd     *     max(0,n_ x l_)
+    return lightColor * diffuseColor * diffuse_dotp_maxd;
+}
+
+// Is
+vec3 calc_Is(vec3 lightColor, float lightIntensity) {
+    return lightColor * lightIntensity;
+}
+
+//Ispecular  Is *  rs * max(0,r_ x c_)^shineValue
+vec3 calc_Ispecular(vec3 lightColor, vec3 specularColor, vec3 r_, vec3 c_, float shineValue) {
+    //Ispecular  Is   *        rs     *     max(0,r_ x c_)^shineValue
+    return lightColor * specularColor * pow(max(dot(r_, c_), 0.0), shineValue);
+}
+
+// Spotlight intensity
+float calc_spotIntensity(vec3 lightDirection, vec3 l, float innerCutOff, float outerCutOff) {
+    float theta = dot(l, normalize(-lightDirection));
+    float epsilon = innerCutOff - outerCutOff;
+    return clamp((theta - outerCutOff) / epsilon, 0.0, 1.0);
+}
+
+void main() {
     //(n) for Idiffuse, normalised normal
     vec3 n_ = normalize(toFrag_worldNormal);
 
@@ -60,38 +106,19 @@ void main () {
 
     // Point lights
     for (int i = 0; i < LightPointSize; i++) {
-        // (l) for Idiffuse, normalized direction from the surface point to the light source
-        vec3 l_ = normalize(LightPointArray[i].position - toFrag_worldPosition.xyz);
-
-        float distance = length(LightPointArray[i].position - toFrag_worldPosition.xyz);//distance from light to fragment
-        float attn = 1.0 / (LightPointArray[i].constant + LightPointArray[i].linear *
-        distance + LightPointArray[i].quadratic * distance * distance);//attenuation
+        vec3 l_ = calc_l_(LightPointArray[i].position, toFrag_worldPosition.xyz);
 
         float diffuse_dotp_nonmaxd = dot(n_, l_);
         float diffuse_dotp_maxd = max(diffuse_dotp_nonmaxd, 0.0);//how strong the light is based on the angle
+        vec3 r_ = cal_r_(l_, n_, diffuse_dotp_nonmaxd);
 
+        vec3 Idiffuse = calc_Idiffuse(LightPointArray[i].color, diffuseColor, diffuse_dotp_maxd);
 
-        // (r_) for Ispecular, reflection direction.
-        vec3 r_;
+        vec3 Is = calc_Is(LightPointArray[i].color, LightPointArray[i].intensity);
+        vec3 Ispecular = calc_Ispecular(Is, specularColor, r_, c_, shineValue);
 
-        // Check if the light is behind the fragment
-        if (diffuse_dotp_nonmaxd < 0.0)
-        {
-            r_ = vec3(0.0, 0.0, 0.0);
-        }
-        else
-        {
-            r_ = reflect(-l_, n_);
-        }
-
-        // ### Idiffuse             Id       *      rd     *     max(0,n_ x l_)
-        vec3 Idiffuse = LightPointArray[i].color * diffuseColor * diffuse_dotp_maxd;
-
-        // Is
-        vec3 Is = LightPointArray[i].color * LightPointArray[i].intensity;
-
-        // ### Ispecular  Is *       rs     *     max(0,r_ x c_)^shineValue
-        vec3 Ispecular = Is * specularColor * pow(max(dot(r_, c_), 0.0), shineValue);
+        float attn = calc_attn(LightPointArray[i].position, toFrag_worldPosition.xyz,
+                               LightPointArray[i].constant, LightPointArray[i].linear, LightPointArray[i].quadratic);
 
         // Sum the diffuse and specular components, ambient is added once
         combinedColor += (Idiffuse + Ispecular) * attn;
@@ -99,71 +126,41 @@ void main () {
 
     // Directional lights
     for (int i = 0; i < LightDirectionalSize; i++) {
-        // (l) for Idiffuse, the direction from the light source
-        vec3 l_ = normalize(-LightDirectionalArray[i].direction);//negated direction
+        vec3 l_ = normalize(-LightDirectionalArray[i].direction); //negated direction
 
         float diffuse_dotp_nonmaxd = dot(n_, l_);
-        float diffuse_dotp_maxd = max(diffuse_dotp_nonmaxd, 0.0);//how strong the light is based on the angle
+        float diffuse_dotp_maxd = max(diffuse_dotp_nonmaxd, 0.0); //how strong the light is based on the angle
+        vec3 r_ = (diffuse_dotp_nonmaxd < 0.0) ? vec3(0.0, 0.0, 0.0) : reflect(-l_, n_);
 
-        // (r_) for Ispecular, reflection direction.
-        vec3 r_;
-        if (diffuse_dotp_nonmaxd < 0.0) {
-            r_ = vec3(0.0, 0.0, 0.0);
-        } else {
-            r_ = reflect(-l_, n_);
-        }
+        vec3 Idiffuse = calc_Idiffuse(LightDirectionalArray[i].color, diffuseColor, diffuse_dotp_maxd);
 
-        // ### Idiffuse             Id                 *       rd     *     max(0,n_ x l_)
-        vec3 Idiffuse = LightDirectionalArray[i].color * diffuseColor * diffuse_dotp_maxd;
-        Idiffuse *= LightDirectionalArray[i].intensity;
-
-        // Is
-        vec3 Is = LightDirectionalArray[i].color * LightDirectionalArray[i].intensity;
-
-        // ### Ispecular  Is *       rs     *     max(0,r_ x c_)^shineValue
-        vec3 Ispecular = Is * specularColor * pow(max(dot(r_, c_), 0.0), shineValue);
+        vec3 Is = calc_Is(LightDirectionalArray[i].color, LightDirectionalArray[i].intensity);
+        vec3 Ispecular = calc_Ispecular(Is, specularColor, r_, c_, shineValue);
 
         // Sum the diffuse and specular components, ambient is added once
         combinedColor += (Idiffuse + Ispecular);
     }
 
+
     // Spotlights
     for (int i = 0; i < LightSpotSize; i++) {
-        // (l) for Idiffuse, normalized direction from the surface point to the light source
-        vec3 l_ = normalize(LightSpotArray[i].position - toFrag_worldPosition.xyz);
-
-        //Spot light specific
-        float theta = dot(l_, normalize(-LightSpotArray[i].direction));// angle between light and fragment
-        float epsilon = LightSpotArray[i].innerCutOff - LightSpotArray[i].outerCutOff;//inner and outer cutoff angle difference
-        float intensity = clamp((theta - LightSpotArray[i].outerCutOff) / epsilon, 0.0, 1.0);// intensity based on angle
-
-        //Attn
-        float distance = length(LightSpotArray[i].position - toFrag_worldPosition.xyz);//distance from light to fragment
-        float attn = 1.0 / (LightSpotArray[i].constant + LightSpotArray[i].linear *
-        distance + LightSpotArray[i].quadratic * distance * distance);//attenuation
+        vec3 l_ = calc_l_(LightSpotArray[i].position, toFrag_worldPosition.xyz);
 
         float diffuse_dotp_nonmaxd = dot(n_, l_);
-        float diffuse_dotp_maxd = max(diffuse_dotp_nonmaxd, 0.0);//how strong the light is based on the angle
+        float diffuse_dotp_maxd = max(diffuse_dotp_nonmaxd, 0.0); //how strong the light is based on the angle
+        vec3 r_ = cal_r_(l_, n_, diffuse_dotp_nonmaxd);
 
-        // (r_) for Ispecular, reflection direction.
-        vec3 r_;
-        if (diffuse_dotp_nonmaxd < 0.0) {
-            r_ = vec3(0.0, 0.0, 0.0);
-        } else {
-            r_ = reflect(-l_, n_);
-        }
+        vec3 Idiffuse = calc_Idiffuse(LightSpotArray[i].color, diffuseColor, diffuse_dotp_maxd);
 
-        // ### Idiffuse             Id          *       rd     *     max(0,n_ x l_)
-        vec3 Idiffuse = LightSpotArray[i].color * diffuseColor * diffuse_dotp_maxd;
-        Idiffuse *= LightSpotArray[i].intensity;
+        vec3 Is = calc_Is(LightSpotArray[i].color, LightSpotArray[i].intensity);
+        vec3 Ispecular = calc_Ispecular(Is, specularColor, r_, c_, shineValue);
 
-        // Is
-        vec3 Is = LightSpotArray[i].color * LightSpotArray[i].intensity;
+        float attn = calc_attn(LightSpotArray[i].position, toFrag_worldPosition.xyz,
+                               LightSpotArray[i].constant, LightSpotArray[i].linear, LightSpotArray[i].quadratic);
+        float intensity = calc_spotIntensity(LightSpotArray[i].direction, l_,
+                                             LightSpotArray[i].innerCutOff, LightSpotArray[i].outerCutOff);
 
-        // ### Ispecular  Is *       rs     *     max(0,r_ x c_)^shineValue
-        vec3 Ispecular = Is * specularColor * pow(max(dot(r_, c_), 0.0), shineValue);
-
-        // Sum
+        // Sum the diffuse and specular components
         combinedColor += (Idiffuse + Ispecular) * attn * intensity;
     }
 

@@ -21,7 +21,7 @@ private:
     std::vector<std::shared_ptr<Map>> Maps;
 public:
     void Initialize();
-    void ForceRefresh();
+    void ForceRefreshMaps();
     MapToShaderLinker ShaderLinker;
     void SetFallbackShader(std::shared_ptr<ShaderHandler> &shader);
 
@@ -42,6 +42,7 @@ public:
     void AddLightToMap(const std::string &name, const std::shared_ptr<RenderableLight>& light);
     void AddLightToCurrentMap(const std::shared_ptr<RenderableLight>& light);
 
+    void ForceRefreshLightsOnCurrentMap();
     std::shared_ptr<RenderableLight> & GetLightOnMap(int mapIndex, int lightIndex);
     std::shared_ptr<RenderableLight> & GetLightOnMap(const std::string &mapName, int lightIndex);
 

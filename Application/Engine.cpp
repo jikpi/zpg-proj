@@ -143,11 +143,14 @@ void Engine::Run() {
     float angle = 0.0f;
     float angleIncrement = glm::radians(1.0f);
 
-    std::shared_ptr<LightSpot> spotLight = std::dynamic_pointer_cast<LightSpot>(
+    std::shared_ptr<LightSpot> spheresSpotLight = std::dynamic_pointer_cast<LightSpot>(
             this->EngineMapManager.GetLightOnMap("Default", 0));
 
+    std::shared_ptr<LightSpot> manyObjectsSpotLight = std::dynamic_pointer_cast<LightSpot>(
+            this->EngineMapManager.GetLightOnMap("Many objects", 0));
+
     this->CameraMain->MoveForwardBackward(0);
-    this->EngineMapManager.ForceRefresh();
+    this->EngineMapManager.ForceRefreshMaps();
     while (!glfwWindowShouldClose(Window)) {
         //Update camera position
         UpdateMoveset();
@@ -174,8 +177,9 @@ void Engine::Run() {
         float x = radius * cos(angle);
         float z = radius * sin(angle);
 
-        spotLight->SetDirection(glm::vec3(x, 0.0f, z));
-        EngineMapManager.GetLightOnMap(0, 0);
+        spheresSpotLight->SetDirection(glm::vec3(x, 0.0f, z));
+        manyObjectsSpotLight->SetDirection(glm::vec3(x, 0.0f, z));
+        EngineMapManager.ForceRefreshLightsOnCurrentMap();
 
 
 
@@ -213,16 +217,16 @@ void Engine::TestLaunch() {
     //Shaders
     this->Shaders.push_back(ShaderHandlerFactory::Phong());
     this->EngineMapManager.SetFallbackShader(SelectShader("Phong"));
-    this->CameraMain->RegisterCameraObserver(Shaders.at(0));
+    this->CameraMain->RegisterCameraObserver(SelectShader("Phong"));
 
-//    this->Shaders.push_back(ShaderHandlerFactory::Lambert());
-//    this->CameraMain->RegisterCameraObserver(Shaders.at(1));
-//
-//    this->Shaders.push_back(ShaderHandlerFactory::ConstantColored());
-//    this->CameraMain->RegisterCameraObserver(Shaders.at(2));
-//
-//    this->Shaders.push_back(ShaderHandlerFactory::BlinnPhong());
-//    this->CameraMain->RegisterCameraObserver(Shaders.at(3));
+    this->Shaders.push_back(ShaderHandlerFactory::Lambert());
+    this->CameraMain->RegisterCameraObserver(SelectShader("Lambert"));
+
+    this->Shaders.push_back(ShaderHandlerFactory::ConstantColored());
+    this->CameraMain->RegisterCameraObserver(SelectShader("Constant"));
+
+    this->Shaders.push_back(ShaderHandlerFactory::BlinnPhong());
+    this->CameraMain->RegisterCameraObserver(SelectShader("BlinnPhong"));
 
     //Models
 
@@ -261,12 +265,12 @@ void Engine::TestLaunch() {
 
     std::shared_ptr<StandardisedModel> objectSphere2 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
                                                                                     "Test model 2");
-    objectSphere2->SetShaderProgram(PhongShader);
+    objectSphere2->SetShaderProgram(BlinnPhongShader);
     this->EngineMapManager.AddObjectToMap(0, objectSphere2);
 
     std::shared_ptr<StandardisedModel> objectSphere3 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
                                                                                     "Test model 3");
-    objectSphere3->SetShaderProgram(PhongShader);
+    objectSphere3->SetShaderProgram(LambertShader);
     this->EngineMapManager.AddObjectToMap(0, objectSphere3);
 
     std::shared_ptr<StandardisedModel> objectSphere4 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
@@ -477,15 +481,14 @@ void Engine::TestLaunch() {
 
 
     this->EngineMapManager.CreateNewMap("Many objects");
-//    EngineMapManager.AddLightToMap("Many objects", std::make_shared<LightPoint>(glm::vec3(0.0f, 3.0f, 0.0f)));
     EngineMapManager.AddLightToMap("Many objects", std::make_shared<LightSpot>(glm::vec3(0.0f, 5.0f, 10.0f),
                                                                                glm::vec3(0.0f, -1.0f, 0.0f)));
+//    EngineMapManager.AddLightToMap("Many objects", std::make_shared<LightDirectional>(glm::vec3(0.0f, -1.0f, 0.0f),
+//                                                                                      glm::vec3(1.0f, 1.0f, 1.0f)));
 
-    std::dynamic_pointer_cast<LightSpot>(EngineMapManager.GetLightOnMap("Many objects", 0));
-//            ->SetOuterCutOff(100.0f)
-//            .SetIntensity(1.0f);
-//    std::dynamic_pointer_cast<LightPoint>(EngineMapManager.GetLightOnMap("Many objects", 0))->SetConstant(1.0f);
-//    std::dynamic_pointer_cast<LightPoint>(EngineMapManager.GetLightOnMap("Many objects", 0))->SetLinear(0.01f);
+    std::dynamic_pointer_cast<LightSpot>(EngineMapManager.GetLightOnMap("Many objects", 0))
+            ->SetQuadratic(0.0001f)
+            .SetIntensity(1.0f);
 
     std::shared_ptr<StandardisedModel> preparedModelGround = ModelFactory::PositionNormal(rawmodel6_plain, size6,
                                                                                           "Ground");
@@ -499,7 +502,7 @@ void Engine::TestLaunch() {
 
 
     auto add100RandomObject = [&randomModel, &randomMaterial, this](std::shared_ptr<ShaderHandler> shader) -> void {
-        for (int i = 0; i < 400; i++) {
+        for (int i = 0; i < 100; i++) {
             std::pair<const float *, int> randomModelPair = randomModel();
 
             std::shared_ptr<StandardisedModel> randomObjectsPhong = ModelFactory::PositionNormal(randomModelPair.first,
@@ -519,8 +522,8 @@ void Engine::TestLaunch() {
     };
 
     add100RandomObject(SelectShader("Phong"));
-//    add100RandomObject(SelectShader("Lambert"));
-//    add100RandomObject(SelectShader("BlinnPhong"));
+    add100RandomObject(SelectShader("Lambert"));
+    add100RandomObject(SelectShader("BlinnPhong"));
 //    add100RandomObject(SelectShader("Constant"));
 
 }
