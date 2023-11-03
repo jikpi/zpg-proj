@@ -361,19 +361,6 @@ void ShaderHandler::RenderLightsArray(
                 SendToShader(lightArrayIndexlocation.constant, light->GetConstant());
                 SendToShader(lightArrayIndexlocation.linear, light->GetLinear());
                 SendToShader(lightArrayIndexlocation.quadratic, light->GetQuadratic());
-
-                //debug print
-                std::cout << "innerCutOff: " << light->GetInnerCutOff() << std::endl;
-                std::cout << "outerCutOff: " << light->GetOuterCutOff() << std::endl;
-                std::cout << "direction: " << light->GetDirection().x << " " << light->GetDirection().y << " " << light->GetDirection().z << std::endl;
-                std::cout << "position: " << light->GetPosition().x << " " << light->GetPosition().y << " " << light->GetPosition().z << std::endl;
-                std::cout << "color: " << light->GetColor().x << " " << light->GetColor().y << " " << light->GetColor().z << std::endl;
-                std::cout << "intensity: " << light->GetIntensity() << std::endl;
-                std::cout << "constant: " << light->GetConstant() << std::endl;
-                std::cout << "linear: " << light->GetLinear() << std::endl;
-                std::cout << "quadratic: " << light->GetQuadratic() << std::endl;
-                std::cout << std::endl;
-
                 break;
         }
 

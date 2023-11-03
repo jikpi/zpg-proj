@@ -14,9 +14,7 @@
 
 class StandardisedModel : public BaseModelData, public RenderableObject {
 private:
-    std::shared_ptr<TransfComposite> Transformations;
     std::weak_ptr<ShaderHandler> SelectedShaderProgram;
-    Material material;
 
 public:
     StandardisedModel(const float *modelData, int modelDataSize, std::string stamp, std::string name = "None");
@@ -35,18 +33,8 @@ public:
     StandardisedModel &InsertTransfScale(glm::vec3 transformation);
     StandardisedModel &InsertTransfComposite(const std::shared_ptr<Transformation> &transformation);
 
-    void ConsolidateTransf(glm::mat4 transformation = glm::mat4(1.0f)) const;
-    void DoTransf(glm::mat4 transformation = glm::mat4(1.0f)) const;
-    [[nodiscard]] glm::mat4 GetTransf() const override;
-    void ClearTransf() const;
-    void ResetTransf() const;
-    void SetTransf(glm::mat4 transformation) const;
-
     void SetShaderProgram(std::shared_ptr<ShaderHandler> &shaderProgram);
     [[nodiscard]] const std::weak_ptr<ShaderHandler> &GetShaderProgram() const;
-
-    void SetMaterial(Material newMaterial);
-    [[nodiscard]] Material GetMaterial() const override;
 };
 
 

@@ -58,21 +58,7 @@ StandardisedModel & StandardisedModel::InsertTransfComposite(const std::shared_p
     return *this;
 }
 
-void StandardisedModel::ConsolidateTransf(glm::mat4 transformation) const {
-    Transformations->Consolidate(transformation);
-}
 
-void StandardisedModel::DoTransf(glm::mat4 transformation) const {
-    this->Transformations->UseAndRemember(transformation);
-}
-
-glm::mat4 StandardisedModel::GetTransf() const {
-    return Transformations->GetResult();
-}
-
-void StandardisedModel::SetTransf(glm::mat4 transformation) const {
-    Transformations->SetResult(transformation);
-}
 
 void StandardisedModel::SetShaderProgram(std::shared_ptr<ShaderHandler> &shaderProgram) {
     SelectedShaderProgram = shaderProgram;
@@ -91,10 +77,13 @@ std::string StandardisedModel::Stamp() const {
 }
 
 StandardisedModel::StandardisedModel(StandardisedModel &&other) noexcept
-        : BaseModelData(std::move(other)),
-          Transformations(std::move(other.Transformations)), // NOLINT(*-use-after-move)
-          SelectedShaderProgram(std::move(other.SelectedShaderProgram)) { // NOLINT(*-use-after-move)
-    material = other.material; // NOLINT(*-use-after-move)
+        : BaseModelData(std::move(other)){ // NOLINT(*-use-after-move)
+
+    Transformations = std::move(other.Transformations);// NOLINT(*-use-after-move)
+    SelectedShaderProgram = std::move(other.SelectedShaderProgram);
+    material = other.material;
+
+    BaseModelData::operator=(std::move(other));
 }
 
 
@@ -110,20 +99,3 @@ StandardisedModel &StandardisedModel::operator=(StandardisedModel &&other) noexc
     BaseModelData::operator=(std::move(other));
     return *this;
 }
-
-void StandardisedModel::SetMaterial(Material newMaterial) {
-    this->material = newMaterial;
-}
-
-Material StandardisedModel::GetMaterial() const {
-    return this->material;
-}
-
-void StandardisedModel::ClearTransf() const {
-    Transformations->ClearTransformations();
-}
-
-void StandardisedModel::ResetTransf() const {
-    Transformations->ResetResult();
-}
-

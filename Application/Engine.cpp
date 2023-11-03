@@ -139,7 +139,9 @@ void Engine::Run() {
     DebugErrorMessages::PrintGLErrors("Before run errors");
 
 
-    float angleChange = 0.0f;
+    float radius = 1.0f;
+    float angle = 0.0f;
+    float angleIncrement = glm::radians(1.0f);
 
     std::shared_ptr<LightSpot> spotLight = std::dynamic_pointer_cast<LightSpot>(
             this->EngineMapManager.GetLightOnMap("Default", 0));
@@ -163,14 +165,17 @@ void Engine::Run() {
         //animate mars
         this->EngineMapManager.GetMapByIndex(1)->GetObjectByName("Mars")->DoTransf();
 
-        //animate spotlight
-        spotLight->SetDirection(glm::vec3(glm::cos(angleChange), glm::sin(angleChange), 0.0f));
-        EngineMapManager.GetLightOnMap("Default", 0);
-//        std::cout << "Spotlight direction: " << spotLight->GetDirection().x << " " << spotLight->GetDirection().y << " " << spotLight->GetDirection().z << std::endl;
-        angleChange += 0.01f;
-        if(angleChange >= 1.0f){
-            angleChange = 0.1f;
+
+        angle += angleIncrement;
+        if (angle > 2 * glm::pi<float>()) {
+            angle -= 2 * glm::pi<float>();
         }
+
+        float x = radius * cos(angle);
+        float z = radius * sin(angle);
+
+        spotLight->SetDirection(glm::vec3(x, 0.0f, z));
+        EngineMapManager.GetLightOnMap(0, 0);
 
 
 
@@ -295,21 +300,26 @@ void Engine::TestLaunch() {
     this->EngineMapManager.AddObjectToMap(0, objectSphere9);
 
     std::shared_ptr<StandardisedModel> objectSphere10 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                    "Test model 10");
+                                                                                     "Test model 10");
     objectSphere10->SetShaderProgram(PhongShader);
     this->EngineMapManager.AddObjectToMap(0, objectSphere10);
 
     std::shared_ptr<StandardisedModel> objectSphere11 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                    "Test model 11");
+                                                                                     "Test model 11");
     objectSphere11->SetShaderProgram(PhongShader);
     this->EngineMapManager.AddObjectToMap(0, objectSphere11);
 
     std::shared_ptr<StandardisedModel> objectSphere12 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                    "Test model 12");
+                                                                                     "Test model 12");
     objectSphere12->SetShaderProgram(PhongShader);
     this->EngineMapManager.AddObjectToMap(0, objectSphere12);
 
-    EngineMapManager.AddLightToMap(0, std::make_shared<LightSpot>(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0, 0)));
+    std::shared_ptr<LightSpot> spotLight = std::make_shared<LightSpot>(glm::vec3(0.0f, 0.0f, 0.0f),
+                                                                       glm::vec3(0.0f,
+                                                                                 1.0f,
+                                                                                 0));
+    spotLight->SetOuterCutOff(100.0f);
+    EngineMapManager.AddLightToMap(0, spotLight);
     EngineMapManager.GetMapByIndex(0)->GetObject(0)->InsertTransfMove(glm::vec3(-2.0f, 0.0f, 0.0f)).ConsolidateTransf();
     EngineMapManager.GetMapByIndex(0)->GetObject(1)->InsertTransfMove(glm::vec3(0.0f, 0.0f, 2.0f)).ConsolidateTransf();
     EngineMapManager.GetMapByIndex(0)->GetObject(2)->InsertTransfMove(glm::vec3(2.0f, 0.0f, 0.0f)).ConsolidateTransf();
@@ -320,10 +330,13 @@ void Engine::TestLaunch() {
     EngineMapManager.GetMapByIndex(0)->GetObject(6)->InsertTransfMove(glm::vec3(2.0f, 4.0f, 0.0f)).ConsolidateTransf();
     EngineMapManager.GetMapByIndex(0)->GetObject(7)->InsertTransfMove(glm::vec3(0.0f, 4.0f, -2.0f)).ConsolidateTransf();
 
-    EngineMapManager.GetMapByIndex(0)->GetObject(8)->InsertTransfMove(glm::vec3(-2.0f, -4.0f, 0.0f)).ConsolidateTransf();
+    EngineMapManager.GetMapByIndex(0)->GetObject(8)->InsertTransfMove(
+            glm::vec3(-2.0f, -4.0f, 0.0f)).ConsolidateTransf();
     EngineMapManager.GetMapByIndex(0)->GetObject(9)->InsertTransfMove(glm::vec3(0.0f, -4.0f, 2.0f)).ConsolidateTransf();
-    EngineMapManager.GetMapByIndex(0)->GetObject(10)->InsertTransfMove(glm::vec3(2.0f, -4.0f, 0.0f)).ConsolidateTransf();
-    EngineMapManager.GetMapByIndex(0)->GetObject(11)->InsertTransfMove(glm::vec3(0.0f, -4.0f, -2.0f)).ConsolidateTransf();
+    EngineMapManager.GetMapByIndex(0)->GetObject(10)->InsertTransfMove(
+            glm::vec3(2.0f, -4.0f, 0.0f)).ConsolidateTransf();
+    EngineMapManager.GetMapByIndex(0)->GetObject(11)->InsertTransfMove(
+            glm::vec3(0.0f, -4.0f, -2.0f)).ConsolidateTransf();
 
     //Map 2 - solar system
     float earthOrbitSpeed = 0.05f;

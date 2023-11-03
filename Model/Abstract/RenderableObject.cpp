@@ -3,3 +3,36 @@
 //
 
 #include "RenderableObject.h"
+
+glm::mat4 RenderableObject::GetTransf() const {
+    return Transformations->GetResult();
+}
+
+void RenderableObject::ConsolidateTransf(glm::mat4 transformation) const {
+    Transformations->Consolidate(transformation);
+}
+
+void RenderableObject::DoTransf(glm::mat4 transformation) const {
+    this->Transformations->UseAndRemember(transformation);
+}
+
+void RenderableObject::SetTransf(glm::mat4 transformation) const {
+    Transformations->SetResult(transformation);
+}
+
+void RenderableObject::ClearTransf() const {
+    Transformations->ClearTransformations();
+}
+
+void RenderableObject::ResetTransf() const {
+    Transformations->ResetResult();
+}
+
+void RenderableObject::SetMaterial(Material newMaterial) {
+    this->material = newMaterial;
+}
+
+Material RenderableObject::GetMaterial() const {
+    return this->material;
+}
+

@@ -8,6 +8,7 @@
 
 #include "glm/vec3.hpp"
 #include "LightType.h"
+#include "../../../Model/Abstract/RenderableObject.h"
 
 class RenderableLight {
 private:
@@ -28,8 +29,8 @@ public:
     [[nodiscard]] float GetIntensity() const;
     [[nodiscard]] LightType GetType() const;
 
-    RenderableLight & SetColor(const glm::vec3 &newColor);
-    RenderableLight & SetIntensity(float newIntensity);
+    RenderableLight &SetColor(const glm::vec3 &newColor);
+    RenderableLight &SetIntensity(float newIntensity);
 };
 
 
