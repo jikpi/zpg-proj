@@ -92,7 +92,7 @@ void main() {
 
     //Directional lights
     for (int i = 0; i < LightDirectionalSize; i++) {
-        vec3 l_ = calc_l_(LightDirectionalArray[i].direction, toFrag_worldPosition.xyz);
+        vec3 l_ = -LightDirectionalArray[i].direction;
         float diffuse_dotp = max(dot(n_, l_), 0.0);//how strong the light is based on the angle
 
         vec3 Idiffuse = calc_Idiffuse(LightDirectionalArray[i].color, diffuseColor, diffuse_dotp);
