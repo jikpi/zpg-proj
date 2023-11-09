@@ -42,6 +42,11 @@ public:
     void AddLightToMap(const std::string &name, const std::shared_ptr<RenderableLight>& light);
     void AddLightToCurrentMap(const std::shared_ptr<RenderableLight>& light);
 
+    void AddSkyboxToMap(int index, const std::shared_ptr<StandardisedModel>& skybox);
+    void AddSkyboxToMap(std::shared_ptr<Map> &map, const std::shared_ptr<StandardisedModel>& skybox);
+    void AddSkyboxToMap(const std::string &name, const std::shared_ptr<StandardisedModel>& skybox);
+    void AddSkyboxToCurrentMap(const std::shared_ptr<StandardisedModel>& skybox);
+
     void ForceRefreshLightsOnCurrentMap();
     std::shared_ptr<RenderableLight> & GetLightOnMap(int mapIndex, int lightIndex);
     std::shared_ptr<RenderableLight> & GetLightOnMap(const std::string &mapName, int lightIndex);

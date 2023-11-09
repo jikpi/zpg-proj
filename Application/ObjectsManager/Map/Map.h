@@ -18,6 +18,7 @@ class Map {
     std::vector<std::shared_ptr<StandardisedModel>> Objects;
     std::shared_ptr<std::vector<std::shared_ptr<RenderableLight>>> Lights;
 
+
     void InsertLight(const std::shared_ptr<RenderableLight>& light);
     unsigned long GetLightCount();
     std::shared_ptr<RenderableLight> & GetLight(int index);
@@ -27,8 +28,9 @@ public:
     friend class MapToShaderLinker;
     friend class MapManager;
 
+    std::shared_ptr<StandardisedModel> Skybox;
 
-
+    void SetSkybox(const std::shared_ptr<StandardisedModel>& skybox);
     void InsertObject(const std::shared_ptr<StandardisedModel>& object);
     unsigned long GetObjectCount();
     std::shared_ptr<StandardisedModel> & GetObject(int index);

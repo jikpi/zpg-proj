@@ -53,3 +53,11 @@ std::string ShaderFileLoader::HardLoadCubemapSkyboxVert() {
 std::string ShaderFileLoader::HardLoadCubemapSkyboxFrag() {
     return LoadShaderCodeFromFile("../Shaders/ShadersCode/ShaderFiles/CubemapSkybox.frag");
 }
+
+std::string ShaderFileLoader::HardLoadMVPNTextureVertex() {
+    return LoadShaderCodeFromFile("../Shaders/ShadersCode/ShaderFiles/MVPNTexture.vert");
+}
+
+std::string ShaderFileLoader::HardLoadPhongTextureFragment() {
+    return LoadShaderCodeFromFile("../Shaders/ShadersCode/ShaderFiles/PhongTexture.frag");
+}

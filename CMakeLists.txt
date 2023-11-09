@@ -6,10 +6,7 @@ project(zpg_test)
 set(CMAKE_CXX_STANDARD 17)
 
 
-find_library(SOIL_LIBRARY NAMES SOIL PATHS /usr/lib)
-if(NOT SOIL_LIBRARY)
-    message(FATAL_ERROR "SOIL library not located!")
-endif()
+
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
@@ -18,6 +15,7 @@ add_subdirectory(libraries/glm)
 
 include_directories(${OPENGL_INCLUDE_DIRS})
 include_directories(${GLEW_INCLUDE_DIRS})
+include_directories("/usr/include/stb/")
 
 add_executable(zpg_test main.cpp
         Model/Abstract/BaseModelData.cpp
@@ -95,5 +93,6 @@ add_executable(zpg_test main.cpp
         Shaders/Lighting/Uniforms/LightArrayDirectionalUniform.h
         Shaders/Lighting/Uniforms/LightsArraySpotUniform.cpp
         Shaders/Lighting/Uniforms/LightsArraySpotUniform.h
+        ExtResources/LessonResources/TextureResources/triangle.h
 )
-target_link_libraries(zpg_test ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${SOIL_LIBRARY} glfw glm::glm)
+target_link_libraries(zpg_test ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw glm::glm)

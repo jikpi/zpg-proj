@@ -16,7 +16,5 @@ void main () {
 
     vec4 position = projectionMatrix * viewMatrix * vec4(vp, 1.0);
     //w-component of the position vector is equal to the w-component before the perspective division.
-    gl_Position = position.xyww;
-
-    toFrag_worldPosition = modelMatrix * vec4(vp, 1.0); //send position to fragment shader
+    gl_Position = position;
 }

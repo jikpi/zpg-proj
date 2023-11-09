@@ -12,7 +12,9 @@
 #include "../Lighting/LightSpot.h"
 
 //Test soil
-#include <SOIL/SOIL.h>
+#define STB_IMAGE_IMPLEMENTATION
+
+#include <stb_image.h>
 
 ShaderHandler::ShaderHandler() : ShaderBase(),
                                  ViewMatrix(glm::mat4(1.0f)),
@@ -32,6 +34,7 @@ ShaderHandler::ShaderHandler() : ShaderBase(),
                                  ShineValueLocation(-2),
                                  SpecularColorLocation(-2),
 
+                                 TextureLocation(-2),
                                  SkyboxLocation(-2) {
 }
 
@@ -41,7 +44,7 @@ ShaderHandler &ShaderHandler::SaveBaseMatrixLocations() {
     ProjectionMatrixLocation = GetUniformLocation(DEF_SHADER_PROJECTION_MATRIX_NAME);
 
     if ((ModelMatrixLocation == -1 || ViewMatrixLocation == -1 || ProjectionMatrixLocation == -1)) {
-        std::cerr << "SHADER FATAL ERROR: A BASIC TRANSFORMATION NOT FOUND IN SHADER CODE." << std::endl;
+        std::cerr << "SHADER ERROR: A BASIC TRANSFORMATION NOT FOUND IN SHADER CODE." << std::endl;
         if (ModelMatrixLocation == -1) std::cerr << "ModelMatrix == -1" << std::endl;
         if (ViewMatrixLocation == -1) std::cerr << "ViewMatrix == -1" << std::endl;
         if (ProjectionMatrixLocation == -1) std::cerr << "ProjectionMatrix == -1" << std::endl;
@@ -216,6 +219,16 @@ ShaderHandler &ShaderHandler::SaveCameraLocationLocation() {
     return *this;
 }
 
+ShaderHandler &ShaderHandler::SaveSkyboxLocation() {
+    this->SkyboxLocation = GetUniformLocation(DEF_SHADER_TEXTURE_CUBEMAP_LOCATION);
+    if (this->SkyboxLocation == -1) {
+        std::cerr << "SHADER ERROR: SKYBOX CUBEMAP NOT FOUND IN SHADER CODE, BUT WAS EXPECTED."
+                  << std::endl;
+        this->PrintName();
+    }
+    return *this;
+}
+
 
 void ShaderHandler::RenderBase(const glm::mat4 &modelMatrix) {
     SendToShader(ModelMatrixLocation, modelMatrix);
@@ -340,32 +353,97 @@ void ShaderHandler::RequestRenderBaseLightsArray() {
     }
 }
 
+GLuint loadCubemap(std::vector<std::string> faces) {
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    int width, height, nrChannels;
+    for (GLuint i = 0; i < faces.size(); i++) {
+        unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+        if (data) {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE,
+                         data);
+            stbi_image_free(data);
+        } else {
+            std::cerr << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+            stbi_image_free(data);
+        }
+    }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureID;
+}
+
+
 void ShaderHandler::RenderSkybox() const {
     glActiveTexture(GL_TEXTURE1);
 
-// Load a cubemap texture using SOIL
-    GLuint cubemapTextureID = SOIL_load_OGL_cubemap(
-            "xpos.jpg", "negx.jpg",
-            "ypos.jpg", "negy.jpg",
-            "zpos.jpg", "negz.jpg",
-            SOIL_LOAD_RGB,
-            SOIL_CREATE_NEW_ID,
-            SOIL_FLAG_MIPMAPS
-    );
+    DebugErrorMessages::PrintGLErrors("Before loading ");
 
-// Check for errors during loading
-    if(cubemapTextureID == 0) {
-        // Handle the error as appropriate
-        std::cerr << "SOIL loading error: '" << SOIL_last_result() << "' (cubemap)" << std::endl;
-    }
+    std::vector<std::string> faces = {
+            "posx.jpg",
+            "negx.jpg",
+            "posy.jpg",
+            "negy.jpg",
+            "posz.jpg",
+            "negz.jpg"
+    };
 
-// Bind the loaded cubemap texture
+    GLuint cubemapTextureID = loadCubemap(faces);
+
+
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTextureID);
 
-// Set the cubemap texture unit to the fragment shader
     GLint cubemapUniformID = glGetUniformLocation(this->ShaderProgramGLuint, DEF_SHADER_TEXTURE_CUBEMAP_LOCATION);
     glUniform1i(cubemapUniformID, 1);
 }
+
+void ShaderHandler::RenderTexture() const {
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("../posx.jpg", &width, &height, &nrChannels, 0); // Corrected the file extension
+
+    if (data) {
+        GLuint textureID;
+        glGenTextures(1, &textureID);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureID);
+
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+
+        GLenum format = GL_RGB;
+        if (nrChannels == 1)
+            format = GL_RED;
+        else if (nrChannels == 3)
+            format = GL_RGB;
+        else if (nrChannels == 4)
+            format = GL_RGBA;
+
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+
+        stbi_image_free(data);
+
+
+        GLint textureUniformID = glGetUniformLocation(this->ShaderProgramGLuint,
+                                                      DEF_SHADER_TEXTURE_TWOD_LOCATION);
+        glUniform1i(textureUniformID, 0);
+    } else {
+        std::cerr << "Texture failed to load at path: " << "posx.jpg" << std::endl;
+    }
+}
+
 
 void ShaderHandler::RequestRender(RenderableObject &object) {
     glm::mat4 modelMatrix = object.GetTransf();
@@ -391,6 +469,14 @@ void ShaderHandler::RequestRender(RenderableObject &object) {
         this->HaveLightsChanged = false;
         this->RequestRenderBaseLightsArray();
     }
+
+    if (this->TextureLocation != -2) {
+        this->RenderTexture();
+    }
+
+    if (this->SkyboxLocation != -2) {
+        this->RenderSkybox();
+    }
 }
 
 
@@ -415,6 +501,15 @@ void ShaderHandler::NotifyLightsChanged() {
     HaveLightsChanged = true;
 }
 
+ShaderHandler &ShaderHandler::SaveTextureLocation() {
+    this->TextureLocation = GetUniformLocation(DEF_SHADER_TEXTURE_TWOD_LOCATION);
+    if (this->TextureLocation == -1) {
+        std::cerr << "SHADER ERROR: TEXTURE NOT FOUND IN SHADER CODE, BUT WAS EXPECTED."
+                  << std::endl;
+        this->PrintName();
+    }
+    return *this;
+}
 
 
 

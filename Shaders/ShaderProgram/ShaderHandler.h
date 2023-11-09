@@ -41,6 +41,7 @@ private:
     void RenderLightsArray(const std::shared_ptr<std::vector<std::shared_ptr<RenderableLight>>> &lightsVector) const;
     void RenderObjectMaterial(Material objectMaterial) const;
     void RenderPhongLight(Material objectMaterial) const;
+    void RenderTexture() const;
     void RenderSkybox() const;
 
 
@@ -69,6 +70,8 @@ private:
     //Blinn-Phong
     GLint SpecularColorLocation{};
     GLint ShineValueLocation{};
+    /* Texture */
+    GLint TextureLocation{};
     /* Skybox cubemap */
     GLint SkyboxLocation{};
 
@@ -96,6 +99,7 @@ public:
     ShaderHandler &SavePhongLightLocation();
     ShaderHandler &SaveCameraLocationLocation();
     ShaderHandler &SaveObjectMaterialLocation();
+    ShaderHandler &SaveTextureLocation();
     ShaderHandler &SaveSkyboxLocation();
 };
 

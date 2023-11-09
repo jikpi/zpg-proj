@@ -53,6 +53,7 @@ inline constexpr const char *DEF_SHADER_MATERIAL_DIFFUSECOLOR_NAME = "diffuseCol
 inline constexpr const char *DEF_SHADER_LIGHTS_BLINNPHONG_SPECCOLOR_NAME = "specularColor";
 inline constexpr const char *DEF_SHADER_LIGHTS_BLINNPHONG_SHINEVALUE_NAME = "shineValue";
 //Texture
+inline constexpr const char *DEF_SHADER_TEXTURE_TWOD_LOCATION= "twoDTexture";
 inline constexpr const char *DEF_SHADER_TEXTURE_CUBEMAP_LOCATION= "cubemapTexture";
 
 //// ### Lights ###

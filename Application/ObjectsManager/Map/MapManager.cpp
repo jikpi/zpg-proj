@@ -178,3 +178,21 @@ void MapManager::ChangeLightOnMap(const std::string &mapName, int lightIndex,
 void MapManager::ForceRefreshLightsOnCurrentMap() {
     ShaderLinker.NotifyLightsOnCurrentMapChanged();
 }
+
+void MapManager::AddSkyboxToMap(int index, const std::shared_ptr<StandardisedModel> &skybox) {
+    std::shared_ptr<Map> &map = this->GetMapByIndex(index);
+    map->SetSkybox(skybox);
+}
+
+void MapManager::AddSkyboxToMap(std::shared_ptr<Map> &map, const std::shared_ptr<StandardisedModel> &skybox) {
+    map->SetSkybox(skybox);
+}
+
+void MapManager::AddSkyboxToMap(const std::string &name, const std::shared_ptr<StandardisedModel> &skybox) {
+    std::shared_ptr<Map> &map = this->GetMapByName(name);
+    map->SetSkybox(skybox);
+}
+
+void MapManager::AddSkyboxToCurrentMap(const std::shared_ptr<StandardisedModel> &skybox) {
+    this->ActiveMap->SetSkybox(skybox);
+}

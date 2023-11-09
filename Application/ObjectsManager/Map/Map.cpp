@@ -55,3 +55,7 @@ std::shared_ptr<RenderableLight> &Map::GetLight(int index) {
 void Map::ChangeLight(int index, const std::shared_ptr<RenderableLight> &light) {
     Lights->at(index) = light;
 }
+
+void Map::SetSkybox(const std::shared_ptr<StandardisedModel> &skybox) {
+    this->Skybox = skybox;
+}

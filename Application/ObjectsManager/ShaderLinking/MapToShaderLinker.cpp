@@ -96,6 +96,10 @@ void MapToShaderLinker::BuildWithMap(const std::shared_ptr<Map> &map) {
     for (auto &set: this->ShaderObjectSets) {
         set->Shader->SetLights(map->Lights);
     }
+
+    for (auto &set: this->ShaderObjectSets) {
+        set->Skybox = map->Skybox;
+    }
 }
 
 void MapToShaderLinker::BuildWithMapSingleObject(const std::shared_ptr<Map> &map,

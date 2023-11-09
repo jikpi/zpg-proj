@@ -53,7 +53,6 @@ std::shared_ptr<StandardisedModel> ModelFactory::PositionNormalTex(const float *
     auto newStandModel = std::make_shared<StandardisedModel>(model, size, "PositionNormalTex", std::move(Name));
 
     //(VBO)
-    GLuint VBO = 0;
     glGenBuffers(1, &newStandModel->VBO); // generate the VBO
     glBindBuffer(GL_ARRAY_BUFFER, newStandModel->VBO);
     glBufferData(GL_ARRAY_BUFFER, newStandModel->GetModelDataSize() * sizeof(float), newStandModel->GetModelDataRaw(),
@@ -67,7 +66,7 @@ std::shared_ptr<StandardisedModel> ModelFactory::PositionNormalTex(const float *
     glEnableVertexAttribArray(0); //enable vertex attributes
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, newStandModel->VBO);
     //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid *) 0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid *) (3 * sizeof(float)));
@@ -132,7 +131,7 @@ std::shared_ptr<StandardisedModel> ModelFactory::Position(const float *model, in
 }
 
 void ModelFactory::CheckBadModelSize(std::shared_ptr<StandardisedModel> &model, int stride) {
-    if(model->RenderingSize % stride != 0)
+    if(model->GetModelDataSize() % stride != 0)
     {
         std::cerr << "Model size is incompatible with selected type, name:" << model->Name() << std::endl;
         std::cerr << "Model size:" << model->GetModelDataSize() << std::endl;
