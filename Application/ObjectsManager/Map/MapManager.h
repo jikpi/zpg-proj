@@ -9,6 +9,7 @@
 #include <memory>
 #include "Map.h"
 #include "../ShaderLinking/MapToShaderLinker.h"
+#include "../../../Model/Texture/Controller/TextureController.h"
 
 class MapManager {
 private:

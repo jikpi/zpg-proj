@@ -41,7 +41,7 @@ private:
     void RenderLightsArray(const std::shared_ptr<std::vector<std::shared_ptr<RenderableLight>>> &lightsVector) const;
     void RenderObjectMaterial(Material objectMaterial) const;
     void RenderPhongLight(Material objectMaterial) const;
-    void RenderTexture() const;
+    void RenderTexture(Texture *texture) const;
     void RenderSkybox() const;
 
 

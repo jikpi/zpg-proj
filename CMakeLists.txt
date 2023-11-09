@@ -94,5 +94,9 @@ add_executable(zpg_test main.cpp
         Shaders/Lighting/Uniforms/LightsArraySpotUniform.cpp
         Shaders/Lighting/Uniforms/LightsArraySpotUniform.h
         ExtResources/LessonResources/TextureResources/triangle.h
+        Model/Texture/Controller/TextureController.cpp
+        Model/Texture/Controller/TextureController.h
+        Model/Texture/Texture.cpp
+        Model/Texture/Texture.h
 )
 target_link_libraries(zpg_test ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw glm::glm)
