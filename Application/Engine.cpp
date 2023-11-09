@@ -146,7 +146,7 @@ void Engine::Run() {
     std::shared_ptr<LightSpot> spheresSpotLight = std::dynamic_pointer_cast<LightSpot>(
             this->ResourceManager.GetLightOnMap("Default", 0));
 
-    std::shared_ptr<LightSpot> manyObjectsSpotLight = std::dynamic_pointer_cast<LightSpot>(
+    std::shared_ptr<LightSpot> manyObjectsFlash = std::dynamic_pointer_cast<LightSpot>(
             this->ResourceManager.GetLightOnMap("Many objects", 0));
 
     this->CameraMain->MoveForwardBackward(0);
@@ -181,34 +181,22 @@ void Engine::Run() {
 //        manyObjectsSpotLight->SetDirection(glm::vec3(x, 0.0f, z));
 
         //set many objects spot light to camera location and target
-        manyObjectsSpotLight->SetPosition(this->CameraMain->GetLocation());
-        manyObjectsSpotLight->SetDirection(this->CameraMain->GetTarget() - this->CameraMain->GetLocation());
-
+        manyObjectsFlash->SetPosition(this->CameraMain->GetLocation());
+        manyObjectsFlash->SetDirection(this->CameraMain->GetTarget() - this->CameraMain->GetLocation());
         ResourceManager.ForceRefreshLightsOnCurrentMap();
 
 
-
-        //Render each shader
-
+        //Render skybox
         if (ResourceManager.GetActiveMap()->Skybox != nullptr) {
-            ResourceManager.GetActiveMap()->Skybox->GetShaderProgram().lock()->UseProgram();
-            ResourceManager.GetActiveMap()->Skybox->BindVertexArray();
+            std::shared_ptr<ShaderHandler> skyboxShader = ResourceManager.GetActiveMap()->Skybox->GetShaderProgram().lock();
+            skyboxShader->UseProgram();
+            skyboxShader->RequestRender(*ResourceManager.GetActiveMap()->Skybox);
             glDrawArrays(GL_TRIANGLES, 0, ResourceManager.GetActiveMap()->Skybox->GetRenderingSize());
         }
 
+        //Render each shader
         for (auto &set: this->ResourceManager.ShaderLinker) {
             set->Shader->UseProgram();
-
-            //Render skybox
-//            if (set->Skybox != nullptr) {
-////                glDepthMask(GL_FALSE);
-////                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//                set->Skybox->BindVertexArray();
-//                glDrawArrays(GL_TRIANGLES, 0, set->Skybox->GetRenderingSize());
-////                glClear(GL_DEPTH_BUFFER_BIT);
-////                glDepthMask(GL_TRUE);
-//            }
-
 
             //Render objects for chosen shader
             for (auto &object: set->Objects) {
@@ -254,7 +242,7 @@ void Engine::TestLaunch() {
     this->Shaders.push_back(ShaderHandlerFactory::PhongTexture());
     this->CameraMain->RegisterCameraObserver(SelectShader("PhongTexture"));
 
-//    this->Shaders.push_back(ShaderHandlerFactory::Skybox());
+    this->Shaders.push_back(ShaderHandlerFactory::Skybox());
 
     //Models
 
@@ -282,8 +270,8 @@ void Engine::TestLaunch() {
     const float *rawmodel8_skycube = skycube;
     int size8 = sizeof(skycube) / sizeof(float);
 
-    const float *triangle_tex = triangle;
-    int size9 = sizeof(triangle) / sizeof(float);
+    const float *rawmodel9_plane_text = plane_tex;
+    int size9 = sizeof(plane_tex) / sizeof(float);
 
 
     std::shared_ptr<ShaderHandler> &ConstantShader = SelectShader("Constant");
@@ -530,13 +518,19 @@ void Engine::TestLaunch() {
             ->SetQuadratic(0.0001f)
             .SetIntensity(1.0f);
 
-    std::shared_ptr<StandardisedModel> preparedModelGround = ModelFactory::PositionNormal(rawmodel6_plain, size6,
-                                                                                          "Ground");
-    preparedModelGround->SetShaderProgram(PhongShader);
+    std::shared_ptr<StandardisedModel> preparedModelGround = ModelFactory::PositionNormalTex(rawmodel9_plane_text,
+                                                                                             size9,
+                                                                                             "Ground");
+    preparedModelGround->SetShaderProgram(SelectShader("PhongTexture"));
     preparedModelGround->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0.5f, 0.5f, 0.5f),
                                               glm::vec3(0.5f, 0.5f, 0.5f), 32.0f));
-    preparedModelGround->InsertTransfMove(
-            glm::vec3(0, -1.0f, 0)).InsertTransfScale(glm::vec3(100, 100, 100)).ConsolidateTransf();
+    Texture *groundTexture = ObjectTextureController.UseTexture("../Resources/Textures/Lesson/grass.png");
+    preparedModelGround->SetTexture(groundTexture);
+
+    preparedModelGround->InsertTransfMove(glm::vec3(0, -1.0f, 0))
+            .InsertTransfRotate(-90, glm::vec3(1, 0, 0))
+            .InsertTransfScale(glm::vec3(100, 100, 100))
+            .ConsolidateTransf();
 
     ResourceManager.AddObjectToMap("Many objects", preparedModelGround);
 
@@ -569,21 +563,21 @@ void Engine::TestLaunch() {
     //Map 6 - textures
     this->ResourceManager.CreateNewMap("Texture");
 
-    std::shared_ptr<StandardisedModel> preparedModelTexTriangle = ModelFactory::PositionNormalTex(triangle_tex, size9,
-                                                                                                  "Text triangle");
-    preparedModelTexTriangle->SetShaderProgram(SelectShader("PhongTexture"));
-    Texture *plankTexture = ObjectTextureController.UseTexture("../Resources/Textures/Lesson/wooden_fence.png");
+    std::shared_ptr<StandardisedModel> pmSkybox = ModelFactory::Position(rawmodel8_skycube,
+                                                                         size8,
+                                                                         "Skybox");
+    pmSkybox->SetShaderProgram(SelectShader("PhongTexture"));
+    Texture *skyboxTexture = ObjectTextureController.UseCubemap("../Resources/Textures/Lesson/FieldSkybox/field");
+    pmSkybox->SetTexture(skyboxTexture);
 
-    preparedModelTexTriangle->SetTexture(plankTexture);
-
-    ResourceManager.AddObjectToMap("Many objects", preparedModelTexTriangle);
+    ResourceManager.AddObjectToMap("Texture", pmSkybox);
 
     std::shared_ptr<StandardisedModel> skySphereTest = ModelFactory::PositionNormal(rawmodel1_sphere, size,
                                                                                     "Skybox sphere");
     skySphereTest->SetShaderProgram(SelectShader("Constant"));
     skySphereTest->InsertTransfMove(glm::vec3(30.0f, 0.0f, 0.0f)).ConsolidateTransf();
 
-    ResourceManager.AddObjectToMap("Texture", skySphereTest);
+    ResourceManager.AddSkyboxToMap("Texture", pmSkybox);
 }
 
 void Engine::CameraLookHorizontal(double x) {

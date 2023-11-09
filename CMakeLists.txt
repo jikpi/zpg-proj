@@ -93,7 +93,7 @@ add_executable(zpg_test main.cpp
         Shaders/Lighting/Uniforms/LightArrayDirectionalUniform.h
         Shaders/Lighting/Uniforms/LightsArraySpotUniform.cpp
         Shaders/Lighting/Uniforms/LightsArraySpotUniform.h
-        ExtResources/LessonResources/TextureResources/triangle.h
+        ExtResources/LessonResources/TextureResources/plane_tex.h
         Model/Texture/Controller/TextureController.cpp
         Model/Texture/Controller/TextureController.h
         Model/Texture/Texture.cpp

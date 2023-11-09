@@ -358,58 +358,7 @@ void ShaderHandler::RequestRenderBaseLightsArray() {
     }
 }
 
-//GLuint loadCubemap(std::vector<std::string> faces) {
-//    GLuint textureID;
-//    glGenTextures(1, &textureID);
-//    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-//
-//    int width, height, nrChannels;
-//    for (GLuint i = 0; i < faces.size(); i++) {
-//        unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
-//        if (data) {
-//            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE,
-//                         data);
-//            stbi_image_free(data);
-//        } else {
-//            std::cerr << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
-//            stbi_image_free(data);
-//        }
-//    }
-//
-//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-//
-//    return textureID;
-//}
-
-
-void ShaderHandler::RenderSkybox() const {
-    glActiveTexture(GL_TEXTURE1);
-
-    DebugErrorMessages::PrintGLErrors("Before loading ");
-
-    std::vector<std::string> faces = {
-            "posx.jpg",
-            "negx.jpg",
-            "posy.jpg",
-            "negy.jpg",
-            "posz.jpg",
-            "negz.jpg"
-    };
-
-//    GLuint cubemapTextureID = loadCubemap(faces);
-
-
-//    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTextureID);
-
-    GLint cubemapUniformID = glGetUniformLocation(this->ShaderProgramGLuint, DEF_SHADER_TEXTURE_CUBEMAP_LOCATION);
-    glUniform1i(cubemapUniformID, 1);
-}
-
-void ShaderHandler::RenderTexture(Texture *texture) const {
+void ShaderHandler::RenderAnyTexture(Texture *texture, int target, const GLint &Location) {
     if (texture) {
         GLuint textureID = texture->GetTextureID();
 
@@ -423,14 +372,21 @@ void ShaderHandler::RenderTexture(Texture *texture) const {
         }
 
         glActiveTexture(GL_TEXTURE0 + texture->GetTextureUnit());
-        glBindTexture(GL_TEXTURE_2D, textureID);
+        glBindTexture(target, textureID);
 
-        SendToShader(TextureLocation, texture->GetTextureUnit());
-
-
+        SendToShader(Location, texture->GetTextureUnit());
     } else {
         std::cerr << "Invalid texture provided" << std::endl;
     }
+}
+
+
+void ShaderHandler::RenderSkybox(Texture *texture) const {
+    RenderAnyTexture(texture, GL_TEXTURE_CUBE_MAP, SkyboxLocation);
+}
+
+void ShaderHandler::RenderTexture(Texture *texture) const {
+    RenderAnyTexture(texture, GL_TEXTURE_2D, TextureLocation);
 }
 
 
@@ -464,7 +420,7 @@ void ShaderHandler::RequestRender(RenderableObject &object) {
     }
 
     if (this->SkyboxLocation != -2) {
-        this->RenderSkybox();
+        this->RenderSkybox(0);
     }
 }
 

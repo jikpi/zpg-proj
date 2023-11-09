@@ -41,8 +41,10 @@ private:
     void RenderLightsArray(const std::shared_ptr<std::vector<std::shared_ptr<RenderableLight>>> &lightsVector) const;
     void RenderObjectMaterial(Material objectMaterial) const;
     void RenderPhongLight(Material objectMaterial) const;
+
+    static void RenderAnyTexture(Texture *texture, int target, const GLint &Location) ;
     void RenderTexture(Texture *texture) const;
-    void RenderSkybox() const;
+    void RenderSkybox(Texture *texture) const;
 
 
     /** GLSL Shaders GLint locations **/

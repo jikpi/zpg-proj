@@ -15,10 +15,13 @@
 class TextureController {
 private:
     static std::unique_ptr<Texture> LoadTexture(const std::string &path);
+    static std::unique_ptr<Texture> LoadCubeMap(const std::string &path);
+
     std::map<std::string, std::shared_ptr<Texture>> Textures;
 
 public:
     Texture *UseTexture(const std::string &path);
+    Texture* UseCubemap(const std::string &path);
     void ResetTextureUnitCounter();
 };
 

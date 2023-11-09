@@ -8,6 +8,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <stb_image.h>
+#include <vector>
 
 std::unique_ptr<Texture> TextureController::LoadTexture(const std::string &path) {
     int width, height, nrChannels;
@@ -67,5 +68,97 @@ void TextureController::ResetTextureUnitCounter() {
         texture.second->SetTextureUnit(-1);
     }
 }
+
+std::unique_ptr<Texture> TextureController::LoadCubeMap(const std::string &path) {
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    std::vector<std::string> filenames = {
+            "negx",
+            "negy",
+            "negz",
+            "posx",
+            "posy",
+            "posz"
+    };
+
+    std::vector<std::string> suffixes = {
+            ".png",
+            ".jpg",
+            ".jpeg"
+    };
+
+    std::vector<std::string> faces;
+
+    bool found = false;
+    for (auto &filename: filenames) {
+        for (auto &suffix: suffixes) {
+            std::string fullPath = path;
+            fullPath.append(filename);
+            fullPath.append(suffix);
+
+
+            std::cout << fullPath << std::endl;
+            if (FILE *file = fopen(fullPath.c_str(), "r")) {
+                fclose(file);
+
+                for (auto &face: filenames) {
+                    std::string facePath = path;
+                    facePath.append(face);
+                    facePath.append(suffix);
+
+                    faces.push_back(facePath);
+                    found = true;
+                }
+
+                break;
+            }
+
+            if (found) {
+                break;
+            }
+        }
+    }
+
+    if (!found) {
+        std::cerr << "ERROR: CubeMap texture failed to load at path: " << path << std::endl;
+        return nullptr;
+    }
+
+    int width, height, nrChannels;
+    for (GLuint i = 0; i < faces.size(); i++) {
+        unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+        if (data) {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE,
+                         data);
+            stbi_image_free(data);
+        } else {
+            std::cerr << "ERROR: Cubemap texture failed to load at path: " << faces[i] << std::endl;
+            stbi_image_free(data);
+            return nullptr;
+        }
+    }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    std::unique_ptr<Texture> newTexture = std::make_unique<Texture>(textureID, width, height, nrChannels);
+    return newTexture;
+}
+
+Texture *TextureController::UseCubemap(const std::string &path) {
+    if (Textures.find(path) == Textures.end()) {
+        Textures[path] = LoadCubeMap(path);
+        return Textures[path].get();
+    }
+
+    return Textures[path].get();
+}
+
+
 
 
