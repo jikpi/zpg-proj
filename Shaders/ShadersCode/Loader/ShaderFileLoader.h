@@ -18,6 +18,9 @@ public:
     static std::string HardLoadConstantColored();
     static std::string HardLoadConstantTrue();
 
+    static std::string HardLoadCubemapSkyboxVert();
+    static std::string HardLoadCubemapSkyboxFrag();
+
 };
 
 

@@ -45,3 +45,11 @@ std::string ShaderFileLoader::HardLoadConstantColored() {
 std::string ShaderFileLoader::HardLoadConstantTrue() {
     return LoadShaderCodeFromFile("../Shaders/ShadersCode/ShaderFiles/ConstantTrue.frag");
 }
+
+std::string ShaderFileLoader::HardLoadCubemapSkyboxVert() {
+    return LoadShaderCodeFromFile("../Shaders/ShadersCode/ShaderFiles/CubemapSkybox.vert");
+}
+
+std::string ShaderFileLoader::HardLoadCubemapSkyboxFrag() {
+    return LoadShaderCodeFromFile("../Shaders/ShadersCode/ShaderFiles/CubemapSkybox.frag");
+}

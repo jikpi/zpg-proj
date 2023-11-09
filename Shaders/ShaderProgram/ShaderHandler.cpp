@@ -11,11 +11,12 @@
 #include "../Lighting/LightDirectional.h"
 #include "../Lighting/LightSpot.h"
 
+//Test soil
+#include <SOIL/SOIL.h>
 
 ShaderHandler::ShaderHandler() : ShaderBase(),
                                  ViewMatrix(glm::mat4(1.0f)),
                                  ProjectionMatrix(glm::mat4(1.0f)),
-                                 HasCameraError(false),
                                  HaveLightsChanged(false),
                                  CameraLocationLocation(-2),
 
@@ -29,70 +30,9 @@ ShaderHandler::ShaderHandler() : ShaderBase(),
                                  DiffuseColorLocation(-2),
 
                                  ShineValueLocation(-2),
-                                 SpecularColorLocation(-2) {
-}
+                                 SpecularColorLocation(-2),
 
-ShaderHandler::~ShaderHandler() = default;
-
-ShaderHandler::ShaderHandler(ShaderHandler &&other) noexcept {
-    HasCameraError = other.HasCameraError;
-    ViewMatrix = other.ViewMatrix;
-    ProjectionMatrix = other.ProjectionMatrix;
-    ProjectionMatrixLocation = other.ProjectionMatrixLocation;
-    ViewMatrixLocation = other.ViewMatrixLocation;
-    ModelMatrixLocation = other.ModelMatrixLocation;
-    NormalMatrixLocation = other.NormalMatrixLocation;
-    Name = std::move(other.Name);
-    AmbientColorLocation = other.AmbientColorLocation;
-    DiffuseColorLocation = other.DiffuseColorLocation;
-    LightsArrayPoint_UniformLocation = other.LightsArrayPoint_UniformLocation;
-    HaveLightsChanged = other.HaveLightsChanged;
-    LightsArrayDirectional_SizeLocation = other.LightsArrayDirectional_SizeLocation;
-    LightsArrayDirectional_UniformLocation = other.LightsArrayDirectional_UniformLocation;
-    LightsArraySpot_SizeLocation = other.LightsArraySpot_SizeLocation;
-    LightsArraySpot_UniformLocation = other.LightsArraySpot_UniformLocation;
-
-
-    other.LightsArrayPoint_UniformLocation = {};
-    other.ModelMatrixLocation = 0;
-    other.ViewMatrixLocation = 0;
-    other.ProjectionMatrixLocation = 0;
-    other.Name = other.Name + " (DELETED)";
-    other.AmbientColorLocation = 0;
-    other.DiffuseColorLocation = 0;
-}
-
-ShaderHandler &ShaderHandler::operator=(ShaderHandler &&other) noexcept {
-
-    if (this == &other) {
-        return *this;
-    }
-
-    HasCameraError = other.HasCameraError;
-    ViewMatrix = other.ViewMatrix;
-    ProjectionMatrix = other.ProjectionMatrix;
-    ProjectionMatrixLocation = other.ProjectionMatrixLocation;
-    ViewMatrixLocation = other.ViewMatrixLocation;
-    ModelMatrixLocation = other.ModelMatrixLocation;
-    NormalMatrixLocation = other.NormalMatrixLocation;
-    Name = std::move(other.Name);
-    AmbientColorLocation = other.AmbientColorLocation;
-    DiffuseColorLocation = other.DiffuseColorLocation;
-    LightsArrayPoint_UniformLocation = other.LightsArrayPoint_UniformLocation;
-    HaveLightsChanged = other.HaveLightsChanged;
-    LightsArrayDirectional_SizeLocation = other.LightsArrayDirectional_SizeLocation;
-    LightsArrayDirectional_UniformLocation = other.LightsArrayDirectional_UniformLocation;
-    LightsArraySpot_SizeLocation = other.LightsArraySpot_SizeLocation;
-    LightsArraySpot_UniformLocation = other.LightsArraySpot_UniformLocation;
-
-    other.LightsArrayPoint_UniformLocation = {};
-    other.ModelMatrixLocation = 0;
-    other.ViewMatrixLocation = 0;
-    other.ProjectionMatrixLocation = 0;
-    other.Name = other.Name + " (DELETED)";
-    other.AmbientColorLocation = 0;
-    other.DiffuseColorLocation = 0;
-    return *this;
+                                 SkyboxLocation(-2) {
 }
 
 ShaderHandler &ShaderHandler::SaveBaseMatrixLocations() {
@@ -400,6 +340,33 @@ void ShaderHandler::RequestRenderBaseLightsArray() {
     }
 }
 
+void ShaderHandler::RenderSkybox() const {
+    glActiveTexture(GL_TEXTURE1);
+
+// Load a cubemap texture using SOIL
+    GLuint cubemapTextureID = SOIL_load_OGL_cubemap(
+            "xpos.jpg", "negx.jpg",
+            "ypos.jpg", "negy.jpg",
+            "zpos.jpg", "negz.jpg",
+            SOIL_LOAD_RGB,
+            SOIL_CREATE_NEW_ID,
+            SOIL_FLAG_MIPMAPS
+    );
+
+// Check for errors during loading
+    if(cubemapTextureID == 0) {
+        // Handle the error as appropriate
+        std::cerr << "SOIL loading error: '" << SOIL_last_result() << "' (cubemap)" << std::endl;
+    }
+
+// Bind the loaded cubemap texture
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTextureID);
+
+// Set the cubemap texture unit to the fragment shader
+    GLint cubemapUniformID = glGetUniformLocation(this->ShaderProgramGLuint, DEF_SHADER_TEXTURE_CUBEMAP_LOCATION);
+    glUniform1i(cubemapUniformID, 1);
+}
+
 void ShaderHandler::RequestRender(RenderableObject &object) {
     glm::mat4 modelMatrix = object.GetTransf();
     RenderBase(modelMatrix);
@@ -447,5 +414,7 @@ void ShaderHandler::SetLights(std::shared_ptr<std::vector<std::shared_ptr<Render
 void ShaderHandler::NotifyLightsChanged() {
     HaveLightsChanged = true;
 }
+
+
 
 

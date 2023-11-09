@@ -11,8 +11,9 @@
 
 class ShaderBase {
 private:
-    GLuint ShaderProgramGLuint;
+
 protected:
+    GLuint ShaderProgramGLuint; //TODO move back to priv
 
     virtual void PrintName() const;
 

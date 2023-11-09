@@ -3,7 +3,7 @@ const int LIGHTS_SIZE_MAX = 16;
 
 in vec3 toFrag_worldNormal;//transformed normal from vertex shader, lighting
 in vec4 toFrag_worldPosition;//world position from vertex shader, lighting
-in vec3 toFrag_eyePosition;//camera position for fragment shader
+in vec3 toFrag_cameraLocation;//camera position for fragment shader
 
 out vec4 out_frag_Color;
 
@@ -106,7 +106,7 @@ void main() {
     vec3 combinedColor = ambientColor * diffuseColor;// ambient light color added to the result
 
     // (c) for Ispecular, direction from fragment to camera
-    vec3 c_ = normalize(toFrag_eyePosition - toFrag_worldPosition.xyz);
+    vec3 c_ = normalize(toFrag_cameraLocation - toFrag_worldPosition.xyz);
 
     // Point lights
     for (int i = 0; i < LightPointSize; i++) {

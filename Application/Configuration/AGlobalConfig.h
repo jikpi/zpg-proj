@@ -7,16 +7,16 @@
 
 #include "glm/vec3.hpp"
 
-// ### Camera ###
+//// ### Camera ###
 inline constexpr float DEF_CAMERA_FOV = 60.0f;
 inline constexpr float DEF_CAMERA_ASPECTRATIO = 4.0f / 3.0f;
 inline constexpr float DEF_CAMERA_MINRENDER = 0.1f;
 inline constexpr float DEF_CAMERA_MAXRENDER = 1000.0f;
 
-// ### Map ###
+//// ### Map ###
 inline constexpr const char *DEF_MAP_NAME = "Default";
 
-// ### ShaderProgram ###
+//// ### ShaderProgram ###
 // model matrix, view matrix, projection matrix
 inline constexpr const char *DEF_SHADER_MODEL_MATRIX_NAME = "modelMatrix";
 inline constexpr const char *DEF_SHADER_VIEW_MATRIX_NAME = "viewMatrix";
@@ -52,8 +52,10 @@ inline constexpr const char *DEF_SHADER_MATERIAL_DIFFUSECOLOR_NAME = "diffuseCol
 //Blinn-Phong
 inline constexpr const char *DEF_SHADER_LIGHTS_BLINNPHONG_SPECCOLOR_NAME = "specularColor";
 inline constexpr const char *DEF_SHADER_LIGHTS_BLINNPHONG_SHINEVALUE_NAME = "shineValue";
+//Texture
+inline constexpr const char *DEF_SHADER_TEXTURE_CUBEMAP_LOCATION= "cubemapTexture";
 
-// ### Lights ###
+//// ### Lights ###
 inline constexpr const float DEF_LIGHT_INTENSITY = 1.0f;
 inline constexpr const float DEF_LIGHT_CONSTANT = 1.0f;
 inline constexpr const float DEF_LIGHT_LINEAR = 0.09f;
