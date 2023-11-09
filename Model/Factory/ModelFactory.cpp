@@ -6,15 +6,17 @@
 #include "../../Application/DebugErrorMessages/DebugErrorMessages.h"
 
 #include <utility>
+#include <stdexcept>
+#include <iostream>
 
 std::shared_ptr<StandardisedModel> ModelFactory::PositionNormal(const float *model, int size, std::string Name) {
-    auto model1 = std::make_shared<StandardisedModel>(model, size, "PositionNormal", std::move(Name));
+    auto newStandModel = std::make_shared<StandardisedModel>(model, size, "PositionNormal", std::move(Name));
 
     //VBO
     //A named block of memory, that contains positions, normals, colors, ...
-    glGenBuffers(1, &model1->VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, model1->VBO);
-    glBufferData(GL_ARRAY_BUFFER, model1->GetModelDataSize() * sizeof(float), model1->GetModelDataRaw(),
+    glGenBuffers(1, &newStandModel->VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, newStandModel->VBO);
+    glBufferData(GL_ARRAY_BUFFER, newStandModel->GetModelDataSize() * sizeof(float), newStandModel->GetModelDataRaw(),
                  GL_STATIC_DRAW);
     DebugErrorMessages::PrintGLErrors("VBO");
 
@@ -31,7 +33,7 @@ std::shared_ptr<StandardisedModel> ModelFactory::PositionNormal(const float *mod
     glEnableVertexAttribArray(1);
 
     //Attach VAO to model
-    model1->SetVAO(VAO);
+    newStandModel->SetVAO(VAO);
 
     //Unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -39,21 +41,65 @@ std::shared_ptr<StandardisedModel> ModelFactory::PositionNormal(const float *mod
     DebugErrorMessages::PrintGLErrors("VAO");
 
     //3 for position, 3 for normal
-    model1->RenderingSize = model1->GetModelDataSize() / 6;
-    model1->Initialize();
+    newStandModel->RenderingSize = newStandModel->GetModelDataSize() / 6;
+    CheckBadModelSize(newStandModel, 6);
+    newStandModel->Initialize();
 
-    model1->DeleteModelData();
-    return model1;
+    newStandModel->DeleteModelData();
+    return newStandModel;
 }
 
-std::shared_ptr<StandardisedModel> ModelFactory::XYZ_Model(const float *model, int size, std::string Name) {
-    auto model1 = std::make_shared<StandardisedModel>(model, size, "XYZ", std::move(Name));
+std::shared_ptr<StandardisedModel> ModelFactory::PositionNormalTex(const float *model, int size, std::string Name) {
+    auto newStandModel = std::make_shared<StandardisedModel>(model, size, "PositionNormalTex", std::move(Name));
+
+    //(VBO)
+    GLuint VBO = 0;
+    glGenBuffers(1, &newStandModel->VBO); // generate the VBO
+    glBindBuffer(GL_ARRAY_BUFFER, newStandModel->VBO);
+    glBufferData(GL_ARRAY_BUFFER, newStandModel->GetModelDataSize() * sizeof(float), newStandModel->GetModelDataRaw(),
+                 GL_STATIC_DRAW);
+    DebugErrorMessages::PrintGLErrors("VBO");
+
+    //vertex attribute object(VAO)
+    GLuint VAO = 0;
+    glGenVertexArrays(1, &VAO); //generate the VAO
+    glBindVertexArray(VAO); //bind the VAO
+    glEnableVertexAttribArray(0); //enable vertex attributes
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid *) 0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid *) (3 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid *) (6 * sizeof(float)));
+
+
+    //Attach VAO to model
+    newStandModel->SetVAO(VAO);
+
+    //Unbind
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+    DebugErrorMessages::PrintGLErrors("VAO");
+
+    //3 for position, 3 for normal, 2 for texture
+    newStandModel->RenderingSize = newStandModel->GetModelDataSize() / 8;
+    CheckBadModelSize(newStandModel, 8);
+
+    newStandModel->Initialize();
+
+    newStandModel->DeleteModelData();
+    return newStandModel;
+}
+
+std::shared_ptr<StandardisedModel> ModelFactory::Position(const float *model, int size, std::string Name) {
+    auto newStandModel = std::make_shared<StandardisedModel>(model, size, "XYZ", std::move(Name));
 
 
     //    vertex buffer object (VBO)
-    glGenBuffers(1, &model1->VBO); // generate the VBO
-    glBindBuffer(GL_ARRAY_BUFFER, model1->VBO);
-    glBufferData(GL_ARRAY_BUFFER, model1->GetModelDataSize() * sizeof(float), model1->GetModelDataRaw(),
+    glGenBuffers(1, &newStandModel->VBO); // generate the VBO
+    glBindBuffer(GL_ARRAY_BUFFER, newStandModel->VBO);
+    glBufferData(GL_ARRAY_BUFFER, newStandModel->GetModelDataSize() * sizeof(float), newStandModel->GetModelDataRaw(),
                  GL_STATIC_DRAW);
 
     DebugErrorMessages::PrintGLErrors("VBO");
@@ -63,11 +109,11 @@ std::shared_ptr<StandardisedModel> ModelFactory::XYZ_Model(const float *model, i
     glGenVertexArrays(1, &VAO); //generate the VAO
     glBindVertexArray(VAO); //bind the VAO
     glEnableVertexAttribArray(0); //enable vertex attributes
-    glBindBuffer(GL_ARRAY_BUFFER, model1->VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, newStandModel->VBO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
     //Attach VAO to model
-    model1->SetVAO(VAO);
+    newStandModel->SetVAO(VAO);
 
     //Unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -77,9 +123,25 @@ std::shared_ptr<StandardisedModel> ModelFactory::XYZ_Model(const float *model, i
 
 
     //3 for position
-    model1->RenderingSize = model1->GetModelDataSize() / 3;
-    model1->Initialize();
+    newStandModel->RenderingSize = newStandModel->GetModelDataSize() / 3;
+    CheckBadModelSize(newStandModel, 3);
+    newStandModel->Initialize();
 
-    model1->DeleteModelData();
-    return model1;
+    newStandModel->DeleteModelData();
+    return newStandModel;
+}
+
+void ModelFactory::CheckBadModelSize(std::shared_ptr<StandardisedModel> &model, int stride) {
+    if(model->RenderingSize % stride != 0)
+    {
+        std::cerr << "Model size is incompatible with selected type, name:" << model->Name() << std::endl;
+        std::cerr << "Model size:" << model->GetModelDataSize() << std::endl;
+        std::cerr << "Stamp: " << model->Stamp() << std::endl;
+        std::cerr << "########################" << std::endl;
+    }
+
+    if(model->GetModelDataSize() <= 0 || model->RenderingSize <= 0)
+    {
+        throw std::runtime_error("Model size is <= 0");
+    }
 }

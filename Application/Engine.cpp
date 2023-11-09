@@ -49,7 +49,7 @@ void Engine::Initialize() {
     glfwWindowHint(GLFW_DEPTH_BITS, 24);
 
     //Create window
-    Window = glfwCreateWindow(640, 480, "ZPG KOP0269", nullptr, nullptr);
+    Window = glfwCreateWindow(1700, 900, "ZPG KOP0269", nullptr, nullptr);
     if (!Window) {
         glfwTerminate();
         exit(EXIT_FAILURE);
@@ -255,6 +255,9 @@ void Engine::TestLaunch() {
 
     const float *rawmodel7_gift = gift;
     int size7 = sizeof(gift) / sizeof(float);
+
+    const float *rawmodel8_skycube = skycube;
+    int size8 = sizeof(skycube) / sizeof(float);
 
 
     std::shared_ptr<ShaderHandler> &ConstantShader = SelectShader("Constant");
@@ -488,8 +491,14 @@ void Engine::TestLaunch() {
     this->EngineMapManager.CreateNewMap("Many objects");
     EngineMapManager.AddLightToMap("Many objects", std::make_shared<LightSpot>(glm::vec3(0.0f, 5.0f, 10.0f),
                                                                                glm::vec3(0.0f, -1.0f, 0.0f)));
-//    EngineMapManager.AddLightToMap("Many objects", std::make_shared<LightDirectional>(glm::vec3(0.0f, -1.0f, 0.0f),
-//                                                                                      glm::vec3(1.0f, 1.0f, 1.0f)));
+
+    std::shared_ptr<LightDirectional> directionalLight = std::make_shared<LightDirectional>(
+            glm::vec3(0.0f, -1.0f, 0.0f),
+            glm::vec3(1.0f, 1.0f, 1.0f));
+    directionalLight->SetIntensity(0).SetColor(glm::vec3(0.3f, 1.0f, 0.4f));
+
+//    EngineMapManager.AddLightToMap("Many objects", directionalLight);
+
 
     std::dynamic_pointer_cast<LightSpot>(EngineMapManager.GetLightOnMap("Many objects", 0))
             ->SetQuadratic(0.0001f)
@@ -504,6 +513,16 @@ void Engine::TestLaunch() {
             glm::vec3(0, -1.0f, 0)).InsertTransfScale(glm::vec3(100, 100, 100)).ConsolidateTransf();
 
     EngineMapManager.AddObjectToMap("Many objects", preparedModelGround);
+
+    std::shared_ptr<StandardisedModel> preparedModelSkyCube = ModelFactory::Position(rawmodel8_skycube, size8,
+                                                                                              "Skycube");
+    preparedModelSkyCube->SetShaderProgram(PhongShader);
+    preparedModelSkyCube->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(1.0f, 1.0f, 1.0f),
+                                               glm::vec3(0.5f, 0.5f, 0.5f), 32.0f));
+
+    preparedModelSkyCube->InsertTransfMove(glm::vec3(10, 10, 10)).ConsolidateTransf();
+
+    EngineMapManager.AddObjectToMap("Many objects", preparedModelSkyCube);
 
 
     auto add100RandomObject = [&randomModel, &randomMaterial, this](std::shared_ptr<ShaderHandler> shader) -> void {
