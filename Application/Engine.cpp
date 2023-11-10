@@ -389,7 +389,7 @@ void Engine::TestLaunch() {
                                                                                 "Sun");
     objectSun->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(1.0f, 0.5f, 0.0f),
                                     glm::vec3(1.0f, 0.5f, 0.0f), 32.0f));
-    objectSun->SetShaderProgram(PhongShader);
+    objectSun->SetShaderProgram(ConstantShader);
     this->ResourceManager.AddObjectToMap(1, objectSun);
 
     //Mercury
@@ -573,6 +573,16 @@ void Engine::TestLaunch() {
 
     //Map 6 - textures
     this->ResourceManager.CreateNewMap("Texture");
+
+    std::shared_ptr<StandardisedModel> starSkybox = ModelFactory::Position(rawmodel8_skycube, size8,
+                                                                                 "Star skybox");
+
+    starSkybox->SetShaderProgram(SelectShader("Skybox").get());
+    Texture *starSkyboxTexture = ResourceManager.ObjectTextureController.UseCubemap(
+            "../Resources/Textures/Galaxy/stars");
+    starSkybox->SetTexture(starSkyboxTexture);
+
+    ResourceManager.AddSkyboxToMap("Solar system", starSkybox);
 
     std::shared_ptr<StandardisedModel> pmSkybox = ModelFactory::Position(rawmodel8_skycube,
                                                                          size8,

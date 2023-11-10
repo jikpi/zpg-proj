@@ -9,7 +9,7 @@ uniform mat4 projectionMatrix; //camera projection matrix
 
 void main() {
     toFrag_textureCoords = vp;
-    mat4 view = mat4(mat3(viewMatrix)); // Remove translation component from the view matrix
+    mat4 view = mat4(mat3(viewMatrix)); //remove translation from view matrix
     vec4 position = projectionMatrix * view * modelMatrix * vec4(vp, 1.0);
-    gl_Position = position.xyww; // Adjust position for depth to ensure it's rendered at the far plane
+    gl_Position = position.xyww; //render to far plane
 }
