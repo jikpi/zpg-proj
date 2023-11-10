@@ -376,7 +376,7 @@ void ShaderHandler::RenderAnyTexture(Texture *texture, int target, const GLint &
 
         SendToShader(Location, texture->GetTextureUnit());
     } else {
-        std::cerr << "Invalid texture provided" << std::endl;
+        std::cerr << "ERROR: ShaderHandler: Texture is null" << std::endl;
     }
 }
 
@@ -416,11 +416,11 @@ void ShaderHandler::RequestRender(RenderableObject &object) {
     }
 
     if (this->TextureLocation != -2) {
-        this->RenderTexture(object.GetMaterial().GetTexture());
+        this->RenderTexture(object.GetTexture());
     }
 
     if (this->SkyboxLocation != -2) {
-        this->RenderSkybox(0);
+        this->RenderSkybox(object.GetTexture());
     }
 }
 

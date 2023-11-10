@@ -160,13 +160,17 @@ void Engine::Run() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //animate mercury
-        this->ResourceManager.GetMapByIndex(1)->GetObjectByName("Mercury")->DoTransf();
+//        this->ResourceManager.GetMap(1)->GetObject("Mercury")->DoTransf();
+        ResourceManager.GetObjectOnMap("Solar system", "Mercury")->DoTransf();
         //animate venus
-        this->ResourceManager.GetMapByIndex(1)->GetObjectByName("Venus")->DoTransf();
+//        this->ResourceManager.GetMap(1)->GetObject("Venus")->DoTransf();
+        ResourceManager.GetObjectOnMap("Solar system", "Venus")->DoTransf();
         //animate earth
-        this->ResourceManager.GetMapByIndex(1)->GetObjectByName("Earth")->DoTransf();
+//        this->ResourceManager.GetMap(1)->GetObject("Earth")->DoTransf();
+        ResourceManager.GetObjectOnMap("Solar system", "Earth")->DoTransf();
         //animate mars
-        this->ResourceManager.GetMapByIndex(1)->GetObjectByName("Mars")->DoTransf();
+//        this->ResourceManager.GetMap(1)->GetObject("Mars")->DoTransf();
+        ResourceManager.GetObjectOnMap("Solar system", "Mars")->DoTransf();
 
 
         angle += angleIncrement;
@@ -188,10 +192,12 @@ void Engine::Run() {
 
         //Render skybox
         if (ResourceManager.GetActiveMap()->Skybox != nullptr) {
-            std::shared_ptr<ShaderHandler> skyboxShader = ResourceManager.GetActiveMap()->Skybox->GetShaderProgram().lock();
+            ShaderHandler* skyboxShader = ResourceManager.GetActiveMap()->Skybox->GetShaderProgram().get();
+            glDepthMask(GL_FALSE);
             skyboxShader->UseProgram();
             skyboxShader->RequestRender(*ResourceManager.GetActiveMap()->Skybox);
             glDrawArrays(GL_TRIANGLES, 0, ResourceManager.GetActiveMap()->Skybox->GetRenderingSize());
+            glDepthMask(GL_TRUE);
         }
 
         //Render each shader
@@ -338,7 +344,9 @@ void Engine::TestLaunch() {
     std::shared_ptr<StandardisedModel> objectSphere12 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
                                                                                      "Test model 12");
     objectSphere12->SetShaderProgram(PhongShader);
-    this->ResourceManager.AddObjectToMap(0, objectSphere12);
+    objectSphere12->InsertTransfMove(
+            glm::vec3(0.0f, -4.0f, -2.0f)).ConsolidateTransf();
+    this->ResourceManager.AddSkyboxToMap(0, objectSphere12);
 
     std::shared_ptr<LightSpot> spotLight = std::make_shared<LightSpot>(glm::vec3(0.0f, 0.0f, 0.0f),
                                                                        glm::vec3(0.0f,
@@ -346,23 +354,23 @@ void Engine::TestLaunch() {
                                                                                  0));
     spotLight->SetOuterCutOff(100.0f);
     ResourceManager.AddLightToMap(0, spotLight);
-    ResourceManager.GetMapByIndex(0)->GetObject(0)->InsertTransfMove(glm::vec3(-2.0f, 0.0f, 0.0f)).ConsolidateTransf();
-    ResourceManager.GetMapByIndex(0)->GetObject(1)->InsertTransfMove(glm::vec3(0.0f, 0.0f, 2.0f)).ConsolidateTransf();
-    ResourceManager.GetMapByIndex(0)->GetObject(2)->InsertTransfMove(glm::vec3(2.0f, 0.0f, 0.0f)).ConsolidateTransf();
-    ResourceManager.GetMapByIndex(0)->GetObject(3)->InsertTransfMove(glm::vec3(0.0f, 0.0f, -2.0f)).ConsolidateTransf();
+    ResourceManager.GetMap(0)->GetObject(0)->InsertTransfMove(glm::vec3(-2.0f, 0.0f, 0.0f)).ConsolidateTransf();
+    ResourceManager.GetMap(0)->GetObject(1)->InsertTransfMove(glm::vec3(0.0f, 0.0f, 2.0f)).ConsolidateTransf();
+    ResourceManager.GetMap(0)->GetObject(2)->InsertTransfMove(glm::vec3(2.0f, 0.0f, 0.0f)).ConsolidateTransf();
+    ResourceManager.GetMap(0)->GetObject(3)->InsertTransfMove(glm::vec3(0.0f, 0.0f, -2.0f)).ConsolidateTransf();
 
-    ResourceManager.GetMapByIndex(0)->GetObject(4)->InsertTransfMove(glm::vec3(-2.0f, 4.0f, 0.0f)).ConsolidateTransf();
-    ResourceManager.GetMapByIndex(0)->GetObject(5)->InsertTransfMove(glm::vec3(0.0f, 4.0f, 2.0f)).ConsolidateTransf();
-    ResourceManager.GetMapByIndex(0)->GetObject(6)->InsertTransfMove(glm::vec3(2.0f, 4.0f, 0.0f)).ConsolidateTransf();
-    ResourceManager.GetMapByIndex(0)->GetObject(7)->InsertTransfMove(glm::vec3(0.0f, 4.0f, -2.0f)).ConsolidateTransf();
+    ResourceManager.GetMap(0)->GetObject(4)->InsertTransfMove(glm::vec3(-2.0f, 4.0f, 0.0f)).ConsolidateTransf();
+    ResourceManager.GetMap(0)->GetObject(5)->InsertTransfMove(glm::vec3(0.0f, 4.0f, 2.0f)).ConsolidateTransf();
+    ResourceManager.GetMap(0)->GetObject(6)->InsertTransfMove(glm::vec3(2.0f, 4.0f, 0.0f)).ConsolidateTransf();
+    ResourceManager.GetMap(0)->GetObject(7)->InsertTransfMove(glm::vec3(0.0f, 4.0f, -2.0f)).ConsolidateTransf();
 
-    ResourceManager.GetMapByIndex(0)->GetObject(8)->InsertTransfMove(
+    ResourceManager.GetMap(0)->GetObject(8)->InsertTransfMove(
             glm::vec3(-2.0f, -4.0f, 0.0f)).ConsolidateTransf();
-    ResourceManager.GetMapByIndex(0)->GetObject(9)->InsertTransfMove(glm::vec3(0.0f, -4.0f, 2.0f)).ConsolidateTransf();
-    ResourceManager.GetMapByIndex(0)->GetObject(10)->InsertTransfMove(
+    ResourceManager.GetMap(0)->GetObject(9)->InsertTransfMove(glm::vec3(0.0f, -4.0f, 2.0f)).ConsolidateTransf();
+    ResourceManager.GetMap(0)->GetObject(10)->InsertTransfMove(
             glm::vec3(2.0f, -4.0f, 0.0f)).ConsolidateTransf();
-    ResourceManager.GetMapByIndex(0)->GetObject(11)->InsertTransfMove(
-            glm::vec3(0.0f, -4.0f, -2.0f)).ConsolidateTransf();
+//    ResourceManager.GetObjectOnMap(0, "Test model 12")->InsertTransfMove(
+//            glm::vec3(0.0f, -4.0f, -2.0f)).ConsolidateTransf();
 
     //Map 2 - solar system
     float earthOrbitSpeed = 0.05f;
@@ -454,7 +462,7 @@ void Engine::TestLaunch() {
     std::shared_ptr<StandardisedModel> preparedModelSingleSphere = ModelFactory::PositionNormal(rawmodel1_sphere, size,
                                                                                                 "Test sphere");
     preparedModelSingleSphere->SetShaderProgram(PhongShader);
-    this->ResourceManager.AddObjectToMap(ResourceManager.GetMapByName("1 sphere"), preparedModelSingleSphere);
+    this->ResourceManager.AddObjectToMap(ResourceManager.GetMap("1 sphere"), preparedModelSingleSphere);
 
     this->ResourceManager.AddLightToMap("1 sphere", std::make_shared<LightPoint>(glm::vec3(0.0f, 0.0f, -3.0f)));
 
@@ -566,18 +574,18 @@ void Engine::TestLaunch() {
     std::shared_ptr<StandardisedModel> pmSkybox = ModelFactory::Position(rawmodel8_skycube,
                                                                          size8,
                                                                          "Skybox");
-    pmSkybox->SetShaderProgram(SelectShader("PhongTexture"));
+    pmSkybox->SetShaderProgram(SelectShader("Skybox"));
     Texture *skyboxTexture = ObjectTextureController.UseCubemap("../Resources/Textures/Lesson/FieldSkybox/field");
     pmSkybox->SetTexture(skyboxTexture);
 
-    ResourceManager.AddObjectToMap("Texture", pmSkybox);
+    ResourceManager.AddSkyboxToMap("Many objects", pmSkybox);
 
     std::shared_ptr<StandardisedModel> skySphereTest = ModelFactory::PositionNormal(rawmodel1_sphere, size,
                                                                                     "Skybox sphere");
     skySphereTest->SetShaderProgram(SelectShader("Constant"));
     skySphereTest->InsertTransfMove(glm::vec3(30.0f, 0.0f, 0.0f)).ConsolidateTransf();
 
-    ResourceManager.AddSkyboxToMap("Texture", pmSkybox);
+    ResourceManager.AddObjectToMap("Many objects", pmSkybox);
 }
 
 void Engine::CameraLookHorizontal(double x) {

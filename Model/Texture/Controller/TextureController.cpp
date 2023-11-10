@@ -12,6 +12,7 @@
 
 std::unique_ptr<Texture> TextureController::LoadTexture(const std::string &path) {
     int width, height, nrChannels;
+    std::cout << "Loading texture: " << path << std::endl;
     unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
 
     if (!data) {
@@ -98,8 +99,6 @@ std::unique_ptr<Texture> TextureController::LoadCubeMap(const std::string &path)
             fullPath.append(filename);
             fullPath.append(suffix);
 
-
-            std::cout << fullPath << std::endl;
             if (FILE *file = fopen(fullPath.c_str(), "r")) {
                 fclose(file);
 
@@ -128,6 +127,7 @@ std::unique_ptr<Texture> TextureController::LoadCubeMap(const std::string &path)
 
     int width, height, nrChannels;
     for (GLuint i = 0; i < faces.size(); i++) {
+        std::cout << "Loading cubemap: " << faces[i] << std::endl;
         unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
         if (data) {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE,
