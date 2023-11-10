@@ -76,7 +76,7 @@ void Engine::Initialize() {
     //Depth
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    glDepthFunc(GL_LEQUAL); //GL_LESS
 
     glfwGetFramebufferSize(Window, &Width, &Height);
     Ratio = Width / (float) Height;
@@ -189,11 +189,16 @@ void Engine::Run() {
         if (ResourceManager.GetActiveMap()->Skybox != nullptr) {
             ShaderHandler *skyboxShader = ResourceManager.GetActiveMap()->Skybox->GetShaderProgram();
             glDepthMask(GL_FALSE);
+            glDepthFunc(GL_LEQUAL);
+            glDisable(GL_CULL_FACE);
+//    glCullFace(GL_BACK);
             skyboxShader->UseProgram();
             skyboxShader->RequestRender(*ResourceManager.GetActiveMap()->Skybox);
             ResourceManager.GetActiveMap()->Skybox->BindVertexArray();
             glDrawArrays(GL_TRIANGLES, 0, ResourceManager.GetActiveMap()->Skybox->GetRenderingSize());
             glDepthMask(GL_TRUE);
+            glDepthFunc(GL_LESS);
+            glEnable(GL_CULL_FACE);
             ShaderHandler::StopProgram();
         }
 
@@ -246,6 +251,7 @@ void Engine::TestLaunch() {
     this->CameraMain->RegisterCameraObserver(SelectShader("PhongTexture"));
 
     this->Shaders.push_back(ShaderHandlerFactory::Skybox());
+    this->CameraMain->RegisterCameraObserver(SelectShader("Skybox"));
 
     //Models
 
@@ -512,9 +518,9 @@ void Engine::TestLaunch() {
     std::shared_ptr<LightDirectional> directionalLight = std::make_shared<LightDirectional>(
             glm::vec3(0.0f, -1.0f, 0.0f),
             glm::vec3(1.0f, 1.0f, 1.0f));
-    directionalLight->SetIntensity(0).SetColor(glm::vec3(0.3f, 1.0f, 0.4f));
+    directionalLight->SetColor(glm::vec3(0.3f, 0.3f, 0.3f));
 
-//    ResourceManager.AddLightToMap("Many objects", directionalLight);
+    ResourceManager.AddLightToMap("Many objects", directionalLight);
 
 
     std::dynamic_pointer_cast<LightSpot>(ResourceManager.GetLightOnMap("Many objects", 0))
@@ -571,19 +577,18 @@ void Engine::TestLaunch() {
     std::shared_ptr<StandardisedModel> pmSkybox = ModelFactory::Position(rawmodel8_skycube,
                                                                          size8,
                                                                          "Skybox");
-    pmSkybox->SetShaderProgram(SelectShader("Phong").get());
+    pmSkybox->SetShaderProgram(SelectShader("Skybox").get());
     Texture *skyboxTexture = ResourceManager.ObjectTextureController.UseCubemap(
             "../Resources/Textures/Lesson/FieldSkybox/field");
     pmSkybox->SetTexture(skyboxTexture);
 
     ResourceManager.AddSkyboxToMap("Default", pmSkybox);
+    ResourceManager.AddSkyboxToMap("Many objects", pmSkybox);
 
     std::shared_ptr<StandardisedModel> skySphereTest = ModelFactory::PositionNormal(rawmodel1_sphere, size,
                                                                                     "Skybox sphere");
     skySphereTest->SetShaderProgram(SelectShader("Constant").get());
     skySphereTest->InsertTransfMove(glm::vec3(30.0f, 0.0f, 0.0f)).ConsolidateTransf();
-
-    ResourceManager.AddObjectToMap("Many objects", pmSkybox);
 }
 
 void Engine::CameraLookHorizontal(double x) {

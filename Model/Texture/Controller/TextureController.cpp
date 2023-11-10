@@ -72,12 +72,12 @@ std::unique_ptr<Texture> TextureController::LoadCubeMap(const std::string &path)
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 
     std::vector<std::string> filenames = {
-            "negx",
-            "negy",
-            "negz",
-            "posx",
-            "posy",
-            "posz"
+            "posx", // Right
+            "negx", // Left
+            "posy", // Top
+            "negy", // Bottom
+            "posz", // Front
+            "negz"  // Back
     };
 
     std::vector<std::string> suffixes = {
@@ -132,6 +132,7 @@ std::unique_ptr<Texture> TextureController::LoadCubeMap(const std::string &path)
         } else {
             std::cerr << "ERROR: Cubemap texture failed to load at path: " << faces[i] << std::endl;
             stbi_image_free(data);
+            glDeleteTextures(1, &textureID);
             return nullptr;
         }
     }
