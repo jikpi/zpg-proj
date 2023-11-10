@@ -14,9 +14,10 @@
 
 class ShaderObjectSet {
 public:
-    explicit ShaderObjectSet(std::shared_ptr<ShaderHandler> shader);
-    std::shared_ptr<ShaderHandler> Shader;
+    explicit ShaderObjectSet(ShaderHandler *shader);
+    ShaderHandler* Shader;
     std::vector<std::shared_ptr<StandardisedModel>> Objects;
+//    std::shared_ptr<StandardisedModel> Skybox;
 };
 
 

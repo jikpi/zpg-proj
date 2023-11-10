@@ -18,6 +18,12 @@ public:
     static std::string HardLoadConstantColored();
     static std::string HardLoadConstantTrue();
 
+    static std::string HardLoadMVPNTextureVertex();
+    static std::string HardLoadPhongTextureFragment();
+
+    static std::string HardLoadCubemapSkyboxVert();
+    static std::string HardLoadCubemapSkyboxFrag();
+
 };
 
 

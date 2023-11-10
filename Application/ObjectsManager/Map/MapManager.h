@@ -9,14 +9,15 @@
 #include <memory>
 #include "Map.h"
 #include "../ShaderLinking/MapToShaderLinker.h"
+#include "../../../Model/Texture/Controller/TextureController.h"
 
 class MapManager {
 private:
+    std::string MapCacheName;
+    int MapCacheIndex;
 
-
-
-    void MasterAddObjectToMap(std::shared_ptr<Map> &map, const std::shared_ptr<StandardisedModel>& object);
-    void MasterAddLightToMap(std::shared_ptr<Map> &map, const std::shared_ptr<RenderableLight>& light);
+    void MasterAddObjectToMap(std::shared_ptr<Map> &map, const std::shared_ptr<StandardisedModel> &object);
+    void MasterAddLightToMap(std::shared_ptr<Map> &map, const std::shared_ptr<RenderableLight> &light);
     std::shared_ptr<Map> ActiveMap;
     std::vector<std::shared_ptr<Map>> Maps;
 public:
@@ -25,33 +26,52 @@ public:
     MapToShaderLinker ShaderLinker;
     void SetFallbackShader(std::shared_ptr<ShaderHandler> &shader);
 
-    std::shared_ptr<Map> & GetMapByName(const std::string &name);
-    std::shared_ptr<Map>& GetMapByIndex(int index);
-    std::shared_ptr<Map>& GetActiveMap();
+    TextureController ObjectTextureController;
+
+    std::shared_ptr<Map> &GetMap(const std::string &name);
+    std::shared_ptr<Map> &GetMap(int index);
+    std::shared_ptr<Map> &GetActiveMap();
 
     void CreateNewMap(const std::string &name);
     void InsertMap(const std::shared_ptr<Map> &map);
 
-    void AddObjectToMap(int mapIndex, const std::shared_ptr<StandardisedModel>& object);
-    void AddObjectToMap(std::shared_ptr<Map> &map, const std::shared_ptr<StandardisedModel>& object);
-    void AddObjectToMap(const std::string &mapName, const std::shared_ptr<StandardisedModel>& object);
-    void AddObjectToCurrentMap(const std::shared_ptr<StandardisedModel>& object);
+    void AddObjectToMap(int mapIndex, const std::shared_ptr<StandardisedModel> &object);
+    void AddObjectToMap(std::shared_ptr<Map> &map, const std::shared_ptr<StandardisedModel> &object);
+    void AddObjectToMap(const std::string &mapName, const std::shared_ptr<StandardisedModel> &object);
+    void AddObjectToCurrentMap(const std::shared_ptr<StandardisedModel> &object);
 
-    void AddLightToMap(int index, const std::shared_ptr<RenderableLight>& light);
-    void AddLightToMap(std::shared_ptr<Map> &map, const std::shared_ptr<RenderableLight>& light);
-    void AddLightToMap(const std::string &name, const std::shared_ptr<RenderableLight>& light);
-    void AddLightToCurrentMap(const std::shared_ptr<RenderableLight>& light);
+    void AddLightToMap(int index, const std::shared_ptr<RenderableLight> &light);
+    void AddLightToMap(std::shared_ptr<Map> &map, const std::shared_ptr<RenderableLight> &light);
+    void AddLightToMap(const std::string &name, const std::shared_ptr<RenderableLight> &light);
+    void AddLightToCurrentMap(const std::shared_ptr<RenderableLight> &light);
+
+    void AddSkyboxToMap(int index, const std::shared_ptr<StandardisedModel> &skybox);
+    static void AddSkyboxToMap(std::shared_ptr<Map> &map, const std::shared_ptr<StandardisedModel> &skybox);
+    void AddSkyboxToMap(const std::string &name, const std::shared_ptr<StandardisedModel> &skybox);
+    void AddSkyboxToCurrentMap(const std::shared_ptr<StandardisedModel> &skybox);
 
     void ForceRefreshLightsOnCurrentMap();
-    std::shared_ptr<RenderableLight> & GetLightOnMap(int mapIndex, int lightIndex);
-    std::shared_ptr<RenderableLight> & GetLightOnMap(const std::string &mapName, int lightIndex);
+    std::shared_ptr<RenderableLight> &GetLightOnMap(int mapIndex, int lightIndex);
+    std::shared_ptr<RenderableLight> &GetLightOnMap(const std::string &mapName, int lightIndex);
 
-    void ChangeLightOnMap(int mapIndex, int lightIndex, const std::shared_ptr<RenderableLight>& light);
-    void ChangeLightOnMap(const std::string &mapName, int lightIndex, const std::shared_ptr<RenderableLight>& light);
+    void ChangeLightOnMap(int mapIndex, int lightIndex, const std::shared_ptr<RenderableLight> &light);
+    void ChangeLightOnMap(const std::string &mapName, int lightIndex, const std::shared_ptr<RenderableLight> &light);
 
     void ChangeMap(std::shared_ptr<Map> &map);
     void ChangeMap(int index);
     void ChangeMap(const std::string &name);
+
+    template<typename T, typename U>
+    std::shared_ptr<StandardisedModel> &GetObjectOnMap(T mapTemplate, U objectTemplate) {
+        static_assert(std::is_integral<T>::value || std::is_same<T, const char *>::value, "T must be an int or string");
+        static_assert(std::is_integral<U>::value || std::is_same<U, const char *>::value,
+                      "U must be an int or a string");
+
+        std::shared_ptr<Map> &map = this->GetMap(mapTemplate);
+        std::shared_ptr<StandardisedModel> &object = map->GetObject(objectTemplate);
+
+        return object;
+    }
 };
 
 

@@ -3,7 +3,7 @@ const int LIGHTS_SIZE_MAX = 16;
 
 in vec3 toFrag_worldNormal;//transformed normal from vertex shader, lighting
 in vec4 toFrag_worldPosition;//world position from vertex shader, lighting
-in vec3 toFrag_eyePosition;//camera position for fragment shader
+in vec3 toFrag_cameraLocation;//camera position for fragment shader
 
 out vec4 out_frag_Color;
 
@@ -55,7 +55,7 @@ vec3 calc_l_(vec3 lightPosition, vec3 fragPosition) {
 }
 
 // (r_) for Ispecular, reflection direction.
-vec3 cal_r_(vec3 l, vec3 n, float diffuse_dotp_nonmaxd) {
+vec3 calc_r_(vec3 l, vec3 n, float diffuse_dotp_nonmaxd) {
     // Check if the light is behind the fragment
     if (diffuse_dotp_nonmaxd < 0.0) {
         return vec3(0.0, 0.0, 0.0);
@@ -102,7 +102,7 @@ void main() {
     vec3 combinedColor = ambientColor * diffuseColor;// ambient light color added to the result
 
     // (c) for Ispecular, direction from fragment to camera
-    vec3 c_ = normalize(toFrag_eyePosition - toFrag_worldPosition.xyz);
+    vec3 c_ = normalize(toFrag_cameraLocation - toFrag_worldPosition.xyz);
 
     // Point lights
     for (int i = 0; i < LightPointSize; i++) {
@@ -110,7 +110,7 @@ void main() {
 
         float diffuse_dotp_nonmaxd = dot(n_, l_);
         float diffuse_dotp_maxd = max(diffuse_dotp_nonmaxd, 0.0);//how strong the light is based on the angle
-        vec3 r_ = cal_r_(l_, n_, diffuse_dotp_nonmaxd);
+        vec3 r_ = calc_r_(l_, n_, diffuse_dotp_nonmaxd);
 
         vec3 Idiffuse = calc_Idiffuse(LightPointArray[i].color, diffuseColor, diffuse_dotp_maxd);
 
@@ -148,7 +148,7 @@ void main() {
 
         float diffuse_dotp_nonmaxd = dot(n_, l_);
         float diffuse_dotp_maxd = max(diffuse_dotp_nonmaxd, 0.0); //how strong the light is based on the angle
-        vec3 r_ = cal_r_(l_, n_, diffuse_dotp_nonmaxd);
+        vec3 r_ = calc_r_(l_, n_, diffuse_dotp_nonmaxd);
 
         vec3 Idiffuse = calc_Idiffuse(LightSpotArray[i].color, diffuseColor, diffuse_dotp_maxd);
 

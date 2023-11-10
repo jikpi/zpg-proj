@@ -4,6 +4,7 @@ const int LIGHTS_SIZE_MAX = 16;
 in vec3 toFrag_worldNormal;//transformed normal from vertex shader, lighting
 in vec4 toFrag_worldPosition;//world position from vertex shader, lighting
 in vec3 toFrag_cameraLocation;//camera position for fragment shader
+in vec2 toFrag_textureUV;//texture UV from vertex shader
 
 out vec4 out_frag_Color;
 
@@ -11,6 +12,8 @@ uniform vec3 diffuseColor = vec3(1.0, 0.0, 0.863);// object color
 uniform vec3 ambientColor = vec3(0.1, 0.1, 0.1);// ambient color
 uniform vec3 specularColor = vec3(1.0, 1.0, 1.0);// spec color
 uniform float shineValue = 255;//10 - 256, more shine
+
+uniform sampler2D twoDTexture;
 
 struct LightPoint {
     vec3 position;
@@ -81,14 +84,10 @@ vec3 calc_Is(vec3 lightColor, float lightIntensity) {
     return lightColor * lightIntensity;
 }
 
-// Calculate the halfway vector for blinn-phong
-vec3 calc_h(vec3 l, vec3 c_) {
-    return normalize(l + c_);
-}
-
-//Ispecular  Is *  rs * max(0,n_ x h)^shineValue
-vec3 calc_Ispecular_BlinnPhong(vec3 lightColor, vec3 specularColor, vec3 n_, vec3 h, float shineValue) {
-    return lightColor * specularColor * pow(max(dot(n_, h), 0.0), shineValue);
+//Ispecular  Is *  rs * max(0,r_ x c_)^shineValue
+vec3 calc_Ispecular(vec3 lightColor, vec3 specularColor, vec3 r_, vec3 c_, float shineValue) {
+    //Ispecular  Is   *        rs     *     max(0,r_ x c_)^shineValue
+    return lightColor * specularColor * pow(max(dot(r_, c_), 0.0), shineValue);
 }
 
 // Spotlight intensity
@@ -119,9 +118,7 @@ void main() {
         vec3 Idiffuse = calc_Idiffuse(LightPointArray[i].color, diffuseColor, diffuse_dotp_maxd);
 
         vec3 Is = calc_Is(LightPointArray[i].color, LightPointArray[i].intensity);
-        vec3 h = calc_h(l_, c_);
-        vec3 Ispecular = calc_Ispecular_BlinnPhong(LightSpotArray[i].color, specularColor, n_, h, shineValue);
-
+        vec3 Ispecular = calc_Ispecular(Is, specularColor, r_, c_, shineValue);
 
         float attn = calc_attn(LightPointArray[i].position, toFrag_worldPosition.xyz,
                                LightPointArray[i].constant, LightPointArray[i].linear, LightPointArray[i].quadratic);
@@ -141,8 +138,7 @@ void main() {
         vec3 Idiffuse = calc_Idiffuse(LightDirectionalArray[i].color, diffuseColor, diffuse_dotp_maxd);
 
         vec3 Is = calc_Is(LightDirectionalArray[i].color, LightDirectionalArray[i].intensity);
-        vec3 h = calc_h(l_, c_);
-        vec3 Ispecular = calc_Ispecular_BlinnPhong(LightSpotArray[i].color, specularColor, n_, h, shineValue);
+        vec3 Ispecular = calc_Ispecular(Is, specularColor, r_, c_, shineValue);
 
         // Sum the diffuse and specular components, ambient is added once
         combinedColor += (Idiffuse + Ispecular);
@@ -160,8 +156,7 @@ void main() {
         vec3 Idiffuse = calc_Idiffuse(LightSpotArray[i].color, diffuseColor, diffuse_dotp_maxd);
 
         vec3 Is = calc_Is(LightSpotArray[i].color, LightSpotArray[i].intensity);
-        vec3 h = calc_h(l_, c_);
-        vec3 Ispecular = calc_Ispecular_BlinnPhong(LightSpotArray[i].color, specularColor, n_, h, shineValue);
+        vec3 Ispecular = calc_Ispecular(Is, specularColor, r_, c_, shineValue);
 
         float attn = calc_attn(LightSpotArray[i].position, toFrag_worldPosition.xyz,
                                LightSpotArray[i].constant, LightSpotArray[i].linear, LightSpotArray[i].quadratic);
@@ -172,5 +167,5 @@ void main() {
         combinedColor += (Idiffuse + Ispecular) * attn * intensity;
     }
 
-    out_frag_Color = vec4(combinedColor, 1.0);
+    out_frag_Color = texture(twoDTexture, toFrag_textureUV) * vec4(combinedColor, 1.0);
 }

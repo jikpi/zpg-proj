@@ -29,10 +29,22 @@ void RenderableObject::ResetTransf() const {
 }
 
 void RenderableObject::SetMaterial(Material newMaterial) {
+    if (this->material.GetTexture() != nullptr) {
+        newMaterial.SetTexture(this->material.GetTexture());
+    }
+
     this->material = newMaterial;
 }
 
 Material RenderableObject::GetMaterial() const {
     return this->material;
+}
+
+Texture *RenderableObject::GetTexture() {
+    return material.GetTexture();
+}
+
+void RenderableObject::SetTexture(Texture *texture) {
+    material.SetTexture(texture);
 }
 

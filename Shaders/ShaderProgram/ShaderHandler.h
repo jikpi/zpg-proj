@@ -25,7 +25,6 @@
 class ShaderHandler : public ShaderBase, public CameraObserver {
 private:
 
-    bool HasCameraError{};
     bool HaveLightsChanged{};
 
     glm::mat4 ViewMatrix{};
@@ -43,6 +42,10 @@ private:
     void RenderObjectMaterial(Material objectMaterial) const;
     void RenderPhongLight(Material objectMaterial) const;
 
+    static void RenderAnyTexture(Texture *texture, int target, const GLint &Location) ;
+    void RenderTexture(Texture *texture) const;
+    void RenderSkybox(Texture *texture) const;
+
 
     /** GLSL Shaders GLint locations **/
     /*Base*/
@@ -50,6 +53,8 @@ private:
     GLint ViewMatrixLocation{};
     GLint ProjectionMatrixLocation{};
     GLint CameraLocationLocation{};
+    /* Normals */
+    GLint NormalMatrixLocation;
     /* Lights */
     //Point Lights
     GLint LightsArrayPoint_SizeLocation{};
@@ -60,27 +65,23 @@ private:
     //Spot Lights
     GLint LightsArraySpot_SizeLocation{};
     std::vector<LightsArraySpotUniform> LightsArraySpot_UniformLocation;
-
-
+    /* Material */
     //Object Material
     GLint AmbientColorLocation{};
     GLint DiffuseColorLocation{};
     //Blinn-Phong
     GLint SpecularColorLocation{};
     GLint ShineValueLocation{};
-
-
-    //Normals
-    GLint NormalMatrixLocation;
+    /* Texture */
+    GLint TextureLocation{};
+    /* Skybox cubemap */
+    GLint SkyboxLocation{};
 
 
 public:
     ShaderHandler();
-    ~ShaderHandler() override;
     ShaderHandler(const ShaderHandler &) = delete;
     ShaderHandler &operator=(const ShaderHandler &) = delete;
-    ShaderHandler(ShaderHandler &&other) noexcept;
-    ShaderHandler &operator=(ShaderHandler &&other) noexcept;
 
     void PrintName() const override;
 
@@ -100,6 +101,8 @@ public:
     ShaderHandler &SavePhongLightLocation();
     ShaderHandler &SaveCameraLocationLocation();
     ShaderHandler &SaveObjectMaterialLocation();
+    ShaderHandler &SaveTextureLocation();
+    ShaderHandler &SaveSkyboxLocation();
 };
 
 

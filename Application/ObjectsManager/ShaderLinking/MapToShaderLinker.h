@@ -14,12 +14,12 @@
 class MapToShaderLinker {
 private:
     std::vector<std::shared_ptr<ShaderObjectSet>> ShaderObjectSets;
-    void AddShader(const std::shared_ptr<ShaderHandler> &shader);
+    void AddShader(ShaderHandler *shader);
 
     std::weak_ptr<ShaderHandler> FallbackShader;
     bool TryUseFallbackShader();
 
-    void AddObjectToShader(std::shared_ptr<ShaderHandler>& shader, const std::shared_ptr<StandardisedModel> &object);
+    void AddObjectToShader(ShaderHandler *shader, const std::shared_ptr<StandardisedModel> &object);
     void AddObjectToShaderWithName(const std::string& name, std::shared_ptr<StandardisedModel> &object);
 
     static void PrintBuildingObjectError(const std::shared_ptr<StandardisedModel> &object);

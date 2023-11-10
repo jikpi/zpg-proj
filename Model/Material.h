@@ -7,14 +7,21 @@
 
 
 #include "glm/vec3.hpp"
+#include "Texture/Texture.h"
 
 class Material {
 private:
+    Texture* MaterialTexture;
 
 public:
     Material(glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, float specularShineValue);
     explicit Material(glm::vec3 diffuseColor);
     Material();
+
+    void SetTexture(Texture* texture);
+    Texture* GetTexture();
+    void RemoveTexture();
+
     glm::vec3 AmbientColor{};
     glm::vec3 DiffuseColor{};
     glm::vec3 SpecularColor{};

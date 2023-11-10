@@ -11,11 +11,9 @@
 #include "../Lighting/LightDirectional.h"
 #include "../Lighting/LightSpot.h"
 
-
 ShaderHandler::ShaderHandler() : ShaderBase(),
                                  ViewMatrix(glm::mat4(1.0f)),
                                  ProjectionMatrix(glm::mat4(1.0f)),
-                                 HasCameraError(false),
                                  HaveLightsChanged(false),
                                  CameraLocationLocation(-2),
 
@@ -29,70 +27,10 @@ ShaderHandler::ShaderHandler() : ShaderBase(),
                                  DiffuseColorLocation(-2),
 
                                  ShineValueLocation(-2),
-                                 SpecularColorLocation(-2) {
-}
+                                 SpecularColorLocation(-2),
 
-ShaderHandler::~ShaderHandler() = default;
-
-ShaderHandler::ShaderHandler(ShaderHandler &&other) noexcept {
-    HasCameraError = other.HasCameraError;
-    ViewMatrix = other.ViewMatrix;
-    ProjectionMatrix = other.ProjectionMatrix;
-    ProjectionMatrixLocation = other.ProjectionMatrixLocation;
-    ViewMatrixLocation = other.ViewMatrixLocation;
-    ModelMatrixLocation = other.ModelMatrixLocation;
-    NormalMatrixLocation = other.NormalMatrixLocation;
-    Name = std::move(other.Name);
-    AmbientColorLocation = other.AmbientColorLocation;
-    DiffuseColorLocation = other.DiffuseColorLocation;
-    LightsArrayPoint_UniformLocation = other.LightsArrayPoint_UniformLocation;
-    HaveLightsChanged = other.HaveLightsChanged;
-    LightsArrayDirectional_SizeLocation = other.LightsArrayDirectional_SizeLocation;
-    LightsArrayDirectional_UniformLocation = other.LightsArrayDirectional_UniformLocation;
-    LightsArraySpot_SizeLocation = other.LightsArraySpot_SizeLocation;
-    LightsArraySpot_UniformLocation = other.LightsArraySpot_UniformLocation;
-
-
-    other.LightsArrayPoint_UniformLocation = {};
-    other.ModelMatrixLocation = 0;
-    other.ViewMatrixLocation = 0;
-    other.ProjectionMatrixLocation = 0;
-    other.Name = other.Name + " (DELETED)";
-    other.AmbientColorLocation = 0;
-    other.DiffuseColorLocation = 0;
-}
-
-ShaderHandler &ShaderHandler::operator=(ShaderHandler &&other) noexcept {
-
-    if (this == &other) {
-        return *this;
-    }
-
-    HasCameraError = other.HasCameraError;
-    ViewMatrix = other.ViewMatrix;
-    ProjectionMatrix = other.ProjectionMatrix;
-    ProjectionMatrixLocation = other.ProjectionMatrixLocation;
-    ViewMatrixLocation = other.ViewMatrixLocation;
-    ModelMatrixLocation = other.ModelMatrixLocation;
-    NormalMatrixLocation = other.NormalMatrixLocation;
-    Name = std::move(other.Name);
-    AmbientColorLocation = other.AmbientColorLocation;
-    DiffuseColorLocation = other.DiffuseColorLocation;
-    LightsArrayPoint_UniformLocation = other.LightsArrayPoint_UniformLocation;
-    HaveLightsChanged = other.HaveLightsChanged;
-    LightsArrayDirectional_SizeLocation = other.LightsArrayDirectional_SizeLocation;
-    LightsArrayDirectional_UniformLocation = other.LightsArrayDirectional_UniformLocation;
-    LightsArraySpot_SizeLocation = other.LightsArraySpot_SizeLocation;
-    LightsArraySpot_UniformLocation = other.LightsArraySpot_UniformLocation;
-
-    other.LightsArrayPoint_UniformLocation = {};
-    other.ModelMatrixLocation = 0;
-    other.ViewMatrixLocation = 0;
-    other.ProjectionMatrixLocation = 0;
-    other.Name = other.Name + " (DELETED)";
-    other.AmbientColorLocation = 0;
-    other.DiffuseColorLocation = 0;
-    return *this;
+                                 TextureLocation(-2),
+                                 SkyboxLocation(-2) {
 }
 
 ShaderHandler &ShaderHandler::SaveBaseMatrixLocations() {
@@ -101,7 +39,7 @@ ShaderHandler &ShaderHandler::SaveBaseMatrixLocations() {
     ProjectionMatrixLocation = GetUniformLocation(DEF_SHADER_PROJECTION_MATRIX_NAME);
 
     if ((ModelMatrixLocation == -1 || ViewMatrixLocation == -1 || ProjectionMatrixLocation == -1)) {
-        std::cerr << "SHADER FATAL ERROR: A BASIC TRANSFORMATION NOT FOUND IN SHADER CODE." << std::endl;
+        std::cerr << "SHADER ERROR: A BASIC TRANSFORMATION NOT FOUND IN SHADER CODE." << std::endl;
         if (ModelMatrixLocation == -1) std::cerr << "ModelMatrix == -1" << std::endl;
         if (ViewMatrixLocation == -1) std::cerr << "ViewMatrix == -1" << std::endl;
         if (ProjectionMatrixLocation == -1) std::cerr << "ProjectionMatrix == -1" << std::endl;
@@ -276,6 +214,26 @@ ShaderHandler &ShaderHandler::SaveCameraLocationLocation() {
     return *this;
 }
 
+ShaderHandler &ShaderHandler::SaveTextureLocation() {
+    this->TextureLocation = GetUniformLocation(DEF_SHADER_TEXTURE_TWOD_LOCATION);
+    if (this->TextureLocation == -1) {
+        std::cerr << "SHADER ERROR: TEXTURE NOT FOUND IN SHADER CODE, BUT WAS EXPECTED."
+                  << std::endl;
+        this->PrintName();
+    }
+    return *this;
+}
+
+ShaderHandler &ShaderHandler::SaveSkyboxLocation() {
+    this->SkyboxLocation = GetUniformLocation(DEF_SHADER_TEXTURE_CUBEMAP_LOCATION);
+    if (this->SkyboxLocation == -1) {
+        std::cerr << "SHADER ERROR: SKYBOX CUBEMAP NOT FOUND IN SHADER CODE, BUT WAS EXPECTED."
+                  << std::endl;
+        this->PrintName();
+    }
+    return *this;
+}
+
 
 void ShaderHandler::RenderBase(const glm::mat4 &modelMatrix) {
     SendToShader(ModelMatrixLocation, modelMatrix);
@@ -400,6 +358,38 @@ void ShaderHandler::RequestRenderBaseLightsArray() {
     }
 }
 
+void ShaderHandler::RenderAnyTexture(Texture *texture, int target, const GLint &Location) {
+    if (texture) {
+        GLuint textureID = texture->GetTextureID();
+
+        if (texture->GetTextureUnit() == -1) {
+            texture->SetTextureUnit(Texture::TextureUnitCounter++);
+        }
+
+        if (texture->GetTextureUnit() >= 32) {
+            std::cerr << "ERROR: Texture unit " << texture->GetTextureUnit() << " is out of range. " << std::endl;
+            return;
+        }
+
+        glActiveTexture(GL_TEXTURE0 + texture->GetTextureUnit());
+        glBindTexture(target, textureID);
+
+        SendToShader(Location, texture->GetTextureUnit());
+    } else {
+        std::cerr << "ERROR: ShaderHandler: Texture is null" << std::endl;
+    }
+}
+
+
+void ShaderHandler::RenderSkybox(Texture *texture) const {
+    RenderAnyTexture(texture, GL_TEXTURE_CUBE_MAP, SkyboxLocation);
+}
+
+void ShaderHandler::RenderTexture(Texture *texture) const {
+    RenderAnyTexture(texture, GL_TEXTURE_2D, TextureLocation);
+}
+
+
 void ShaderHandler::RequestRender(RenderableObject &object) {
     glm::mat4 modelMatrix = object.GetTransf();
     RenderBase(modelMatrix);
@@ -424,6 +414,14 @@ void ShaderHandler::RequestRender(RenderableObject &object) {
         this->HaveLightsChanged = false;
         this->RequestRenderBaseLightsArray();
     }
+
+    if (this->TextureLocation != -2) {
+        this->RenderTexture(object.GetTexture());
+    }
+
+    if (this->SkyboxLocation != -2) {
+        this->RenderSkybox(object.GetTexture());
+    }
 }
 
 
@@ -447,5 +445,6 @@ void ShaderHandler::SetLights(std::shared_ptr<std::vector<std::shared_ptr<Render
 void ShaderHandler::NotifyLightsChanged() {
     HaveLightsChanged = true;
 }
+
 
 

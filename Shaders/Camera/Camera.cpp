@@ -133,14 +133,28 @@ void Camera::ChangeFi(float change) {
 }
 
 void Camera::LookSphericalSide(float degrees) {
+    if(IsUnlocked)
+    {
+        return;
+    }
     ChangeFi(glm::radians(degrees));
 }
 
 void Camera::LookSphericalVertical(float degrees) {
+    if(IsUnlocked)
+    {
+        return;
+    }
+
     ChangeAlpha(-glm::radians(degrees));
 }
 
 void Camera::MoveForwardBackward(float distance) {
+    if(IsUnlocked)
+    {
+        return;
+    }
+
     //calculate direction, normalize to 1
     glm::vec3 direction = glm::normalize(Target - Location);
 
@@ -159,6 +173,11 @@ void Camera::MoveForwardBackward(float distance) {
 }
 
 void Camera::MoveSideToSide(float distance) {
+    if(IsUnlocked)
+    {
+        return;
+    }
+
     //calculate direction, normalize to 1
     glm::vec3 forward = glm::normalize(Target - Location);
 
@@ -174,6 +193,11 @@ void Camera::MoveSideToSide(float distance) {
 }
 
 void Camera::MoveUpDown(float distance) {
+    if(IsUnlocked)
+    {
+        return;
+    }
+
     Location += Up * distance;
     Target += Up * distance;
 

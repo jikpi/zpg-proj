@@ -11,9 +11,12 @@
 #include "../StandardisedModel.h"
 
 class ModelFactory {
+private:
+    static void CheckBadModelSize(std::shared_ptr<StandardisedModel> &model, int stride);
 public:
     static std::shared_ptr<StandardisedModel> PositionNormal(const float *model, int size, std::string Name = "None");
-    static std::shared_ptr<StandardisedModel> XYZ_Model(const float *model, int size, std::string Name = "None");
+    static std::shared_ptr<StandardisedModel> PositionNormalTex(const float *model, int size, std::string Name = "None");
+    static std::shared_ptr<StandardisedModel> Position(const float *model, int size, std::string Name = "None");
 
 };
 

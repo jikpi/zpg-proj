@@ -40,12 +40,13 @@ private:
     float Ratio{};
 
     std::vector<std::shared_ptr<ShaderHandler>> Shaders;
-    MapManager EngineMapManager;
+    MapManager ResourceManager;
     std::shared_ptr<ShaderHandler> & SelectShader(const std::string& name);
 
     std::shared_ptr<Camera> CameraMain;
 
     std::shared_ptr<MovesetInputManager> MovesetManager;
+
     void UpdateMoveset();
 
 public:
@@ -64,6 +65,7 @@ public:
     void ToggleCameraPerspective();
     void ToggleCameraYDirection();
     void RequestMapChange(int index);
+    void RequestMapChange(const std::string &name);
 
 
     void AddShader(const std::shared_ptr<ShaderHandler> &shader);

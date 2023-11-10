@@ -97,6 +97,8 @@ void main() {
 
         vec3 Idiffuse = calc_Idiffuse(LightDirectionalArray[i].color, diffuseColor, diffuse_dotp);
 
+        Idiffuse *= LightDirectionalArray[i].intensity;
+
         combinedColor += Idiffuse;
     }
 

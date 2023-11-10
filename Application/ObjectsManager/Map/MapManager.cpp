@@ -9,10 +9,17 @@
 void MapManager::Initialize() {
     this->Maps.push_back(std::make_shared<Map>(DEF_MAP_NAME));
     this->ChangeMap(0);
+
+    MapCacheName = DEF_MAP_NAME;
+    MapCacheIndex = 0;
 }
 
 void MapManager::ForceRefreshMaps() {
+    //Refresh map
     this->ShaderLinker.BuildWithMap(this->ActiveMap);
+
+    //Reset shader units
+    ObjectTextureController.ResetTextureUnitCounter();
 }
 
 void MapManager::CreateNewMap(const std::string &name) {
@@ -23,7 +30,7 @@ void MapManager::InsertMap(const std::shared_ptr<Map> &map) {
     this->Maps.push_back(map);
 }
 
-std::shared_ptr<Map> &MapManager::GetMapByIndex(int index) {
+std::shared_ptr<Map> &MapManager::GetMap(const int index) {
     if (index >= this->Maps.size()) {
         std::cerr << "ERROR: MapManager: Map index not found." << std::endl;
         return this->Maps.at(0);
@@ -31,12 +38,19 @@ std::shared_ptr<Map> &MapManager::GetMapByIndex(int index) {
     return this->Maps.at(index);
 }
 
-std::shared_ptr<Map> &MapManager::GetMapByName(const std::string &name) {
-    for (auto &map: this->Maps) {
-        if (map->GetName() == name) {
-            return map;
+std::shared_ptr<Map> &MapManager::GetMap(const std::string &name) {
+    if (name == MapCacheName) {
+        return this->Maps.at(MapCacheIndex);
+    }
+
+    for (int i = 0; i < this->Maps.size(); i++) {
+        if (this->Maps.at(i)->GetName() == name) {
+            MapCacheName = name;
+            MapCacheIndex = i;
+            return this->Maps.at(i);
         }
     }
+
     std::cerr << "ERROR: MapManager: Map name \"" << name << "\" not found." << std::endl;
     return this->Maps.at(0);
 }
@@ -67,7 +81,7 @@ void MapManager::ChangeMap(int index) {
 
 void MapManager::ChangeMap(const std::string &name) {
     //By name
-    std::shared_ptr<Map> &map = this->GetMapByName(name);
+    std::shared_ptr<Map> &map = this->GetMap(name);
     this->ActiveMap = map;
 
     //Refresh shader linker
@@ -88,11 +102,11 @@ void MapManager::AddObjectToMap(std::shared_ptr<Map> &map, const std::shared_ptr
 }
 
 void MapManager::AddObjectToMap(int mapIndex, const std::shared_ptr<StandardisedModel> &object) {
-    this->MasterAddObjectToMap(GetMapByIndex(mapIndex), object);
+    this->MasterAddObjectToMap(GetMap(mapIndex), object);
 }
 
 void MapManager::AddObjectToMap(const std::string &mapName, const std::shared_ptr<StandardisedModel> &object) {
-    std::shared_ptr<Map> &map = this->GetMapByName(mapName);
+    std::shared_ptr<Map> &map = this->GetMap(mapName);
     this->MasterAddObjectToMap(map, object);
 }
 
@@ -114,7 +128,7 @@ void MapManager::AddLightToMap(std::shared_ptr<Map> &map, const std::shared_ptr<
 }
 
 void MapManager::AddLightToMap(int index, const std::shared_ptr<RenderableLight> &light) {
-    this->MasterAddLightToMap(GetMapByIndex(index), light);
+    this->MasterAddLightToMap(GetMap(index), light);
 }
 
 void MapManager::AddLightToCurrentMap(const std::shared_ptr<RenderableLight> &light) {
@@ -122,16 +136,15 @@ void MapManager::AddLightToCurrentMap(const std::shared_ptr<RenderableLight> &li
 }
 
 void MapManager::AddLightToMap(const std::string &name, const std::shared_ptr<RenderableLight> &light) {
-    std::shared_ptr<Map> &map = this->GetMapByName(name);
+    std::shared_ptr<Map> &map = this->GetMap(name);
     this->MasterAddLightToMap(map, light);
 }
 
-std::shared_ptr<RenderableLight> & MapManager::GetLightOnMap(int mapIndex, int lightIndex) {
-    std::shared_ptr<Map> &map = this->GetMapByIndex(mapIndex);
+std::shared_ptr<RenderableLight> &MapManager::GetLightOnMap(int mapIndex, int lightIndex) {
+    std::shared_ptr<Map> &map = this->GetMap(mapIndex);
     std::shared_ptr<RenderableLight> &light = map->GetLight(lightIndex);
 
-    if(map == this->ActiveMap)
-    {
+    if (map == this->ActiveMap) {
         ShaderLinker.NotifyLightsOnCurrentMapChanged();
     }
 
@@ -139,11 +152,10 @@ std::shared_ptr<RenderableLight> & MapManager::GetLightOnMap(int mapIndex, int l
 }
 
 void MapManager::ChangeLightOnMap(int mapIndex, int lightIndex, const std::shared_ptr<RenderableLight> &light) {
-    std::shared_ptr<Map> &map = this->GetMapByIndex(mapIndex);
+    std::shared_ptr<Map> &map = this->GetMap(mapIndex);
     map->ChangeLight(lightIndex, light);
 
-    if(map == this->ActiveMap)
-    {
+    if (map == this->ActiveMap) {
         ShaderLinker.NotifyLightsOnCurrentMapChanged();
     }
 }
@@ -153,11 +165,10 @@ void MapManager::SetFallbackShader(std::shared_ptr<ShaderHandler> &shader) {
 }
 
 std::shared_ptr<RenderableLight> &MapManager::GetLightOnMap(const std::string &mapName, int lightIndex) {
-    std::shared_ptr<Map> &map = this->GetMapByName(mapName);
+    std::shared_ptr<Map> &map = this->GetMap(mapName);
     std::shared_ptr<RenderableLight> &light = map->GetLight(lightIndex);
 
-    if(map == this->ActiveMap)
-    {
+    if (map == this->ActiveMap) {
         ShaderLinker.NotifyLightsOnCurrentMapChanged();
     }
 
@@ -166,15 +177,32 @@ std::shared_ptr<RenderableLight> &MapManager::GetLightOnMap(const std::string &m
 
 void MapManager::ChangeLightOnMap(const std::string &mapName, int lightIndex,
                                   const std::shared_ptr<RenderableLight> &light) {
-    std::shared_ptr<Map> &map = this->GetMapByName(mapName);
+    std::shared_ptr<Map> &map = this->GetMap(mapName);
     map->ChangeLight(lightIndex, light);
 
-    if(map == this->ActiveMap)
-    {
+    if (map == this->ActiveMap) {
         ShaderLinker.NotifyLightsOnCurrentMapChanged();
     }
 }
 
 void MapManager::ForceRefreshLightsOnCurrentMap() {
     ShaderLinker.NotifyLightsOnCurrentMapChanged();
+}
+
+void MapManager::AddSkyboxToMap(int index, const std::shared_ptr<StandardisedModel> &skybox) {
+    std::shared_ptr<Map> &map = this->GetMap(index);
+    map->SetSkybox(skybox);
+}
+
+void MapManager::AddSkyboxToMap(std::shared_ptr<Map> &map, const std::shared_ptr<StandardisedModel> &skybox) {
+    map->SetSkybox(skybox);
+}
+
+void MapManager::AddSkyboxToMap(const std::string &name, const std::shared_ptr<StandardisedModel> &skybox) {
+    std::shared_ptr<Map> &map = this->GetMap(name);
+    map->SetSkybox(skybox);
+}
+
+void MapManager::AddSkyboxToCurrentMap(const std::shared_ptr<StandardisedModel> &skybox) {
+    this->ActiveMap->SetSkybox(skybox);
 }

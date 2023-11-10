@@ -6,6 +6,6 @@
 
 #include <utility>
 
-ShaderObjectSet::ShaderObjectSet(std::shared_ptr<ShaderHandler> shader) {
-    Shader = std::move(shader);
+ShaderObjectSet::ShaderObjectSet(ShaderHandler *shader) {
+    Shader = shader;
 }

@@ -25,7 +25,10 @@ public:
     void SetTransf(glm::mat4 transformation) const;
 
     void SetMaterial(Material newMaterial);
-    [[nodiscard]] virtual Material GetMaterial() const;
+    [[nodiscard]] Material GetMaterial() const;
+
+    void SetTexture(Texture* texture);
+    Texture* GetTexture();
 };
 
 

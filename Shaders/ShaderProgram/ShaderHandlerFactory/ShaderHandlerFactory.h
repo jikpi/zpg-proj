@@ -15,6 +15,10 @@ public:
     static std::shared_ptr<ShaderHandler> Lambert();
     static std::shared_ptr<ShaderHandler> Phong();
     static std::shared_ptr<ShaderHandler> BlinnPhong();
+
+    static std::shared_ptr<ShaderHandler> PhongTexture();
+
+    static std::shared_ptr<ShaderHandler> Skybox();
 };
 
 
