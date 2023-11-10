@@ -160,16 +160,12 @@ void Engine::Run() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //animate mercury
-//        this->ResourceManager.GetMap(1)->GetObject("Mercury")->DoTransf();
         ResourceManager.GetObjectOnMap("Solar system", "Mercury")->DoTransf();
         //animate venus
-//        this->ResourceManager.GetMap(1)->GetObject("Venus")->DoTransf();
         ResourceManager.GetObjectOnMap("Solar system", "Venus")->DoTransf();
         //animate earth
-//        this->ResourceManager.GetMap(1)->GetObject("Earth")->DoTransf();
         ResourceManager.GetObjectOnMap("Solar system", "Earth")->DoTransf();
         //animate mars
-//        this->ResourceManager.GetMap(1)->GetObject("Mars")->DoTransf();
         ResourceManager.GetObjectOnMap("Solar system", "Mars")->DoTransf();
 
 
@@ -189,15 +185,16 @@ void Engine::Run() {
         manyObjectsFlash->SetDirection(this->CameraMain->GetTarget() - this->CameraMain->GetLocation());
         ResourceManager.ForceRefreshLightsOnCurrentMap();
 
-
         //Render skybox
         if (ResourceManager.GetActiveMap()->Skybox != nullptr) {
-            ShaderHandler* skyboxShader = ResourceManager.GetActiveMap()->Skybox->GetShaderProgram().get();
+            ShaderHandler *skyboxShader = ResourceManager.GetActiveMap()->Skybox->GetShaderProgram();
             glDepthMask(GL_FALSE);
             skyboxShader->UseProgram();
             skyboxShader->RequestRender(*ResourceManager.GetActiveMap()->Skybox);
+            ResourceManager.GetActiveMap()->Skybox->BindVertexArray();
             glDrawArrays(GL_TRIANGLES, 0, ResourceManager.GetActiveMap()->Skybox->GetRenderingSize());
             glDepthMask(GL_TRUE);
+            ShaderHandler::StopProgram();
         }
 
         //Render each shader
@@ -211,7 +208,7 @@ void Engine::Run() {
                 glDrawArrays(GL_TRIANGLES, 0, object->GetRenderingSize());
             }
 
-            set->Shader->StopProgram();
+            ShaderHandler::StopProgram();
         }
 
         glfwPollEvents();
@@ -280,10 +277,10 @@ void Engine::TestLaunch() {
     int size9 = sizeof(plane_tex) / sizeof(float);
 
 
-    std::shared_ptr<ShaderHandler> &ConstantShader = SelectShader("Constant");
-    std::shared_ptr<ShaderHandler> &PhongShader = SelectShader("Phong");
-    std::shared_ptr<ShaderHandler> &BlinnPhongShader = SelectShader("BlinnPhong");
-    std::shared_ptr<ShaderHandler> &LambertShader = SelectShader("Lambert");
+    ShaderHandler *ConstantShader = SelectShader("Constant").get();
+    ShaderHandler *PhongShader = SelectShader("Phong").get();
+    ShaderHandler *BlinnPhongShader = SelectShader("BlinnPhong").get();
+    ShaderHandler *LambertShader = SelectShader("Lambert").get();
 
     //Map 1 - 4 spheres and light
     std::shared_ptr<StandardisedModel> objectSphere1 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
@@ -344,9 +341,7 @@ void Engine::TestLaunch() {
     std::shared_ptr<StandardisedModel> objectSphere12 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
                                                                                      "Test model 12");
     objectSphere12->SetShaderProgram(PhongShader);
-    objectSphere12->InsertTransfMove(
-            glm::vec3(0.0f, -4.0f, -2.0f)).ConsolidateTransf();
-    this->ResourceManager.AddSkyboxToMap(0, objectSphere12);
+    this->ResourceManager.AddObjectToMap(0, objectSphere12);
 
     std::shared_ptr<LightSpot> spotLight = std::make_shared<LightSpot>(glm::vec3(0.0f, 0.0f, 0.0f),
                                                                        glm::vec3(0.0f,
@@ -369,8 +364,8 @@ void Engine::TestLaunch() {
     ResourceManager.GetMap(0)->GetObject(9)->InsertTransfMove(glm::vec3(0.0f, -4.0f, 2.0f)).ConsolidateTransf();
     ResourceManager.GetMap(0)->GetObject(10)->InsertTransfMove(
             glm::vec3(2.0f, -4.0f, 0.0f)).ConsolidateTransf();
-//    ResourceManager.GetObjectOnMap(0, "Test model 12")->InsertTransfMove(
-//            glm::vec3(0.0f, -4.0f, -2.0f)).ConsolidateTransf();
+    ResourceManager.GetObjectOnMap(0, "Test model 12")->InsertTransfMove(
+            glm::vec3(0.0f, -4.0f, -2.0f)).ConsolidateTransf();
 
     //Map 2 - solar system
     float earthOrbitSpeed = 0.05f;
@@ -529,10 +524,11 @@ void Engine::TestLaunch() {
     std::shared_ptr<StandardisedModel> preparedModelGround = ModelFactory::PositionNormalTex(rawmodel9_plane_text,
                                                                                              size9,
                                                                                              "Ground");
-    preparedModelGround->SetShaderProgram(SelectShader("PhongTexture"));
+    preparedModelGround->SetShaderProgram(SelectShader("PhongTexture").get());
     preparedModelGround->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0.5f, 0.5f, 0.5f),
                                               glm::vec3(0.5f, 0.5f, 0.5f), 32.0f));
-    Texture *groundTexture = ObjectTextureController.UseTexture("../Resources/Textures/Lesson/grass.png");
+    Texture *groundTexture = ResourceManager.ObjectTextureController.UseTexture(
+            "../Resources/Textures/Lesson/grass.png");
     preparedModelGround->SetTexture(groundTexture);
 
     preparedModelGround->InsertTransfMove(glm::vec3(0, -1.0f, 0))
@@ -543,7 +539,8 @@ void Engine::TestLaunch() {
     ResourceManager.AddObjectToMap("Many objects", preparedModelGround);
 
 
-    auto add100RandomObject = [&randomModel, &randomMaterial, this](std::shared_ptr<ShaderHandler> shader) -> void {
+    auto add100RandomObject = [&randomModel, &randomMaterial, this](
+            const std::shared_ptr<ShaderHandler> &shader) -> void {
         for (int i = 0; i < 100; i++) {
             std::pair<const float *, int> randomModelPair = randomModel();
 
@@ -551,7 +548,7 @@ void Engine::TestLaunch() {
                                                                                                  randomModelPair.second,
                                                                                                  "Random object p1, " +
                                                                                                  std::to_string(i));
-            randomObjectsPhong->SetShaderProgram(shader);
+            randomObjectsPhong->SetShaderProgram(shader.get());
             randomObjectsPhong->SetMaterial(randomMaterial());
             float randomScale = (float) rand() / RAND_MAX * 2 + 0.5f;
             randomObjectsPhong->InsertTransfMove(
@@ -574,15 +571,16 @@ void Engine::TestLaunch() {
     std::shared_ptr<StandardisedModel> pmSkybox = ModelFactory::Position(rawmodel8_skycube,
                                                                          size8,
                                                                          "Skybox");
-    pmSkybox->SetShaderProgram(SelectShader("Skybox"));
-    Texture *skyboxTexture = ObjectTextureController.UseCubemap("../Resources/Textures/Lesson/FieldSkybox/field");
+    pmSkybox->SetShaderProgram(SelectShader("Phong").get());
+    Texture *skyboxTexture = ResourceManager.ObjectTextureController.UseCubemap(
+            "../Resources/Textures/Lesson/FieldSkybox/field");
     pmSkybox->SetTexture(skyboxTexture);
 
-    ResourceManager.AddSkyboxToMap("Many objects", pmSkybox);
+    ResourceManager.AddSkyboxToMap("Default", pmSkybox);
 
     std::shared_ptr<StandardisedModel> skySphereTest = ModelFactory::PositionNormal(rawmodel1_sphere, size,
                                                                                     "Skybox sphere");
-    skySphereTest->SetShaderProgram(SelectShader("Constant"));
+    skySphereTest->SetShaderProgram(SelectShader("Constant").get());
     skySphereTest->InsertTransfMove(glm::vec3(30.0f, 0.0f, 0.0f)).ConsolidateTransf();
 
     ResourceManager.AddObjectToMap("Many objects", pmSkybox);
@@ -697,13 +695,11 @@ void Engine::RandomMaterialsTest() {
 
 void Engine::RequestMapChange(int index) {
     this->ResourceManager.ChangeMap(index);
-    ObjectTextureController.ResetTextureUnitCounter();
     std::cout << "Map changed to " << this->ResourceManager.GetActiveMap()->GetName() << std::endl;
 }
 
 void Engine::RequestMapChange(const std::string &name) {
     this->ResourceManager.ChangeMap(name);
-    ObjectTextureController.ResetTextureUnitCounter();
     std::cout << "Map changed to " << this->ResourceManager.GetActiveMap()->GetName() << std::endl;
 }
 

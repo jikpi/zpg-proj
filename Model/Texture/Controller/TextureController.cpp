@@ -10,6 +10,24 @@
 #include <stb_image.h>
 #include <vector>
 
+Texture *TextureController::UseTexture(const std::string &path) {
+    if (Textures.find(path) == Textures.end()) {
+        Textures[path] = LoadTexture(path);
+        return Textures[path].get();
+    }
+
+    return Textures[path].get();
+}
+
+Texture *TextureController::UseCubemap(const std::string &path) {
+    if (Textures.find(path) == Textures.end()) {
+        Textures[path] = LoadCubeMap(path);
+        return Textures[path].get();
+    }
+
+    return Textures[path].get();
+}
+
 std::unique_ptr<Texture> TextureController::LoadTexture(const std::string &path) {
     int width, height, nrChannels;
     std::cout << "Loading texture: " << path << std::endl;
@@ -47,28 +65,6 @@ std::unique_ptr<Texture> TextureController::LoadTexture(const std::string &path)
     return newTexture;
 }
 
-Texture *TextureController::UseTexture(const std::string &path) {
-    if (Textures.find(path) == Textures.end()) {
-        Textures[path] = LoadTexture(path);
-        return Textures[path].get();
-    }
-
-    return Textures[path].get();
-}
-
-void TextureController::ResetTextureUnitCounter() {
-    Texture::TextureUnitCounter = 0;
-
-    for (auto &texture: Textures) {
-        //check if texture exists
-        if (!texture.second) {
-            std::cerr << "ERROR: Texture not found: " << texture.first << std::endl;
-            continue;
-        }
-
-        texture.second->SetTextureUnit(-1);
-    }
-}
 
 std::unique_ptr<Texture> TextureController::LoadCubeMap(const std::string &path) {
     GLuint textureID;
@@ -150,15 +146,17 @@ std::unique_ptr<Texture> TextureController::LoadCubeMap(const std::string &path)
     return newTexture;
 }
 
-Texture *TextureController::UseCubemap(const std::string &path) {
-    if (Textures.find(path) == Textures.end()) {
-        Textures[path] = LoadCubeMap(path);
-        return Textures[path].get();
+
+void TextureController::ResetTextureUnitCounter() {
+    Texture::TextureUnitCounter = 0;
+
+    for (auto &texture: Textures) {
+        //check if texture exists
+        if (!texture.second) {
+            std::cerr << "ERROR: Texture not found: " << texture.first << std::endl;
+            continue;
+        }
+
+        texture.second->SetTextureUnit(-1);
     }
-
-    return Textures[path].get();
 }
-
-
-
-

@@ -9,7 +9,7 @@ MapToShaderLinker::MapToShaderLinker() {
     ShaderObjectSets = std::vector<std::shared_ptr<ShaderObjectSet>>();
 }
 
-void MapToShaderLinker::AddShader(const std::shared_ptr<ShaderHandler> &shader) {
+void MapToShaderLinker::AddShader(ShaderHandler *shader) {
     ShaderObjectSets.push_back(std::make_shared<ShaderObjectSet>(shader));
 }
 
@@ -18,7 +18,7 @@ void MapToShaderLinker::SetFallbackShader(std::shared_ptr<ShaderHandler> &shader
 }
 
 void
-MapToShaderLinker::AddObjectToShader(std::shared_ptr<ShaderHandler> &shader,
+MapToShaderLinker::AddObjectToShader(ShaderHandler *shader,
                                      const std::shared_ptr<StandardisedModel> &object) {
     for (auto &set: ShaderObjectSets) {
         if (set->Shader == shader) {
@@ -68,11 +68,11 @@ void MapToShaderLinker::BuildWithMap(const std::shared_ptr<Map> &map) {
 
     for (auto &object: map->Objects) {
 
-        std::shared_ptr<ShaderHandler> objectsShader = object->GetShaderProgram().lock();
+        ShaderHandler *objectsShader = object->GetShaderProgram();
         if (objectsShader == nullptr) {
             this->PrintBuildingObjectError(object);
             if (this->TryUseFallbackShader()) {
-                objectsShader = this->FallbackShader.lock();
+                objectsShader = this->FallbackShader.lock().get();
             } else {
                 continue;
             }
@@ -96,19 +96,15 @@ void MapToShaderLinker::BuildWithMap(const std::shared_ptr<Map> &map) {
     for (auto &set: this->ShaderObjectSets) {
         set->Shader->SetLights(map->Lights);
     }
-
-    for (auto &set: this->ShaderObjectSets) {
-        set->Skybox = map->Skybox;
-    }
 }
 
 void MapToShaderLinker::BuildWithMapSingleObject(const std::shared_ptr<Map> &map,
                                                  const std::shared_ptr<StandardisedModel> &object) {
-    std::shared_ptr<ShaderHandler> objectsShader = object->GetShaderProgram().lock();
+    ShaderHandler *objectsShader = object->GetShaderProgram();
     if (objectsShader == nullptr) {
         PrintBuildingObjectError(object);
         if (this->TryUseFallbackShader()) {
-            objectsShader = this->FallbackShader.lock();
+            objectsShader = this->FallbackShader.lock().get();
         } else {
             return;
         }

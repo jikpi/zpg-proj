@@ -26,6 +26,8 @@ public:
     MapToShaderLinker ShaderLinker;
     void SetFallbackShader(std::shared_ptr<ShaderHandler> &shader);
 
+    TextureController ObjectTextureController;
+
     std::shared_ptr<Map> &GetMap(const std::string &name);
     std::shared_ptr<Map> &GetMap(int index);
     std::shared_ptr<Map> &GetActiveMap();

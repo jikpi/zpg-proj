@@ -27,6 +27,7 @@ StandardisedModel::StandardisedModel(const float *modelData, int modelDataSize, 
                         std::move(name),
                         std::move(stamp)) {
     Transformations = std::make_shared<TransfComposite>();
+    SelectedShaderProgram = nullptr;
 
 }
 
@@ -60,11 +61,11 @@ StandardisedModel & StandardisedModel::InsertTransfComposite(const std::shared_p
 
 
 
-void StandardisedModel::SetShaderProgram(std::shared_ptr<ShaderHandler> &shaderProgram) {
+void StandardisedModel::SetShaderProgram(ShaderHandler *shaderProgram) {
     SelectedShaderProgram = shaderProgram;
 }
 
-const std::weak_ptr<ShaderHandler> &StandardisedModel::GetShaderProgram() const {
+ShaderHandler * StandardisedModel::GetShaderProgram() const {
     return SelectedShaderProgram;
 }
 
@@ -80,7 +81,7 @@ StandardisedModel::StandardisedModel(StandardisedModel &&other) noexcept
         : BaseModelData(std::move(other)){ // NOLINT(*-use-after-move)
 
     Transformations = std::move(other.Transformations);// NOLINT(*-use-after-move)
-    SelectedShaderProgram = std::move(other.SelectedShaderProgram);
+    SelectedShaderProgram = other.SelectedShaderProgram;
     material = other.material;
 
     BaseModelData::operator=(std::move(other));
@@ -93,7 +94,7 @@ StandardisedModel &StandardisedModel::operator=(StandardisedModel &&other) noexc
     }
 
     Transformations = std::move(other.Transformations);
-    SelectedShaderProgram = std::move(other.SelectedShaderProgram);
+    SelectedShaderProgram = other.SelectedShaderProgram;
     material = other.material;
 
     BaseModelData::operator=(std::move(other));

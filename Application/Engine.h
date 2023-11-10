@@ -41,7 +41,6 @@ private:
 
     std::vector<std::shared_ptr<ShaderHandler>> Shaders;
     MapManager ResourceManager;
-    TextureController ObjectTextureController;
     std::shared_ptr<ShaderHandler> & SelectShader(const std::string& name);
 
     std::shared_ptr<Camera> CameraMain;

@@ -20,6 +20,7 @@ public:
 
     void SetTexture(Texture* texture);
     Texture* GetTexture();
+    void RemoveTexture();
 
     glm::vec3 AmbientColor{};
     glm::vec3 DiffuseColor{};

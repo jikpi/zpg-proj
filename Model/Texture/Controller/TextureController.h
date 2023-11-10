@@ -6,7 +6,6 @@
 #define ZPG_TEST_TEXTURECONTROLLER_H
 
 
-
 #include <string>
 #include <map>
 #include <memory>
@@ -17,11 +16,11 @@ private:
     static std::unique_ptr<Texture> LoadTexture(const std::string &path);
     static std::unique_ptr<Texture> LoadCubeMap(const std::string &path);
 
-    std::map<std::string, std::shared_ptr<Texture>> Textures;
+    std::map<std::string, std::unique_ptr<Texture>> Textures;
 
 public:
     Texture *UseTexture(const std::string &path);
-    Texture* UseCubemap(const std::string &path);
+    Texture *UseCubemap(const std::string &path);
     void ResetTextureUnitCounter();
 };
 

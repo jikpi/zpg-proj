@@ -8,7 +8,8 @@ Material::Material(glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 spe
         : AmbientColor(ambientColor),
           DiffuseColor(diffuseColor),
           SpecularColor(specularColor),
-          ShineValue(specularShineValue) {
+          ShineValue(specularShineValue),
+          MaterialTexture(nullptr){
 }
 
 Material::Material() : Material(glm::vec3(0.1f, 0.1f, 0.1f),
@@ -30,4 +31,8 @@ void Material::SetTexture(Texture *texture) {
 
 Texture *Material::GetTexture() {
     return MaterialTexture;
+}
+
+void Material::RemoveTexture() {
+    MaterialTexture = nullptr;
 }

@@ -15,7 +15,11 @@ void MapManager::Initialize() {
 }
 
 void MapManager::ForceRefreshMaps() {
+    //Refresh map
     this->ShaderLinker.BuildWithMap(this->ActiveMap);
+
+    //Reset shader units
+    ObjectTextureController.ResetTextureUnitCounter();
 }
 
 void MapManager::CreateNewMap(const std::string &name) {

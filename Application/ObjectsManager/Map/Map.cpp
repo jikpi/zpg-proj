@@ -22,7 +22,7 @@ void Map::InsertObject(const std::shared_ptr<StandardisedModel> &object) {
 
 std::shared_ptr<StandardisedModel> &Map::GetObject(const int index) {
 
-    if(index >= Objects.size()) {
+    if (index >= Objects.size()) {
         std::cerr << "ERROR: Map: Object index not found." << std::endl;
         throw std::runtime_error("ERROR: Map: Object index not found.");
     }
@@ -63,5 +63,9 @@ void Map::ChangeLight(int index, const std::shared_ptr<RenderableLight> &light) 
 }
 
 void Map::SetSkybox(const std::shared_ptr<StandardisedModel> &skybox) {
+    if (this->Skybox != nullptr) {
+        std::cerr << "WARNING: Map: Skybox on map '" << this->Name << "' already set, overriding with object: "
+                  << skybox->Name() << std::endl;
+    }
     this->Skybox = skybox;
 }
