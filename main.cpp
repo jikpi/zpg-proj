@@ -1,4 +1,3 @@
-#include <SOIL/SOIL.h>
 #include "Application/Engine.h"
 
 int main() {

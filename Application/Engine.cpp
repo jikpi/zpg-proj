@@ -575,7 +575,7 @@ void Engine::TestLaunch() {
     this->ResourceManager.CreateNewMap("Texture");
 
     std::shared_ptr<StandardisedModel> starSkybox = ModelFactory::Position(rawmodel8_skycube, size8,
-                                                                                 "Star skybox");
+                                                                           "Star skybox");
 
     starSkybox->SetShaderProgram(SelectShader("Skybox").get());
     Texture *starSkyboxTexture = ResourceManager.ObjectTextureController.UseCubemap(
