@@ -12,7 +12,9 @@ find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(GLEW REQUIRED)
 add_subdirectory(libraries/glm)
+find_package(assimp REQUIRED)
 
+include_directories(${ASSIMP_INCLUDE_DIRS})
 include_directories(${OPENGL_INCLUDE_DIRS})
 include_directories(${GLEW_INCLUDE_DIRS})
 include_directories("/usr/include/stb/")
@@ -99,4 +101,4 @@ add_executable(zpg_test main.cpp
         Model/Texture/Texture.cpp
         Model/Texture/Texture.h
 )
-target_link_libraries(zpg_test ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw glm::glm)
+target_link_libraries(zpg_test ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES}  glfw glm::glm assimp::assimp)
