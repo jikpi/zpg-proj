@@ -21,10 +21,10 @@ StandardisedModel::~StandardisedModel() {
     }
 }
 
-StandardisedModel::StandardisedModel(std::string stamp, std::string name)
+StandardisedModel::StandardisedModel(ModelStamp stamp, std::string name)
         : BaseModelData(
         std::move(name),
-        std::move(stamp)) {
+        stamp) {
     Transformations = std::make_shared<TransfComposite>();
     SelectedShaderProgram = nullptr;
 
@@ -34,37 +34,36 @@ std::string StandardisedModel::Info() const {
     return BaseModelData::Name;
 }
 
-StandardisedModel & StandardisedModel::InsertTransfMove(glm::vec3 transformation) {
+StandardisedModel &StandardisedModel::InsertTransfMove(glm::vec3 transformation) {
     Transformations->Insert(std::make_shared<Move>(transformation));
 
     return *this;
 }
 
-StandardisedModel & StandardisedModel::InsertTransfRotate(float angle, glm::vec3 transformation) {
+StandardisedModel &StandardisedModel::InsertTransfRotate(float angle, glm::vec3 transformation) {
     Transformations->Insert(std::make_shared<Rotate>(angle, transformation));
 
     return *this;
 }
 
-StandardisedModel & StandardisedModel::InsertTransfScale(glm::vec3 transformation) {
+StandardisedModel &StandardisedModel::InsertTransfScale(glm::vec3 transformation) {
     Transformations->Insert(std::make_shared<Scale>(transformation));
 
     return *this;
 }
 
-StandardisedModel & StandardisedModel::InsertTransfComposite(const std::shared_ptr<Transformation> &transformation) {
+StandardisedModel &StandardisedModel::InsertTransfComposite(const std::shared_ptr<Transformation> &transformation) {
     Transformations->Insert(transformation);
 
     return *this;
 }
 
 
-
 void StandardisedModel::SetShaderProgram(ShaderHandler *shaderProgram) {
     SelectedShaderProgram = shaderProgram;
 }
 
-ShaderHandler * StandardisedModel::GetShaderProgram() const {
+ShaderHandler *StandardisedModel::GetShaderProgram() const {
     return SelectedShaderProgram;
 }
 
@@ -73,11 +72,22 @@ std::string StandardisedModel::Name() const {
 }
 
 std::string StandardisedModel::Stamp() const {
-    return BaseModelData::Stamp;
+    std::string stamp;
+    if (BaseModelData::Stamp & MODEL_STAMP_VERTICES) {
+        stamp += "Vertices ";
+    }
+    if (BaseModelData::Stamp & MODEL_STAMP_NORMALS) {
+        stamp += "Normals ";
+    }
+    if (BaseModelData::Stamp & MODEL_STAMP_TEXTURE_COORDS) {
+        stamp += "Texture Coords ";
+    }
+
+    return stamp;
 }
 
 StandardisedModel::StandardisedModel(StandardisedModel &&other) noexcept
-        : BaseModelData(std::move(other)){ // NOLINT(*-use-after-move)
+        : BaseModelData(std::move(other)) { // NOLINT(*-use-after-move)
 
     Transformations = std::move(other.Transformations);// NOLINT(*-use-after-move)
     SelectedShaderProgram = other.SelectedShaderProgram;

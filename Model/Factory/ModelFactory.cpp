@@ -3,14 +3,13 @@
 //
 
 #include "ModelFactory.h"
-#include "../../Application/DebugErrorMessages/DebugErrorMessages.h"
 
 #include <utility>
 #include <stdexcept>
-#include <iostream>
 
 std::shared_ptr<StandardisedModel> ModelFactory::PositionNormal(const float *model, int size, std::string Name) {
-    auto newStandModel = std::make_shared<StandardisedModel>("PositionNormal", std::move(Name));
+    auto newStandModel = std::make_shared<StandardisedModel>(
+            static_cast<ModelStamp>(ModelStamp::MODEL_STAMP_VERTICES | MODEL_STAMP_NORMALS), std::move(Name));
 
     //VBO
     //A named block of memory, that contains positions, normals, colors, ...
@@ -26,7 +25,7 @@ std::shared_ptr<StandardisedModel> ModelFactory::PositionNormal(const float *mod
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
     //Position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) nullptr);
     glEnableVertexAttribArray(0);
     //Normal
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
@@ -48,7 +47,7 @@ std::shared_ptr<StandardisedModel> ModelFactory::PositionNormal(const float *mod
 }
 
 std::shared_ptr<StandardisedModel> ModelFactory::PositionNormalTex(const float *model, int size, std::string Name) {
-    auto newStandModel = std::make_shared<StandardisedModel>("PositionNormalTex", std::move(Name));
+    auto newStandModel = std::make_shared<StandardisedModel>(static_cast<ModelStamp>(ModelStamp::MODEL_STAMP_VERTICES | MODEL_STAMP_NORMALS | ModelStamp::MODEL_STAMP_TEXTURE_COORDS), std::move(Name));
 
     //(VBO)
     glGenBuffers(1, &newStandModel->VBO); // generate the VBO
@@ -66,7 +65,7 @@ std::shared_ptr<StandardisedModel> ModelFactory::PositionNormalTex(const float *
     glEnableVertexAttribArray(2);
     glBindBuffer(GL_ARRAY_BUFFER, newStandModel->VBO);
     //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid *) 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid *) nullptr);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid *) (3 * sizeof(float)));
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid *) (6 * sizeof(float)));
 
@@ -88,7 +87,7 @@ std::shared_ptr<StandardisedModel> ModelFactory::PositionNormalTex(const float *
 }
 
 std::shared_ptr<StandardisedModel> ModelFactory::Position(const float *model, int size, std::string Name) {
-    auto newStandModel = std::make_shared<StandardisedModel>("XYZ", std::move(Name));
+    auto newStandModel = std::make_shared<StandardisedModel>(static_cast<ModelStamp>(ModelStamp::MODEL_STAMP_VERTICES), std::move(Name));
 
 
     //    vertex buffer object (VBO)
@@ -105,7 +104,7 @@ std::shared_ptr<StandardisedModel> ModelFactory::Position(const float *model, in
     glBindVertexArray(VAO); //bind the VAO
     glEnableVertexAttribArray(0); //enable vertex attributes
     glBindBuffer(GL_ARRAY_BUFFER, newStandModel->VBO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
     //Attach VAO to model
     newStandModel->SetVAO(VAO);
@@ -125,7 +124,7 @@ std::shared_ptr<StandardisedModel> ModelFactory::Position(const float *model, in
 }
 
 std::shared_ptr<StandardisedModel> ModelFactory::AssimpPositionNormalTex(std::vector<float> &model, std::string Name) {
-    auto newStandModel = std::make_shared<StandardisedModel>("PositionNormalTex", std::move(Name));
+    auto newStandModel = std::make_shared<StandardisedModel>(static_cast<ModelStamp>(ModelStamp::MODEL_STAMP_VERTICES | MODEL_STAMP_NORMALS | MODEL_STAMP_TEXTURE_COORDS), std::move(Name));
 
     float *modelData = model.data();
     auto size = static_cast<GLsizeiptr>(model.size() * sizeof(float));
@@ -168,7 +167,7 @@ std::shared_ptr<StandardisedModel> ModelFactory::AssimpPositionNormalTex(std::ve
 }
 
 std::shared_ptr<StandardisedModel> ModelFactory::AssimpPositionNormal(std::vector<float> &model, std::string Name) {
-    auto newStandModel = std::make_shared<StandardisedModel>("PositionNormal", std::move(Name));
+    auto newStandModel = std::make_shared<StandardisedModel>(static_cast<ModelStamp>(ModelStamp::MODEL_STAMP_VERTICES | MODEL_STAMP_NORMALS), std::move(Name));
 
     float *modelData = model.data();
     auto size = static_cast<GLsizeiptr>(model.size() * sizeof(float));
@@ -209,7 +208,7 @@ std::shared_ptr<StandardisedModel> ModelFactory::AssimpPositionNormal(std::vecto
 }
 
 std::shared_ptr<StandardisedModel> ModelFactory::AssimpPosition(std::vector<float> &model, std::string Name) {
-    auto newStandModel = std::make_shared<StandardisedModel>("XYZ", std::move(Name));
+    auto newStandModel = std::make_shared<StandardisedModel>(static_cast<ModelStamp>(ModelStamp::MODEL_STAMP_VERTICES), std::move(Name));
 
     float *modelData = model.data();
     auto size = static_cast<GLsizeiptr>(model.size() * sizeof(float));
@@ -229,7 +228,7 @@ std::shared_ptr<StandardisedModel> ModelFactory::AssimpPosition(std::vector<floa
     glBindVertexArray(VAO); //bind the VAO
     glEnableVertexAttribArray(0); //enable vertex attributes
     glBindBuffer(GL_ARRAY_BUFFER, newStandModel->VBO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
     //Attach VAO to model
     newStandModel->SetVAO(VAO);

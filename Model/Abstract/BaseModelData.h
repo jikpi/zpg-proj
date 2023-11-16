@@ -14,18 +14,20 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include "../ModelStamp.h"
+
 
 class BaseModelData {
 protected:
     GLuint VAO;
     GLuint VBO;
     bool IsInitialized = false;
-    std::string Stamp;
+    ModelStamp Stamp;
     std::string Name;
     int RenderingSize;
 
 public:
-    BaseModelData(std::string name, std::string Stamp);
+    BaseModelData(std::string name, ModelStamp Stamp);
     virtual ~BaseModelData() = default;
     BaseModelData(const BaseModelData &) = delete;
     BaseModelData &operator=(const BaseModelData &) = delete;

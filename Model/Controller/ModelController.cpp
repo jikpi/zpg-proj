@@ -17,7 +17,6 @@ ModelController::ModelData ModelController::LoadModel(const std::string &path) {
     std::cout << "Loading model: " << path << std::endl;
 
     std::vector<float> data;
-    unsigned int count = 0;
 
     Assimp::Importer importer;
     unsigned int options = aiProcess_Triangulate
@@ -32,16 +31,15 @@ ModelController::ModelData ModelController::LoadModel(const std::string &path) {
     }
 
     aiMesh *mesh = scene->mMeshes[0];
-    count = mesh->mNumFaces * 3;
 
     ModelData modelData;
+    modelData.Type = static_cast<ModelStamp>(0);
+    modelData.Type = static_cast<ModelStamp>(modelData.Type | ModelStamp::MODEL_STAMP_VERTICES);
 
-    if (mesh->HasNormals() && mesh->HasTextureCoords(0)) {
-        modelData.Type = ModelType::PositionNormalTex;
-    } else if (mesh->HasNormals()) {
-        modelData.Type = ModelType::PositionNormal;
-    } else {
-        modelData.Type = ModelType::Position;
+    if (mesh->HasNormals())
+        modelData.Type = static_cast<ModelStamp>(modelData.Type | ModelStamp::MODEL_STAMP_NORMALS);
+    if (mesh->HasTextureCoords(0)) {
+        modelData.Type = static_cast<ModelStamp>(modelData.Type | ModelStamp::MODEL_STAMP_TEXTURE_COORDS);
     }
 
 
@@ -74,13 +72,46 @@ ModelController::ModelData ModelController::LoadModel(const std::string &path) {
         }
     }
 
+
+    ////Load material
+    modelData.HasMaterial = false;
+    if (scene->mNumMaterials > 0) {
+        aiMaterial *mat = scene->mMaterials[0];
+
+        aiString matName;
+        mat->Get(AI_MATKEY_NAME, matName);
+        if (std::string(matName.C_Str()) == AI_DEFAULT_MATERIAL_NAME) {
+            goto no_material;
+        }
+
+        aiColor3D ambient(0.f, 0.f, 0.f);
+        aiColor3D diffuse(0.f, 0.f, 0.f);
+        aiColor3D specular(0.f, 0.f, 0.f);
+        float shininess = 0.0f;
+
+        mat->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
+        mat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
+        mat->Get(AI_MATKEY_COLOR_SPECULAR, specular);
+        mat->Get(AI_MATKEY_SHININESS, shininess);
+
+        modelData.material = Material(
+                glm::vec3(ambient.r, ambient.g, ambient.b),
+                glm::vec3(diffuse.r, diffuse.g, diffuse.b),
+                glm::vec3(specular.r, specular.g, specular.b),
+                shininess
+        );
+
+        modelData.HasMaterial = true;
+    }
+    no_material:
+
     modelData.Data = std::move(data);
     return modelData;
 }
 
 
 std::shared_ptr<StandardisedModel>
-ModelController::RetrieveModel(const std::string &path, ModelController::ModelType type, const std::string &Name,
+ModelController::RetrieveModel(const std::string &path, ModelStamp type, const std::string &Name, bool anyType,
                                bool standardPath) {
 
     std::string fullPath;
@@ -96,47 +127,64 @@ ModelController::RetrieveModel(const std::string &path, ModelController::ModelTy
 
     ModelData &mData = ModelsData[fullPath];
 
-    if (type != Any && mData.Type != type) {
+    if (!anyType && mData.Type != type) {
         std::cerr << "ModelController::RetrieveModel: Warning: Model type mismatch, overriding." << std::endl;
     }
 
-    switch (mData.Type) {
-        case ModelType::PositionNormalTex:
-            return ModelFactory::AssimpPositionNormalTex(mData.Data, Name);
-        case ModelType::PositionNormal:
-            return ModelFactory::AssimpPositionNormal(mData.Data, Name);
-        case ModelType::Position:
-            return ModelFactory::AssimpPosition(mData.Data, Name);
+    std::shared_ptr<StandardisedModel> model;
 
-        case Any:
-            break;
+    if ((mData.Type & ModelStamp::MODEL_STAMP_VERTICES) &&
+        (mData.Type & ModelStamp::MODEL_STAMP_NORMALS) &&
+        (mData.Type & ModelStamp::MODEL_STAMP_TEXTURE_COORDS)) {
+
+        model = ModelFactory::AssimpPositionNormalTex(mData.Data, Name);
+    } else if ((mData.Type & ModelStamp::MODEL_STAMP_VERTICES) &&
+               (mData.Type & ModelStamp::MODEL_STAMP_NORMALS)) {
+
+        model = ModelFactory::AssimpPositionNormal(mData.Data, Name);
+    } else if (mData.Type & ModelStamp::MODEL_STAMP_VERTICES) {
+
+        model = ModelFactory::AssimpPosition(mData.Data, Name);
+    } else {
+        throw std::runtime_error("ModelController::RetrieveModel: Error: Model type not found");
     }
 
-    throw std::runtime_error("ModelController::RetrieveModel: Error: Model type not found");
+
+    if (mData.HasMaterial) {
+        model->SetMaterial(mData.material);
+    }
+
+    return model;
 }
 
 std::shared_ptr<StandardisedModel>
 ModelController::UsePositionNormalTex(const std::string &path, const std::string &Name, bool standardPath) {
-    std::shared_ptr<StandardisedModel> model = RetrieveModel(path, ModelType::PositionNormalTex, Name, standardPath);
-    return model;
+    return RetrieveModel(path,
+                         static_cast<ModelStamp>(
+                                 ModelStamp::MODEL_STAMP_VERTICES |
+                                 ModelStamp::MODEL_STAMP_NORMALS |
+                                 ModelStamp::MODEL_STAMP_TEXTURE_COORDS),
+                         Name, false,
+                         standardPath);
 }
 
 std::shared_ptr<StandardisedModel>
 ModelController::UsePositionNormal(const std::string &path, const std::string &Name, bool standardPath) {
-    std::shared_ptr<StandardisedModel> model = RetrieveModel(path, ModelType::PositionNormal, Name, standardPath);
-    return model;
+    return RetrieveModel(path, static_cast<ModelStamp>(
+            ModelStamp::MODEL_STAMP_VERTICES |
+            ModelStamp::MODEL_STAMP_NORMALS), Name, false, standardPath);
 }
 
 std::shared_ptr<StandardisedModel>
 ModelController::UsePosition(const std::string &path, const std::string &Name, bool standardPath) {
-    std::shared_ptr<StandardisedModel> model = RetrieveModel(path, ModelType::Position, Name, standardPath);
-    return model;
+    return RetrieveModel(path, static_cast<ModelStamp>(
+            ModelStamp::MODEL_STAMP_VERTICES), Name, false, standardPath);
 }
 
 std::shared_ptr<StandardisedModel>
 ModelController::UseAny(const std::string &path, const std::string &Name, bool standardPath) {
-    std::shared_ptr<StandardisedModel> model = RetrieveModel(path, ModelType::Any, Name, standardPath);
-    return model;
+    return RetrieveModel(path, static_cast<ModelStamp>(0), Name, true,
+                         standardPath);
 }
 
 

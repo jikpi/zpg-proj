@@ -81,8 +81,6 @@ add_executable(zpg_test main.cpp
         Shaders/ShaderProgram/ShaderBase/ShaderBase.h
         Application/ObjectsManager/Map/MapManager.cpp
         Application/ObjectsManager/Map/MapManager.h
-        Application/ObjectsManager/Map/PremadeMaps/PremadeMapsFactory.cpp
-        Application/ObjectsManager/Map/PremadeMaps/PremadeMapsFactory.h
         ExtResources/LessonResources/InclLessonModels.h
         Shaders/Lighting/Abstract/RenderableLight.cpp
         Shaders/Lighting/Abstract/RenderableLight.h
@@ -102,5 +100,8 @@ add_executable(zpg_test main.cpp
         Model/Texture/Texture.h
         Model/Controller/ModelController.cpp
         Model/Controller/ModelController.h
+        Model/ModelStamp.h
+        Application/ObjectsManager/Map/PremadeMaps/MapCreator.cpp
+        Application/ObjectsManager/Map/PremadeMaps/MapCreator.h
 )
 target_link_libraries(zpg_test ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES}  glfw glm::glm assimp::assimp)

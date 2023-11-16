@@ -89,6 +89,15 @@ void Engine::Initialize() {
 
     //Map
     this->ResourceManager.Initialize();
+
+    //Camera
+    this->CameraMain = std::make_shared<Camera>();
+    this->CameraMain->SetAspectRatio(this->Ratio);
+
+    //Shaders
+    LoadAllShaders();
+
+
 }
 
 void Engine::InitializeInputHandling() {
@@ -228,31 +237,6 @@ void Engine::KillWindow() const {
 
 void Engine::TestLaunch() {
 
-    //Camera
-    this->CameraMain = std::make_shared<Camera>();
-    this->CameraMain->SetAspectRatio(this->Ratio);
-
-
-    //Shaders
-    this->Shaders.push_back(ShaderHandlerFactory::Phong());
-    this->ResourceManager.SetFallbackShader(SelectShader("Phong"));
-    this->CameraMain->RegisterCameraObserver(SelectShader("Phong"));
-
-    this->Shaders.push_back(ShaderHandlerFactory::Lambert());
-    this->CameraMain->RegisterCameraObserver(SelectShader("Lambert"));
-
-    this->Shaders.push_back(ShaderHandlerFactory::ConstantColored());
-    this->CameraMain->RegisterCameraObserver(SelectShader("Constant"));
-
-    this->Shaders.push_back(ShaderHandlerFactory::BlinnPhong());
-    this->CameraMain->RegisterCameraObserver(SelectShader("BlinnPhong"));
-
-    this->Shaders.push_back(ShaderHandlerFactory::PhongTexture());
-    this->CameraMain->RegisterCameraObserver(SelectShader("PhongTexture"));
-
-    this->Shaders.push_back(ShaderHandlerFactory::Skybox());
-    this->CameraMain->RegisterCameraObserver(SelectShader("Skybox"));
-
     //Models
 
     const float *rawmodel1_sphere = sphere;
@@ -289,8 +273,10 @@ void Engine::TestLaunch() {
     ShaderHandler *LambertShader = SelectShader("Lambert").get();
 
     //Map 1 - 4 spheres and light
-    std::shared_ptr<StandardisedModel> objectSphere1 = ModelGenerator.UseAny(
-            "Lesson/cube.obj", "Test model 1");
+    std::shared_ptr<StandardisedModel> objectSphere1 = ResourceManager.ModelObjectController.UseAny(
+            "Lesson/model.obj", "Test model 1");
+
+
     objectSphere1->SetShaderProgram(PhongShader);
     this->ResourceManager.AddObjectToMap(0, objectSphere1);
 
@@ -533,8 +519,8 @@ void Engine::TestLaunch() {
     preparedModelGround->SetShaderProgram(SelectShader("PhongTexture").get());
     preparedModelGround->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0.5f, 0.5f, 0.5f),
                                               glm::vec3(0.5f, 0.5f, 0.5f), 32.0f));
-    Texture *groundTexture = ResourceManager.ObjectTextureController.UseTexture(
-            "../Resources/Textures/Lesson/grass.png", false);
+    Texture *groundTexture = ResourceManager.TextureObjectsController.UseTexture(
+            "Lesson/grass.png");
     preparedModelGround->SetTexture(groundTexture);
 
     preparedModelGround->InsertTransfMove(glm::vec3(0, -1.0f, 0))
@@ -578,7 +564,7 @@ void Engine::TestLaunch() {
                                                                            "Star skybox");
 
     starSkybox->SetShaderProgram(SelectShader("Skybox").get());
-    Texture *starSkyboxTexture = ResourceManager.ObjectTextureController.UseCubemap(
+    Texture *starSkyboxTexture = ResourceManager.TextureObjectsController.UseCubemap(
             "../Resources/Textures/Galaxy/stars", false);
     starSkybox->SetTexture(starSkyboxTexture);
 
@@ -588,7 +574,7 @@ void Engine::TestLaunch() {
                                                                          size8,
                                                                          "Skybox");
     pmSkybox->SetShaderProgram(SelectShader("Skybox").get());
-    Texture *skyboxTexture = ResourceManager.ObjectTextureController.UseCubemap(
+    Texture *skyboxTexture = ResourceManager.TextureObjectsController.UseCubemap(
             "../Resources/Textures/Lesson/FieldSkybox/field", false);
     pmSkybox->SetTexture(skyboxTexture);
 
@@ -732,6 +718,28 @@ std::shared_ptr<ShaderHandler> &Engine::SelectShader(const std::string &name) {
     }
 
     return this->Shaders.at(0);
+}
+
+void Engine::LoadAllShaders() {
+    this->Shaders.push_back(ShaderHandlerFactory::Phong());
+    this->Shaders.push_back(ShaderHandlerFactory::Lambert());
+    this->Shaders.push_back(ShaderHandlerFactory::ConstantColored());
+    this->Shaders.push_back(ShaderHandlerFactory::BlinnPhong());
+    this->Shaders.push_back(ShaderHandlerFactory::PhongTexture());
+    this->Shaders.push_back(ShaderHandlerFactory::Skybox());
+
+
+    if (this->CameraMain != nullptr) {
+        for (auto &shader: this->Shaders) {
+            this->CameraMain->RegisterCameraObserver(shader);
+        }
+    } else {
+        std::cerr << "FATAL: Engine: No camera available." << std::endl;
+        throw std::runtime_error("No camera available.");
+    }
+
+
+    this->ResourceManager.SetFallbackShader(SelectShader("Phong"));
 }
 
 

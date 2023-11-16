@@ -5,10 +5,10 @@
 #include <stdexcept>
 #include "BaseModelData.h"
 
-BaseModelData::BaseModelData(std::string name, std::string Stamp) : VAO(0), VBO(0),
-                                                                    Name(std::move(name)),
-                                                                    Stamp(std::move(Stamp)),
-                                                                    RenderingSize(0) {
+BaseModelData::BaseModelData(std::string name, ModelStamp Stamp) : VAO(0), VBO(0),
+                                                                   Name(std::move(name)),
+                                                                   Stamp(Stamp),
+                                                                   RenderingSize(0) {
 
 
 }

@@ -11,19 +11,16 @@
 #include <map>
 #include <memory>
 #include "../StandardisedModel.h"
+#include "../../Model/ModelStamp.h"
 
 class ModelController {
 private:
-    enum ModelType {
-        Any,
-        PositionNormalTex,
-        PositionNormal,
-        Position
-    };
 
     struct ModelData {
         std::vector<float> Data;
-        ModelType Type;
+        ModelStamp Type;
+        bool HasMaterial;
+        Material material;
     };
 
     std::map<std::string, ModelData> ModelsData;
@@ -31,7 +28,8 @@ private:
     static ModelController::ModelData LoadModel(const std::string &path);
 
     std::shared_ptr<StandardisedModel>
-    RetrieveModel(const std::string &path, ModelController::ModelType type, const std::string &Name, bool standardPath);
+    RetrieveModel(const std::string &path, ModelStamp type, const std::string &Name, bool anyType,
+                  bool standardPath);
 public:
     std::shared_ptr<StandardisedModel>
     UsePositionNormalTex(const std::string &path, const std::string &Name = "None", bool standardPath = true);
