@@ -29,6 +29,7 @@
 #include "../Shaders/Camera/Camera.h"
 #include "ObjectsManager/ShaderLinking/MapToShaderLinker.h"
 #include "ObjectsManager/Map/MapManager.h"
+#include "../Model/Controller/ModelController.h"
 
 class Engine : public std::enable_shared_from_this<Engine> {
 private:
@@ -46,6 +47,7 @@ private:
     std::shared_ptr<Camera> CameraMain;
 
     std::shared_ptr<MovesetInputManager> MovesetManager;
+    ModelController ModelGenerator;
 
     void UpdateMoveset();
 

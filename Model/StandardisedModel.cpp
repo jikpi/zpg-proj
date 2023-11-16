@@ -21,11 +21,10 @@ StandardisedModel::~StandardisedModel() {
     }
 }
 
-StandardisedModel::StandardisedModel(const float *modelData, int modelDataSize, std::string stamp, std::string name)
-        : BaseModelData(modelData,
-                        modelDataSize,
-                        std::move(name),
-                        std::move(stamp)) {
+StandardisedModel::StandardisedModel(std::string stamp, std::string name)
+        : BaseModelData(
+        std::move(name),
+        std::move(stamp)) {
     Transformations = std::make_shared<TransfComposite>();
     SelectedShaderProgram = nullptr;
 

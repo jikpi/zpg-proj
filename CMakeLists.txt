@@ -100,5 +100,7 @@ add_executable(zpg_test main.cpp
         Model/Texture/Controller/TextureController.h
         Model/Texture/Texture.cpp
         Model/Texture/Texture.h
+        Model/Controller/ModelController.cpp
+        Model/Controller/ModelController.h
 )
 target_link_libraries(zpg_test ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES}  glfw glm::glm assimp::assimp)
