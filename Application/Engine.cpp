@@ -289,8 +289,8 @@ void Engine::TestLaunch() {
     ShaderHandler *LambertShader = SelectShader("Lambert").get();
 
     //Map 1 - 4 spheres and light
-    std::shared_ptr<StandardisedModel> objectSphere1 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                    "Test model 1");
+    std::shared_ptr<StandardisedModel> objectSphere1 = ModelGenerator.UseAny(
+            "Lesson/cube.obj", "Test model 1");
     objectSphere1->SetShaderProgram(PhongShader);
     this->ResourceManager.AddObjectToMap(0, objectSphere1);
 
@@ -534,7 +534,7 @@ void Engine::TestLaunch() {
     preparedModelGround->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0.5f, 0.5f, 0.5f),
                                               glm::vec3(0.5f, 0.5f, 0.5f), 32.0f));
     Texture *groundTexture = ResourceManager.ObjectTextureController.UseTexture(
-            "../Resources/Textures/Lesson/grass.png");
+            "../Resources/Textures/Lesson/grass.png", false);
     preparedModelGround->SetTexture(groundTexture);
 
     preparedModelGround->InsertTransfMove(glm::vec3(0, -1.0f, 0))
@@ -579,7 +579,7 @@ void Engine::TestLaunch() {
 
     starSkybox->SetShaderProgram(SelectShader("Skybox").get());
     Texture *starSkyboxTexture = ResourceManager.ObjectTextureController.UseCubemap(
-            "../Resources/Textures/Galaxy/stars");
+            "../Resources/Textures/Galaxy/stars", false);
     starSkybox->SetTexture(starSkyboxTexture);
 
     ResourceManager.AddSkyboxToMap("Solar system", starSkybox);
@@ -589,7 +589,7 @@ void Engine::TestLaunch() {
                                                                          "Skybox");
     pmSkybox->SetShaderProgram(SelectShader("Skybox").get());
     Texture *skyboxTexture = ResourceManager.ObjectTextureController.UseCubemap(
-            "../Resources/Textures/Lesson/FieldSkybox/field");
+            "../Resources/Textures/Lesson/FieldSkybox/field", false);
     pmSkybox->SetTexture(skyboxTexture);
 
     ResourceManager.AddSkyboxToMap("Default", pmSkybox);

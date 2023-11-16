@@ -10,8 +10,12 @@
 
 #include "ModelController.h"
 #include "../Factory/ModelFactory.h"
+#include "../../Application/Configuration/AGlobalConfig.h"
 
 ModelController::ModelData ModelController::LoadModel(const std::string &path) {
+
+    std::cout << "Loading model: " << path << std::endl;
+
     std::vector<float> data;
     unsigned int count = 0;
 
@@ -77,15 +81,20 @@ ModelController::ModelData ModelController::LoadModel(const std::string &path) {
 
 std::shared_ptr<StandardisedModel>
 ModelController::RetrieveModel(const std::string &path, ModelController::ModelType type, const std::string &Name,
-                               bool exists) {
+                               bool standardPath) {
 
-    if (ModelsData.find(path) == ModelsData.end()) {
-        if (exists)
-            throw std::runtime_error("ModelController::RetrieveModel: Debug: Model does not exist");
-        ModelsData[path] = LoadModel(path);
+    std::string fullPath;
+    if (standardPath) {
+        fullPath = DEF_PATH_MODELS + path;
+    } else {
+        fullPath = path;
     }
 
-    ModelData &mData = ModelsData[path];
+    if (ModelsData.find(fullPath) == ModelsData.end()) {
+        ModelsData[fullPath] = LoadModel(fullPath);
+    }
+
+    ModelData &mData = ModelsData[fullPath];
 
     if (type != Any && mData.Type != type) {
         std::cerr << "ModelController::RetrieveModel: Warning: Model type mismatch, overriding." << std::endl;
@@ -107,24 +116,26 @@ ModelController::RetrieveModel(const std::string &path, ModelController::ModelTy
 }
 
 std::shared_ptr<StandardisedModel>
-ModelController::UsePositionNormalTex(const std::string &path, const std::string &Name) {
-    std::shared_ptr<StandardisedModel> model = RetrieveModel(path, ModelType::PositionNormalTex, Name, false);
+ModelController::UsePositionNormalTex(const std::string &path, const std::string &Name, bool standardPath) {
+    std::shared_ptr<StandardisedModel> model = RetrieveModel(path, ModelType::PositionNormalTex, Name, standardPath);
     return model;
 }
 
 std::shared_ptr<StandardisedModel>
-ModelController::UsePositionNormal(const std::string &path, const std::string &Name) {
-    std::shared_ptr<StandardisedModel> model = RetrieveModel(path, ModelType::PositionNormal, Name, false);
+ModelController::UsePositionNormal(const std::string &path, const std::string &Name, bool standardPath) {
+    std::shared_ptr<StandardisedModel> model = RetrieveModel(path, ModelType::PositionNormal, Name, standardPath);
     return model;
 }
 
-std::shared_ptr<StandardisedModel> ModelController::UsePosition(const std::string &path, const std::string &Name) {
-    std::shared_ptr<StandardisedModel> model = RetrieveModel(path, ModelType::Position, Name, false);
+std::shared_ptr<StandardisedModel>
+ModelController::UsePosition(const std::string &path, const std::string &Name, bool standardPath) {
+    std::shared_ptr<StandardisedModel> model = RetrieveModel(path, ModelType::Position, Name, standardPath);
     return model;
 }
 
-std::shared_ptr<StandardisedModel> ModelController::UseAny(const std::string &path, const std::string &Name) {
-    std::shared_ptr<StandardisedModel> model = RetrieveModel(path, ModelType::Any, Name, true);
+std::shared_ptr<StandardisedModel>
+ModelController::UseAny(const std::string &path, const std::string &Name, bool standardPath) {
+    std::shared_ptr<StandardisedModel> model = RetrieveModel(path, ModelType::Any, Name, standardPath);
     return model;
 }
 

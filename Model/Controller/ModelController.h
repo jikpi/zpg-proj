@@ -31,13 +31,16 @@ private:
     static ModelController::ModelData LoadModel(const std::string &path);
 
     std::shared_ptr<StandardisedModel>
-    RetrieveModel(const std::string &path, ModelController::ModelType type, const std::string &Name,
-                  bool exists = false);
+    RetrieveModel(const std::string &path, ModelController::ModelType type, const std::string &Name, bool standardPath);
 public:
-    std::shared_ptr<StandardisedModel> UsePositionNormalTex(const std::string &path, const std::string& Name = "None");
-    std::shared_ptr<StandardisedModel> UsePositionNormal(const std::string &path, const std::string& Name = "None");
-    std::shared_ptr<StandardisedModel> UsePosition(const std::string &path, const std::string& Name = "None");
-    std::shared_ptr<StandardisedModel> UseAny(const std::string &path, const std::string& Name = "None");
+    std::shared_ptr<StandardisedModel>
+    UsePositionNormalTex(const std::string &path, const std::string &Name = "None", bool standardPath = true);
+    std::shared_ptr<StandardisedModel>
+    UsePositionNormal(const std::string &path, const std::string &Name = "None", bool standardPath = true);
+    std::shared_ptr<StandardisedModel>
+    UsePosition(const std::string &path, const std::string &Name = "None", bool standardPath = true);
+    std::shared_ptr<StandardisedModel>
+    UseAny(const std::string &path, const std::string &Name = "None", bool standardPath = true);
 };
 
 

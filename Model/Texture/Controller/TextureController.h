@@ -19,8 +19,8 @@ private:
     std::map<std::string, std::unique_ptr<Texture>> Textures;
 
 public:
-    Texture *UseTexture(const std::string &path);
-    Texture *UseCubemap(const std::string &path);
+    Texture *UseTexture(const std::string &path, bool standardPath = false);
+    Texture *UseCubemap(const std::string &path, bool standardPath = false);
     void ResetTextureUnitCounter();
 };
 

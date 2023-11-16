@@ -3,29 +3,43 @@
 //
 
 #include <iostream>
-#include "TextureController.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <stb_image.h>
 #include <vector>
 
-Texture *TextureController::UseTexture(const std::string &path) {
-    if (Textures.find(path) == Textures.end()) {
-        Textures[path] = LoadTexture(path);
-        return Textures[path].get();
+#include "TextureController.h"
+#include "../../Application/Configuration/AGlobalConfig.h"
+
+Texture *TextureController::UseTexture(const std::string &path, bool standardPath) {
+
+    std::string fullPath = path;
+    if (standardPath) {
+        fullPath = DEF_PATH_TEXTURES + path;
     }
 
-    return Textures[path].get();
+    if (Textures.find(fullPath) == Textures.end()) {
+        Textures[fullPath] = LoadTexture(fullPath);
+        return Textures[fullPath].get();
+    }
+
+    return Textures[fullPath].get();
 }
 
-Texture *TextureController::UseCubemap(const std::string &path) {
-    if (Textures.find(path) == Textures.end()) {
-        Textures[path] = LoadCubeMap(path);
-        return Textures[path].get();
+Texture *TextureController::UseCubemap(const std::string &path, bool standardPath) {
+
+    std::string fullPath = path;
+    if (standardPath) {
+        fullPath = DEF_PATH_TEXTURES + path;
     }
 
-    return Textures[path].get();
+    if (Textures.find(fullPath) == Textures.end()) {
+        Textures[fullPath] = LoadCubeMap(fullPath);
+        return Textures[fullPath].get();
+    }
+
+    return Textures[fullPath].get();
 }
 
 std::unique_ptr<Texture> TextureController::LoadTexture(const std::string &path) {
