@@ -345,7 +345,7 @@ void ShaderHandler::RenderCameraLocation() const {
     SendToShader(CameraLocationLocation, CameraLocation);
 }
 
-void ShaderHandler::RequestRenderBaseLightsArray() {
+void ShaderHandler::RenderBaseLightsArray() {
     if (LightsArrayPoint_SizeLocation != -2 && LightsArrayDirectional_SizeLocation != -2) {
         std::shared_ptr<std::vector<std::shared_ptr<RenderableLight>>> lightsVectorPtr = this->SelectedLightsFromMap.lock();
         if (lightsVectorPtr == nullptr) {
@@ -412,7 +412,7 @@ void ShaderHandler::RequestRender(RenderableObject &object) {
 
     if (this->HaveLightsChanged) {
         this->HaveLightsChanged = false;
-        this->RequestRenderBaseLightsArray();
+        this->RenderBaseLightsArray();
     }
 
     if (this->TextureLocation != -2) {

@@ -18,6 +18,8 @@ public:
     static std::shared_ptr<StandardisedModel> PositionNormalTex(const float *model, int size, std::string Name = "None");
     static std::shared_ptr<StandardisedModel> Position(const float *model, int size, std::string Name = "None");
 
+//    static std::shared_ptr
+
 };
 
 

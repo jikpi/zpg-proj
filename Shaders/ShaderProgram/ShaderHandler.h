@@ -33,7 +33,7 @@ private:
 
     std::weak_ptr<std::vector<std::shared_ptr<RenderableLight>>> SelectedLightsFromMap;
 
-    void RequestRenderBaseLightsArray();
+    void RenderBaseLightsArray();
 
     void RenderBase(const glm::mat4 &modelMatrix);
     void RenderCameraLocation() const;
