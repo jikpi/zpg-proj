@@ -33,9 +33,6 @@ void MapCreator::Overworld(const std::string &mapName, std::vector<std::shared_p
     const float *rawmodel7_gift = gift;
     int size7 = sizeof(gift) / sizeof(float);
 
-    const float *rawmodel8_skycube = skycube;
-    int size8 = sizeof(skycube) / sizeof(float);
-
     const float *rawmodel9_plane_text = plane_tex;
     int size9 = sizeof(plane_tex) / sizeof(float);
 
@@ -84,18 +81,16 @@ void MapCreator::Overworld(const std::string &mapName, std::vector<std::shared_p
             ->SetQuadratic(0.0001f)
             .SetIntensity(1.0f);
 
-    std::shared_ptr<StandardisedModel> preparedModelGround = ModelFactory::PositionNormalTex(rawmodel9_plane_text,
-                                                                                             size9,
-                                                                                             "Ground");
+    std::shared_ptr<StandardisedModel> preparedModelGround = mapManager.ModelObjectController.UseAny("Lesson/plane.obj");
     preparedModelGround->SetShaderProgram(PhongTextureShader);
-    preparedModelGround->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0.5f, 0.5f, 0.5f),
-                                              glm::vec3(0.5f, 0.5f, 0.5f), 32.0f));
-    Texture *groundTexture = mapManager.TextureObjectsController.UseTexture(
-            "Lesson/grass.png");
+    preparedModelGround->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f),
+                                              glm::vec3(0.5f, 0.5f, 0.5f),
+                                              glm::vec3(0.5f, 0.5f, 0.5f),
+                                              32.0f));
+    Texture *groundTexture = mapManager.TextureObjectsController.UseTexture("Lesson/grass.png");
     preparedModelGround->SetTexture(groundTexture);
 
     preparedModelGround->InsertTransfMove(glm::vec3(0, -1.0f, 0))
-            .InsertTransfRotate(-90, glm::vec3(1, 0, 0))
             .InsertTransfScale(glm::vec3(100, 100, 100))
             .ConsolidateTransf();
 
@@ -106,26 +101,48 @@ void MapCreator::Overworld(const std::string &mapName, std::vector<std::shared_p
         for (int i = 0; i < 100; i++) {
             std::pair<const float *, int> randomModelPair = randomModel();
 
-            std::shared_ptr<StandardisedModel> randomObjectsPhong = ModelFactory::PositionNormal(randomModelPair.first,
-                                                                                                 randomModelPair.second,
-                                                                                                 "Random object p1, " +
-                                                                                                 std::to_string(i));
-            randomObjectsPhong->SetShaderProgram(shader);
-            randomObjectsPhong->SetMaterial(randomMaterial());
+//            std::shared_ptr<StandardisedModel> randomObjectsPhong = ModelFactory::PositionNormal(randomModelPair.first,
+//                                                                                                 randomModelPair.second,
+//                                                                                                 "Random object p1, " +
+//                                                                                                 std::to_string(i));
+            std::shared_ptr<StandardisedModel> randomObject = mapManager.ModelObjectController.UseAny("Lesson/zombie.obj");
+
+
+            randomObject->SetShaderProgram(shader);
+            randomObject->SetMaterial(randomMaterial());
             float randomScale = (float) rand() / RAND_MAX * 2 + 0.5f;
-            randomObjectsPhong->InsertTransfMove(
-                    glm::vec3((float) rand() / RAND_MAX * 100 - 50, -0.9f,
-                              (float) rand() / RAND_MAX * 100 - 50)).InsertTransfRotate(
-                    (float) rand() / RAND_MAX * 360, glm::vec3(0.0f, 1.0f, 0.0f)).
-                    InsertTransfScale(glm::vec3(randomScale, randomScale, randomScale)).ConsolidateTransf();
-            mapManager.AddObjectToMap(mapName, randomObjectsPhong);
+            randomObject->InsertTransfMove(
+                            glm::vec3((float) rand() / RAND_MAX * 100 - 50, -0.9f,
+                                      (float) rand() / RAND_MAX * 100 - 50)).InsertTransfRotate(
+                            (float) rand() / RAND_MAX * 360, glm::vec3(0.0f, 1.0f, 0.0f)).
+                            InsertTransfScale(glm::vec3(randomScale, randomScale, randomScale))
+                    .InsertTransfRotate(90, glm::vec3(-1, 0, 0))
+                    .InsertTransfScale(glm::vec3(0.6f, 0.6f, 0.6f))
+                    .ConsolidateTransf();
+
+            mapManager.AddObjectToMap(mapName, randomObject);
         }
     };
 
     add100RandomObject(PhongShader);
-    add100RandomObject(LambertShader);
-    add100RandomObject(BlinnPhongShader);
+//    add100RandomObject(LambertShader);
+//    add100RandomObject(BlinnPhongShader);
 //    add100RandomObject(SelectShader("Constant"));
+
+    //Zombie
+    std::shared_ptr<StandardisedModel> zombie = mapManager.ModelObjectController.UseAny("Lesson/zombie.obj");
+    zombie->SetShaderProgram(PhongTextureShader);
+    zombie->SetTexture(mapManager.TextureObjectsController.UseTexture("Lesson/zombie.png"));
+    zombie->InsertTransfMove(glm::vec3(-10, -1.0f, 0)).ConsolidateTransf();
+    mapManager.AddObjectToMap(map, zombie);
+
+    //Shed 1
+    std::shared_ptr<StandardisedModel> shed = mapManager.ModelObjectController.UsePositionNormalTex("Lesson/model.obj");
+    shed->SetShaderProgram(PhongTextureShader);
+    shed->SetTexture(mapManager.TextureObjectsController.UseTexture("Lesson/building.png"));
+    shed->InsertTransfMove(glm::vec3(10, -1.0f, 0)).ConsolidateTransf();
+    mapManager.AddObjectToMap(map, shed);
+
 
     //Skybox
     const float *rawmodel_skycube = skycube;

@@ -1,11 +1,9 @@
 //
 // Created by KOP0269 on 25.9.23.
 //
-#include <string>
 #include <stdexcept>
 
 #include "GLSLShader.h"
-#include "ShadersCode/LegacyShaderStrings/LegacyShadersStrings.h"
 #include "ShadersCode/Loader/ShaderFileLoader.h"
 
 GLSLShader::GLSLShader(const char *new_shader_string, ShaderType type) : ShaderString(new_shader_string),

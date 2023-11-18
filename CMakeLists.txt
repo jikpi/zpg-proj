@@ -40,7 +40,6 @@ add_executable(zpg_test main.cpp
         Application/DebugErrorMessages/DebugErrorMessages.h
         Shaders/ShadersCode/LegacyShaderStrings/LegacyShadersStrings.h
         Shaders/ShadersCode/LegacyShaderStrings/LegacyShaderStrings.cpp
-        Transformations/Composite/Abstract/Transformation.cpp
         Transformations/Composite/Abstract/Transformation.h
         Transformations/Composite/Transformations/Rotate.cpp
         Transformations/Composite/Transformations/Rotate.h
@@ -56,10 +55,8 @@ add_executable(zpg_test main.cpp
         Shaders/Camera/Camera.h
         Application/InputHandler/MovesetInputManager.cpp
         Application/InputHandler/MovesetInputManager.h
-        Shaders/Camera/CameraObserver/CameraObserver.cpp
         Shaders/Camera/CameraObserver/CameraObserver.h
         Application/Configuration/AGlobalConfig.h
-        Application/Configuration/AGlobalConfig.cpp
         Shaders/ShadersCode/Loader/ShaderFileLoader.cpp
         Shaders/ShadersCode/Loader/ShaderFileLoader.h
         Shaders/Lighting/LightPoint.cpp
@@ -75,7 +72,6 @@ add_executable(zpg_test main.cpp
         Model/Abstract/RenderableObject.h
         Shaders/ShaderProgram/ShaderHandlerFactory/ShaderHandlerFactory.cpp
         Shaders/ShaderProgram/ShaderHandlerFactory/ShaderHandlerFactory.h
-        Shaders/Lighting/Uniforms/LightsArrayPointUniform.cpp
         Shaders/Lighting/Uniforms/LightsArrayPointUniform.h
         Shaders/ShaderProgram/ShaderBase/ShaderBase.cpp
         Shaders/ShaderProgram/ShaderBase/ShaderBase.h
@@ -89,9 +85,7 @@ add_executable(zpg_test main.cpp
         Shaders/Lighting/LightDirectional.h
         Shaders/Lighting/LightSpot.cpp
         Shaders/Lighting/LightSpot.h
-        Shaders/Lighting/Uniforms/LightArrayDirectionalUniform.cpp
         Shaders/Lighting/Uniforms/LightArrayDirectionalUniform.h
-        Shaders/Lighting/Uniforms/LightsArraySpotUniform.cpp
         Shaders/Lighting/Uniforms/LightsArraySpotUniform.h
         ExtResources/LessonResources/TextureResources/plane_tex.h
         Model/Texture/Controller/TextureController.cpp

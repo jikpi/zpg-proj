@@ -45,6 +45,8 @@ Texture *TextureController::UseCubemap(const std::string &path, bool standardPat
 std::unique_ptr<Texture> TextureController::LoadTexture(const std::string &path) {
     int width, height, nrChannels;
     std::cout << "Loading texture: " << path << std::endl;
+
+    stbi_set_flip_vertically_on_load(true);
     unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
 
     if (!data) {
@@ -76,6 +78,7 @@ std::unique_ptr<Texture> TextureController::LoadTexture(const std::string &path)
     stbi_image_free(data);
 
     std::unique_ptr<Texture> newTexture = std::make_unique<Texture>(textureID, width, height, nrChannels);
+    glBindTexture(GL_TEXTURE_2D, 0);
     return newTexture;
 }
 
@@ -162,6 +165,7 @@ std::unique_ptr<Texture> TextureController::LoadCubeMap(const std::string &path)
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
     return std::make_unique<Texture>(textureID, width, height, nrChannels);
 }
 

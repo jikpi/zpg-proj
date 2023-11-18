@@ -4,8 +4,6 @@
 
 #include "LightSpot.h"
 #include "../../Application/Configuration/AGlobalConfig.h"
-#include "glm/geometric.hpp"
-#include "glm/trigonometric.hpp"
 
 LightSpot::LightSpot(const glm::vec3 &position, const glm::vec3 &direction, const glm::vec3 &color, float intensity,
                      float constant, float linear, float quadratic, float cutOff, float outerCutOff)

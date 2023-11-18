@@ -3,7 +3,6 @@
 //
 
 #include <stdexcept>
-#include <iostream>
 #include "RenderableLight.h"
 #include "../../../Application/Configuration/AGlobalConfig.h"
 

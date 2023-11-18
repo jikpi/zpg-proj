@@ -4,7 +4,6 @@
 
 #include "LightDirectional.h"
 #include "../../Application/Configuration/AGlobalConfig.h"
-#include "glm/geometric.hpp"
 
 LightDirectional::LightDirectional(const glm::vec3 &direction, const glm::vec3 &color, float intensity)
         : RenderableLight(LIGHT_TYPE_DIRECTIONAL, color, intensity),
