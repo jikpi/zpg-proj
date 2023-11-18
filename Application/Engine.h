@@ -44,7 +44,6 @@ private:
     void LoadAllShaders();
 
     MapManager ResourceManager;
-    std::shared_ptr<ShaderHandler> & SelectShader(const std::string& name);
 
     std::shared_ptr<Camera> CameraMain;
 

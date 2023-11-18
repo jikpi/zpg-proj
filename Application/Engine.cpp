@@ -146,6 +146,12 @@ void Engine::PrintVersionInfo() {
     printf("Move camera with 'wasd' and 'r,f', press 'c' to toggle camera, 'y' to toggle movement method, '1-9' to change the map, 'p' to toggle perspective, 'm' to set random materials for objects.\n");
 }
 
+void Engine::TestLaunch() {
+    MapCreator::FourSpheres("4 spheres", this->Shaders, this->ResourceManager);
+    MapCreator::SolarSystem("Solar system", this->Shaders, this->ResourceManager);
+    MapCreator::Overworld("Overworld", this->Shaders, this->ResourceManager);
+}
+
 void Engine::Run() {
     this->SetCameraLock(true);
     DebugErrorMessages::PrintGLErrors("Before run errors");
@@ -236,13 +242,6 @@ void Engine::Run() {
 
 void Engine::KillWindow() const {
     glfwDestroyWindow(Window);
-}
-
-void Engine::TestLaunch() {
-    MapCreator::FourSpheres("4 spheres", this->Shaders, this->ResourceManager);
-    MapCreator::SolarSystem("Solar system", this->Shaders, this->ResourceManager);
-    MapCreator::Overworld("Overworld", this->Shaders, this->ResourceManager);
-
 }
 
 void Engine::CameraLookHorizontal(double x) {
@@ -362,22 +361,6 @@ void Engine::RequestMapChange(const std::string &name) {
     std::cout << "Map changed to " << this->ResourceManager.GetActiveMap()->GetName() << std::endl;
 }
 
-std::shared_ptr<ShaderHandler> &Engine::SelectShader(const std::string &name) {
-    for (auto &shader: this->Shaders) {
-        if (shader->Name == name) {
-            return shader;
-        }
-    }
-    std::cerr << "ERROR: Engine: Shader name \"" << name << "\" not found. Returning any shader." << std::endl;
-
-    if (this->Shaders.empty()) {
-        std::cerr << "FATAL: Engine: No shaders available." << std::endl;
-        throw std::runtime_error("No shaders available.");
-    }
-
-    return this->Shaders.at(0);
-}
-
 void Engine::LoadAllShaders() {
     this->Shaders.push_back(ShaderHandlerFactory::Phong());
     this->Shaders.push_back(ShaderHandlerFactory::Lambert());
@@ -397,7 +380,7 @@ void Engine::LoadAllShaders() {
     }
 
 
-    this->ResourceManager.SetFallbackShader(SelectShader("Phong"));
+    this->ResourceManager.SetFallbackShader(this->Shaders.at(0));
 }
 
 

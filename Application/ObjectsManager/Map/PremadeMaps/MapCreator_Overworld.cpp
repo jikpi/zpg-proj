@@ -60,7 +60,7 @@ void MapCreator::Overworld(const std::string &mapName, std::vector<std::shared_p
 
     auto randomMaterial = []() -> Material {
         Material material;
-        material.AmbientColor = glm::vec3(0.1f, 0.1f, 0.1f);
+        material.AmbientColor = glm::vec3(0.0f, 0.0f, 0.0f);
         material.DiffuseColor = glm::vec3((float) rand() / RAND_MAX, (float) rand() / RAND_MAX,
                                           (float) rand() / RAND_MAX);
         material.SpecularColor = glm::vec3((float) rand() / RAND_MAX, (float) rand() / RAND_MAX,
@@ -77,7 +77,7 @@ void MapCreator::Overworld(const std::string &mapName, std::vector<std::shared_p
             glm::vec3(1.0f, 1.0f, 1.0f));
     directionalLight->SetColor(glm::vec3(0.3f, 0.3f, 0.3f));
 
-    mapManager.AddLightToMap(map, directionalLight);
+//    mapManager.AddLightToMap(map, directionalLight);
 
 
     std::dynamic_pointer_cast<LightSpot>(mapManager.GetLightOnMap(map, 0))
@@ -126,4 +126,16 @@ void MapCreator::Overworld(const std::string &mapName, std::vector<std::shared_p
     add100RandomObject(LambertShader);
     add100RandomObject(BlinnPhongShader);
 //    add100RandomObject(SelectShader("Constant"));
+
+    //Skybox
+    const float *rawmodel_skycube = skycube;
+    int skycube_size = sizeof(skycube) / sizeof(float);
+    std::shared_ptr<StandardisedModel> starSkybox = ModelFactory::Position(rawmodel_skycube, skycube_size,
+                                                                           "Star skybox");
+
+    starSkybox->SetShaderProgram(SkyboxShader);
+    Texture *starSkyboxTexture = mapManager.TextureObjectsController.UseCubemap(
+            "starbox");
+    starSkybox->SetTexture(starSkyboxTexture);
+    MapManager::AddSkyboxToMap(map, starSkybox);
 }

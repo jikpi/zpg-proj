@@ -85,7 +85,7 @@ void MapManager::ChangeMap(std::shared_ptr<Map> &map) {
 void MapManager::ChangeMap(int index) {
     //By index
     if (index >= this->Maps.size()) {
-        std::cerr << "ERROR: MapManager: Map index not found." << std::endl;
+        std::cerr << "ERROR: MapManager: Map index not found: " << index << std::endl;
         return;
     }
 

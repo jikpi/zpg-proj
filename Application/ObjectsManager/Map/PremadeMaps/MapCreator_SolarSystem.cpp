@@ -120,6 +120,5 @@ MapCreator::SolarSystem(const std::string &mapName, std::vector<std::shared_ptr<
     Texture *starSkyboxTexture = mapManager.TextureObjectsController.UseCubemap(
             "../Resources/Textures/Galaxy/stars", false);
     starSkybox->SetTexture(starSkyboxTexture);
-
     MapManager::AddSkyboxToMap(map, starSkybox);
 }
