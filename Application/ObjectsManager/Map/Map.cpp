@@ -74,3 +74,7 @@ void Map::SetSkybox(const std::shared_ptr<StandardisedModel> &skybox) {
     }
     this->Skybox = skybox;
 }
+
+const std::shared_ptr<StandardisedModel> &Map::GetSkybox() const {
+    return this->Skybox;
+}

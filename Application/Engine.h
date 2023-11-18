@@ -24,7 +24,6 @@
 #include <vector>
 #include <iostream>
 #include "../Shaders/ShaderProgram/ShaderHandler.h"
-#include "ObjectsManager/Map/Map.h"
 #include "InputHandler/MovesetInputManager.h"
 #include "../Shaders/Camera/Camera.h"
 #include "ObjectsManager/ShaderLinking/MapToShaderLinker.h"

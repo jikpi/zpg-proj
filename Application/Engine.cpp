@@ -204,16 +204,16 @@ void Engine::Run() {
         ResourceManager.ForceRefreshLightsOnCurrentMap();
 
         ////Render skybox
-        if (ResourceManager.GetActiveMap()->Skybox != nullptr) {
-            ShaderHandler *skyboxShader = ResourceManager.GetActiveMap()->Skybox->GetShaderProgram();
+        if (ResourceManager.GetActiveMap()->GetSkybox() != nullptr ) {
+            ShaderHandler *skyboxShader = ResourceManager.GetActiveMap()->GetSkybox()->GetShaderProgram();
             glDepthMask(GL_FALSE);
             glDepthFunc(GL_LEQUAL);
             glDisable(GL_CULL_FACE);
 //    glCullFace(GL_BACK);
             skyboxShader->UseProgram();
-            skyboxShader->RequestRender(*ResourceManager.GetActiveMap()->Skybox);
-            ResourceManager.GetActiveMap()->Skybox->BindVertexArray();
-            glDrawArrays(GL_TRIANGLES, 0, ResourceManager.GetActiveMap()->Skybox->GetRenderingSize());
+            skyboxShader->RequestRender(*ResourceManager.GetActiveMap()->GetSkybox());
+            ResourceManager.GetActiveMap()->GetSkybox()->BindVertexArray();
+            glDrawArrays(GL_TRIANGLES, 0, ResourceManager.GetActiveMap()->GetSkybox()->GetRenderingSize());
             glDepthMask(GL_TRUE);
             glDepthFunc(GL_LESS);
             glEnable(GL_CULL_FACE);

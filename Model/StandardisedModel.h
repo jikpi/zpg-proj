@@ -35,6 +35,8 @@ public:
 
     void SetShaderProgram(ShaderHandler *shaderProgram);
     [[nodiscard]] ShaderHandler * GetShaderProgram() const;
+
+    std::vector<std::shared_ptr<StandardisedModel>> Objects;
 };
 
 

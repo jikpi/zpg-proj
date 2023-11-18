@@ -15,7 +15,7 @@
 ModelController::ModelData ModelController::LoadModel(const std::string &path) {
     std::cout << "Loading model: " << path << std::endl;
 
-    std::vector<float> data;
+    std::vector<float> completeData;
     Assimp::Importer importer;
     unsigned int options = aiProcess_Triangulate
                            | aiProcess_OptimizeMeshes
@@ -31,6 +31,8 @@ ModelController::ModelData ModelController::LoadModel(const std::string &path) {
     ModelData modelData;
     modelData.Type = static_cast<ModelStamp>(0);
 
+    std::vector<std::vector<float>> meshData;
+
     //Load all meshes
     for (unsigned int m = 0; m < scene->mNumMeshes; m++) {
         aiMesh *mesh = scene->mMeshes[m];
@@ -44,6 +46,8 @@ ModelController::ModelData ModelController::LoadModel(const std::string &path) {
             modelData.Type = static_cast<ModelStamp>(modelData.Type | ModelStamp::MODEL_STAMP_TEXTURE_COORDS);
         }
 
+        meshData.emplace_back();
+
         for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
             aiFace face = mesh->mFaces[i];
 
@@ -52,23 +56,23 @@ ModelController::ModelData ModelController::LoadModel(const std::string &path) {
 
                 // Vertex position
                 aiVector3D pos = mesh->mVertices[id];
-                data.push_back(pos.x);
-                data.push_back(pos.y);
-                data.push_back(pos.z);
+                meshData[m].push_back(pos.x);
+                meshData[m].push_back(pos.y);
+                meshData[m].push_back(pos.z);
 
                 // Vertex normal
                 if (mesh->HasNormals()) {
                     aiVector3D nor = mesh->mNormals[id];
-                    data.push_back(nor.x);
-                    data.push_back(nor.y);
-                    data.push_back(nor.z);
+                    meshData[m].push_back(nor.x);
+                    meshData[m].push_back(nor.y);
+                    meshData[m].push_back(nor.z);
                 }
 
                 // Vertex texture coordinates
                 if (mesh->HasTextureCoords(0)) {
                     aiVector3D tex = mesh->mTextureCoords[0][id];
-                    data.push_back(tex.x);
-                    data.push_back(tex.y);
+                    meshData[m].push_back(tex.x);
+                    meshData[m].push_back(tex.y);
                 }
             }
         }
@@ -107,7 +111,12 @@ ModelController::ModelData ModelController::LoadModel(const std::string &path) {
     }
     no_material:
 
-    modelData.Data = std::move(data);
+    //Merge all meshes
+    for (auto &mesh: meshData) {
+        completeData.insert(completeData.end(), mesh.begin(), mesh.end());
+    }
+
+    modelData.Data = std::move(completeData);
     return modelData;
 }
 

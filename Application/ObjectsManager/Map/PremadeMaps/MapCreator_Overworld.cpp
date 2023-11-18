@@ -74,7 +74,7 @@ void MapCreator::Overworld(const std::string &mapName, std::vector<std::shared_p
             glm::vec3(1.0f, 1.0f, 1.0f));
     directionalLight->SetColor(glm::vec3(0.3f, 0.3f, 0.3f));
 
-//    mapManager.AddLightToMap(map, directionalLight);
+    mapManager.AddLightToMap(map, directionalLight);
 
 
     std::dynamic_pointer_cast<LightSpot>(mapManager.GetLightOnMap(map, 0))
@@ -136,12 +136,23 @@ void MapCreator::Overworld(const std::string &mapName, std::vector<std::shared_p
     zombie->InsertTransfMove(glm::vec3(-10, -1.0f, 0)).ConsolidateTransf();
     mapManager.AddObjectToMap(map, zombie);
 
-    //Shed 1
+    //Shed
     std::shared_ptr<StandardisedModel> shed = mapManager.ModelObjectController.UsePositionNormalTex("Lesson/model.obj");
     shed->SetShaderProgram(PhongTextureShader);
     shed->SetTexture(mapManager.TextureObjectsController.UseTexture("Lesson/building.png"));
     shed->InsertTransfMove(glm::vec3(10, -1.0f, 0)).ConsolidateTransf();
     mapManager.AddObjectToMap(map, shed);
+
+    //Tree
+    std::shared_ptr<StandardisedModel> tree = mapManager.ModelObjectController.UsePositionNormalTex(
+            "ScottsPine.3ds");
+    tree->SetShaderProgram(PhongShader);
+//    tree->SetTexture(mapManager.TextureObjectsController.UseTexture("palmTree.jpg"));
+//    tree->InsertTransfMove(glm::vec3(0, -1.0f, 20))
+//            .InsertTransfRotate(90, glm::vec3(-1.0f, 0, 0))
+//            .InsertTransfScale(glm::vec3(0.01f, 0.01f, 0.01f))
+//            .ConsolidateTransf();
+    mapManager.AddObjectToMap(map, tree);
 
 
     //Skybox
@@ -152,7 +163,7 @@ void MapCreator::Overworld(const std::string &mapName, std::vector<std::shared_p
 
     starSkybox->SetShaderProgram(SkyboxShader);
     Texture *starSkyboxTexture = mapManager.TextureObjectsController.UseCubemap(
-            "starbox");
+            "Lesson/FieldSkybox/field");
     starSkybox->SetTexture(starSkyboxTexture);
     MapManager::AddSkyboxToMap(map, starSkybox);
 }
