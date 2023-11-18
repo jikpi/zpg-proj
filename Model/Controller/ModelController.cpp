@@ -12,10 +12,9 @@
 #include "../Factory/ModelFactory.h"
 #include "../../Application/Configuration/AGlobalConfig.h"
 
-ModelController::ModelData ModelController::LoadModel(const std::string &path) {
+std::vector<ModelController::ModelData> ModelController::LoadModel(const std::string &path) {
     std::cout << "Loading model: " << path << std::endl;
 
-    std::vector<float> completeData;
     Assimp::Importer importer;
     unsigned int options = aiProcess_Triangulate
                            | aiProcess_OptimizeMeshes
@@ -28,14 +27,15 @@ ModelController::ModelData ModelController::LoadModel(const std::string &path) {
         throw std::runtime_error("ModelController::LoadModel: Error: " + std::string(importer.GetErrorString()));
     }
 
-    ModelData modelData;
-    modelData.Type = static_cast<ModelStamp>(0);
+    std::vector<ModelData> allMeshes;
 
-    std::vector<std::vector<float>> meshData;
-
-    //Load all meshes
+    // Load all meshes
     for (unsigned int m = 0; m < scene->mNumMeshes; m++) {
         aiMesh *mesh = scene->mMeshes[m];
+
+        ModelData modelData;
+        modelData.Type = static_cast<ModelStamp>(0);
+        modelData.HasMaterial = false;
 
         modelData.Type = static_cast<ModelStamp>(modelData.Type | ModelStamp::MODEL_STAMP_VERTICES);
 
@@ -46,8 +46,6 @@ ModelController::ModelData ModelController::LoadModel(const std::string &path) {
             modelData.Type = static_cast<ModelStamp>(modelData.Type | ModelStamp::MODEL_STAMP_TEXTURE_COORDS);
         }
 
-        meshData.emplace_back();
-
         for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
             aiFace face = mesh->mFaces[i];
 
@@ -56,68 +54,64 @@ ModelController::ModelData ModelController::LoadModel(const std::string &path) {
 
                 // Vertex position
                 aiVector3D pos = mesh->mVertices[id];
-                meshData[m].push_back(pos.x);
-                meshData[m].push_back(pos.y);
-                meshData[m].push_back(pos.z);
+                modelData.Data.push_back(pos.x);
+                modelData.Data.push_back(pos.y);
+                modelData.Data.push_back(pos.z);
 
                 // Vertex normal
                 if (mesh->HasNormals()) {
                     aiVector3D nor = mesh->mNormals[id];
-                    meshData[m].push_back(nor.x);
-                    meshData[m].push_back(nor.y);
-                    meshData[m].push_back(nor.z);
+                    modelData.Data.push_back(nor.x);
+                    modelData.Data.push_back(nor.y);
+                    modelData.Data.push_back(nor.z);
                 }
 
                 // Vertex texture coordinates
                 if (mesh->HasTextureCoords(0)) {
                     aiVector3D tex = mesh->mTextureCoords[0][id];
-                    meshData[m].push_back(tex.x);
-                    meshData[m].push_back(tex.y);
+                    modelData.Data.push_back(tex.x);
+                    modelData.Data.push_back(tex.y);
                 }
             }
         }
-    }
 
+        // Load material for the mesh
+        unsigned int materialIndex = mesh->mMaterialIndex;
+        if (materialIndex < scene->mNumMaterials) {
+            aiMaterial *mat = scene->mMaterials[materialIndex];
 
-    ////Load material
-    modelData.HasMaterial = false;
-    if (scene->mNumMaterials > 0) {
-        aiMaterial *mat = scene->mMaterials[0];
+            //Check if default material
+            aiString matName;
+            mat->Get(AI_MATKEY_NAME, matName);
+            if (std::string(matName.C_Str()) == AI_DEFAULT_MATERIAL_NAME) {
+                goto no_material;
+            }
 
-        aiString matName;
-        mat->Get(AI_MATKEY_NAME, matName);
-        if (std::string(matName.C_Str()) == AI_DEFAULT_MATERIAL_NAME) {
-            goto no_material;
+            aiColor3D ambient(0.f, 0.f, 0.f);
+            aiColor3D diffuse(0.f, 0.f, 0.f);
+            aiColor3D specular(0.f, 0.f, 0.f);
+            float shininess = 0.0f;
+
+            mat->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
+            mat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
+            mat->Get(AI_MATKEY_COLOR_SPECULAR, specular);
+            mat->Get(AI_MATKEY_SHININESS, shininess);
+
+            modelData.material = Material(
+                    glm::vec3(ambient.r, ambient.g, ambient.b),
+                    glm::vec3(diffuse.r, diffuse.g, diffuse.b),
+                    glm::vec3(specular.r, specular.g, specular.b),
+                    shininess
+            );
+
+            modelData.HasMaterial = true;
         }
+        no_material:
 
-        aiColor3D ambient(0.f, 0.f, 0.f);
-        aiColor3D diffuse(0.f, 0.f, 0.f);
-        aiColor3D specular(0.f, 0.f, 0.f);
-        float shininess = 0.0f;
-
-        mat->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
-        mat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
-        mat->Get(AI_MATKEY_COLOR_SPECULAR, specular);
-        mat->Get(AI_MATKEY_SHININESS, shininess);
-
-        modelData.material = Material(
-                glm::vec3(ambient.r, ambient.g, ambient.b),
-                glm::vec3(diffuse.r, diffuse.g, diffuse.b),
-                glm::vec3(specular.r, specular.g, specular.b),
-                shininess
-        );
-
-        modelData.HasMaterial = true;
-    }
-    no_material:
-
-    //Merge all meshes
-    for (auto &mesh: meshData) {
-        completeData.insert(completeData.end(), mesh.begin(), mesh.end());
+        allMeshes.push_back(std::move(modelData));
     }
 
-    modelData.Data = std::move(completeData);
-    return modelData;
+    return allMeshes;
 }
 
 
@@ -136,33 +130,56 @@ ModelController::RetrieveModel(const std::string &path, ModelStamp type, const s
         ModelsData[fullPath] = LoadModel(fullPath);
     }
 
-    ModelData &mData = ModelsData[fullPath];
+    auto &modelsData = ModelsData[fullPath];
 
-    if (!anyType && mData.Type != type) {
+    if (!anyType && modelsData.at(0).Type != type) {
         std::cerr << "ModelController::RetrieveModel: Warning: Model type mismatch, overriding." << std::endl;
     }
 
     std::shared_ptr<StandardisedModel> model;
 
-    if ((mData.Type & ModelStamp::MODEL_STAMP_VERTICES) &&
-        (mData.Type & ModelStamp::MODEL_STAMP_NORMALS) &&
-        (mData.Type & ModelStamp::MODEL_STAMP_TEXTURE_COORDS)) {
+    if ((modelsData.at(0).Type & ModelStamp::MODEL_STAMP_VERTICES) &&
+        (modelsData.at(0).Type & ModelStamp::MODEL_STAMP_NORMALS) &&
+        (modelsData.at(0).Type & ModelStamp::MODEL_STAMP_TEXTURE_COORDS)) {
 
-        model = ModelFactory::AssimpPositionNormalTex(mData.Data, Name);
-    } else if ((mData.Type & ModelStamp::MODEL_STAMP_VERTICES) &&
-               (mData.Type & ModelStamp::MODEL_STAMP_NORMALS)) {
+        model = ModelFactory::AssimpPositionNormalTex(modelsData.at(0).Data, Name);
+    } else if ((modelsData.at(0).Type & ModelStamp::MODEL_STAMP_VERTICES) &&
+               (modelsData.at(0).Type & ModelStamp::MODEL_STAMP_NORMALS)) {
 
-        model = ModelFactory::AssimpPositionNormal(mData.Data, Name);
-    } else if (mData.Type & ModelStamp::MODEL_STAMP_VERTICES) {
+        model = ModelFactory::AssimpPositionNormal(modelsData.at(0).Data, Name);
+    } else if (modelsData.at(0).Type & ModelStamp::MODEL_STAMP_VERTICES) {
 
-        model = ModelFactory::AssimpPosition(mData.Data, Name);
+        model = ModelFactory::AssimpPosition(modelsData.at(0).Data, Name);
     } else {
         throw std::runtime_error("ModelController::RetrieveModel: Error: Model type not found");
     }
 
+    if (modelsData.at(0).HasMaterial) {
+        model->SetMaterial(modelsData.at(0).material);
+    }
 
-    if (mData.HasMaterial) {
-        model->SetMaterial(mData.material);
+
+    //Process child meshes
+    for (int i = 1; i < modelsData.size(); i++) {
+        if ((modelsData.at(i).Type & ModelStamp::MODEL_STAMP_VERTICES) &&
+            (modelsData.at(i).Type & ModelStamp::MODEL_STAMP_NORMALS) &&
+            (modelsData.at(i).Type & ModelStamp::MODEL_STAMP_TEXTURE_COORDS)) {
+
+            model->ChildObjects.push_back(ModelFactory::AssimpPositionNormalTex(modelsData.at(i).Data, Name));
+        } else if ((modelsData.at(i).Type & ModelStamp::MODEL_STAMP_VERTICES) &&
+                   (modelsData.at(i).Type & ModelStamp::MODEL_STAMP_NORMALS)) {
+
+            model->ChildObjects.push_back(ModelFactory::AssimpPositionNormal(modelsData.at(i).Data, Name));
+        } else if (modelsData.at(i).Type & ModelStamp::MODEL_STAMP_VERTICES) {
+
+            model->ChildObjects.push_back(ModelFactory::AssimpPosition(modelsData.at(i).Data, Name));
+        } else {
+            throw std::runtime_error("ModelController::RetrieveModel: Error: Model type not found");
+        }
+
+        if (modelsData.at(i).HasMaterial) {
+            model->ChildObjects.at(i - 1)->SetMaterial(modelsData.at(i).material);
+        }
     }
 
     return model;

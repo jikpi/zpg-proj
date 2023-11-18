@@ -114,3 +114,9 @@ StandardisedModel &StandardisedModel::operator=(StandardisedModel &&other) noexc
     BaseModelData::operator=(std::move(other));
     return *this;
 }
+
+void StandardisedModel::SetChildrenTransformations() {
+    for (auto &object : ChildObjects) {
+        object->SetTransf(Transformations->GetResult());
+    }
+}

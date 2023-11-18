@@ -178,14 +178,14 @@ void Engine::Run() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //animate mercury
-        ResourceManager.GetObjectOnMap("Solar system", "Mercury")->DoTransf();
-        //animate venus
-        ResourceManager.GetObjectOnMap("Solar system", "Venus")->DoTransf();
-        //animate earth
-        ResourceManager.GetObjectOnMap("Solar system", "Earth")->DoTransf();
-        //animate mars
-        ResourceManager.GetObjectOnMap("Solar system", "Mars")->DoTransf();
+//        //animate mercury
+//        ResourceManager.GetObjectOnMap("Solar system", "Mercury")->DoTransf();
+//        //animate venus
+//        ResourceManager.GetObjectOnMap("Solar system", "Venus")->DoTransf();
+//        //animate earth
+//        ResourceManager.GetObjectOnMap("Solar system", "Earth")->DoTransf();
+//        //animate mars
+//        ResourceManager.GetObjectOnMap("Solar system", "Mars")->DoTransf();
 
 
         angle += angleIncrement;
@@ -204,7 +204,7 @@ void Engine::Run() {
         ResourceManager.ForceRefreshLightsOnCurrentMap();
 
         ////Render skybox
-        if (ResourceManager.GetActiveMap()->GetSkybox() != nullptr ) {
+        if (ResourceManager.GetActiveMap()->GetSkybox() != nullptr) {
             ShaderHandler *skyboxShader = ResourceManager.GetActiveMap()->GetSkybox()->GetShaderProgram();
             glDepthMask(GL_FALSE);
             glDepthFunc(GL_LEQUAL);
@@ -226,9 +226,20 @@ void Engine::Run() {
 
             //Render objects for chosen shader
             for (auto &object: set->Objects) {
+                object->DoTransf();
                 set->Shader->RequestRender(*object);
                 object->BindVertexArray();
                 glDrawArrays(GL_TRIANGLES, 0, object->GetRenderingSize());
+
+                //Render inner objects
+                if (!object->ChildObjects.empty()) {
+                    object->SetChildrenTransformations();
+                    for (auto &innerObject: object->ChildObjects) {
+                        set->Shader->RequestRender(*innerObject);
+                        innerObject->BindVertexArray();
+                        glDrawArrays(GL_TRIANGLES, 0, innerObject->GetRenderingSize());
+                    }
+                }
             }
 
             ShaderHandler::StopProgram();

@@ -36,7 +36,9 @@ public:
     void SetShaderProgram(ShaderHandler *shaderProgram);
     [[nodiscard]] ShaderHandler * GetShaderProgram() const;
 
-    std::vector<std::shared_ptr<StandardisedModel>> Objects;
+    //Quick implementation of multiple meshes
+    std::vector<std::shared_ptr<StandardisedModel>> ChildObjects;
+    void SetChildrenTransformations();
 };
 
 

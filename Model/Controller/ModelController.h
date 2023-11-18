@@ -23,9 +23,9 @@ private:
         Material material;
     };
 
-    std::map<std::string, ModelData> ModelsData;
+    std::map<std::string, std::vector<ModelData>> ModelsData;
 
-    static ModelController::ModelData LoadModel(const std::string &path);
+    static std::vector<ModelData> LoadModel(const std::string &path);
 
     std::shared_ptr<StandardisedModel>
     RetrieveModel(const std::string &path, ModelStamp type, const std::string &Name, bool anyType,
