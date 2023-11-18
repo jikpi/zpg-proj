@@ -10,15 +10,20 @@
 #include "../Map.h"
 #include "../../../../Model/Texture/Controller/TextureController.h"
 #include "../../../../Model/Controller/ModelController.h"
+#include "../MapManager.h"
 
 class MapCreator {
 private:
-    static ShaderHandler* SelectShader(std::vector<std::shared_ptr<ShaderHandler>> &shaders, const std::string& name);
+    static ShaderHandler *SelectShader(std::vector<std::shared_ptr<ShaderHandler>> &shaders, const std::string &name);
 public:
 
 
-    static std::shared_ptr<Map> FourSpheres(std::string mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders,
-                                            TextureController &textureController, ModelController &modelController);
+    static void
+    FourSpheres(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, MapManager &mapManager);
+    static void
+    SolarSystem(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, MapManager &mapManager);
+    static void
+    Overworld(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, MapManager &mapManager);
 
 };
 

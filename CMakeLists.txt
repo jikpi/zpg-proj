@@ -103,5 +103,8 @@ add_executable(zpg_test main.cpp
         Model/ModelStamp.h
         Application/ObjectsManager/Map/PremadeMaps/MapCreator.cpp
         Application/ObjectsManager/Map/PremadeMaps/MapCreator.h
+        Application/ObjectsManager/Map/PremadeMaps/MapCreator_4Spheres.cpp
+        Application/ObjectsManager/Map/PremadeMaps/MapCreator_SolarSystem.cpp
+        Application/ObjectsManager/Map/PremadeMaps/MapCreator_Overworld.cpp
 )
 target_link_libraries(zpg_test ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES}  glfw glm::glm assimp::assimp)

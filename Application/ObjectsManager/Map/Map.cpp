@@ -55,6 +55,11 @@ unsigned long Map::GetLightCount() {
 }
 
 std::shared_ptr<RenderableLight> &Map::GetLight(int index) {
+    if(index >= Lights->size()) {
+        std::cerr << "ERROR: Map: Light index not found, map name: " << this->Name << std::endl;
+        throw std::runtime_error("ERROR: Map: Light index not found.");
+    }
+
     return Lights->at(index);
 }
 

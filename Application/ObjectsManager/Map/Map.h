@@ -27,8 +27,8 @@ public:
     explicit Map(std::string name = "None");
 
     friend class MapToShaderLinker;
-
     friend class MapManager;
+    friend class MapCreator;
 
     std::shared_ptr<StandardisedModel> Skybox;
 

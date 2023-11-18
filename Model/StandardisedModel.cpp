@@ -8,6 +8,7 @@
 #include "../Transformations/Composite/Transformations/Scale.h"
 
 #include <utility>
+#include <iostream>
 
 StandardisedModel::~StandardisedModel() {
     if (this->VBO != 0) {
@@ -60,6 +61,10 @@ StandardisedModel &StandardisedModel::InsertTransfComposite(const std::shared_pt
 
 
 void StandardisedModel::SetShaderProgram(ShaderHandler *shaderProgram) {
+    if(shaderProgram == nullptr) {
+        std::cerr << "WARNING: StandardisedModel: Shader program is null, name:" << this->Name() << std::endl;
+    }
+
     SelectedShaderProgram = shaderProgram;
 }
 

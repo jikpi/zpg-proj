@@ -12,9 +12,3 @@ ShaderHandler *MapCreator::SelectShader(std::vector<std::shared_ptr<ShaderHandle
     }
     return nullptr;
 }
-
-std::shared_ptr<Map>
-MapCreator::FourSpheres(std::string mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders,
-                        TextureController &textureController, ModelController &modelController) {
-
-}

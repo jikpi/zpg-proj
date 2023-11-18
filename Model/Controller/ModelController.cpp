@@ -13,11 +13,9 @@
 #include "../../Application/Configuration/AGlobalConfig.h"
 
 ModelController::ModelData ModelController::LoadModel(const std::string &path) {
-
     std::cout << "Loading model: " << path << std::endl;
 
     std::vector<float> data;
-
     Assimp::Importer importer;
     unsigned int options = aiProcess_Triangulate
                            | aiProcess_OptimizeMeshes
@@ -30,44 +28,48 @@ ModelController::ModelData ModelController::LoadModel(const std::string &path) {
         throw std::runtime_error("ModelController::LoadModel: Error: " + std::string(importer.GetErrorString()));
     }
 
-    aiMesh *mesh = scene->mMeshes[0];
-
     ModelData modelData;
     modelData.Type = static_cast<ModelStamp>(0);
-    modelData.Type = static_cast<ModelStamp>(modelData.Type | ModelStamp::MODEL_STAMP_VERTICES);
 
-    if (mesh->HasNormals())
-        modelData.Type = static_cast<ModelStamp>(modelData.Type | ModelStamp::MODEL_STAMP_NORMALS);
-    if (mesh->HasTextureCoords(0)) {
-        modelData.Type = static_cast<ModelStamp>(modelData.Type | ModelStamp::MODEL_STAMP_TEXTURE_COORDS);
-    }
+    //Load all meshes
+    for (unsigned int m = 0; m < scene->mNumMeshes; m++) {
+        aiMesh *mesh = scene->mMeshes[m];
 
+        modelData.Type = static_cast<ModelStamp>(modelData.Type | ModelStamp::MODEL_STAMP_VERTICES);
 
-    for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
-        aiFace face = mesh->mFaces[i];
+        if (mesh->HasNormals()) {
+            modelData.Type = static_cast<ModelStamp>(modelData.Type | ModelStamp::MODEL_STAMP_NORMALS);
+        }
+        if (mesh->HasTextureCoords(0)) {
+            modelData.Type = static_cast<ModelStamp>(modelData.Type | ModelStamp::MODEL_STAMP_TEXTURE_COORDS);
+        }
 
-        for (unsigned int j = 0; j < 3; j++) {
-            unsigned int id = face.mIndices[j];
+        for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
+            aiFace face = mesh->mFaces[i];
 
-            // Vertex position
-            aiVector3D pos = mesh->mVertices[id];
-            data.push_back(pos.x);
-            data.push_back(pos.y);
-            data.push_back(pos.z);
+            for (unsigned int j = 0; j < face.mNumIndices; j++) {
+                unsigned int id = face.mIndices[j];
 
-            // Vertex normal
-            if (mesh->HasNormals()) {
-                aiVector3D nor = mesh->mNormals[id];
-                data.push_back(nor.x);
-                data.push_back(nor.y);
-                data.push_back(nor.z);
-            }
+                // Vertex position
+                aiVector3D pos = mesh->mVertices[id];
+                data.push_back(pos.x);
+                data.push_back(pos.y);
+                data.push_back(pos.z);
 
-            // Vertex texture coordinates
-            if (mesh->HasTextureCoords(0)) {
-                aiVector3D tex = mesh->mTextureCoords[0][id];
-                data.push_back(tex.x);
-                data.push_back(tex.y);
+                // Vertex normal
+                if (mesh->HasNormals()) {
+                    aiVector3D nor = mesh->mNormals[id];
+                    data.push_back(nor.x);
+                    data.push_back(nor.y);
+                    data.push_back(nor.z);
+                }
+
+                // Vertex texture coordinates
+                if (mesh->HasTextureCoords(0)) {
+                    aiVector3D tex = mesh->mTextureCoords[0][id];
+                    data.push_back(tex.x);
+                    data.push_back(tex.y);
+                }
             }
         }
     }

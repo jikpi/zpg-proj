@@ -26,6 +26,9 @@
 #include "../Shaders/Lighting/LightDirectional.h"
 #include "../Shaders/Lighting/LightSpot.h"
 
+//Map creator
+#include "ObjectsManager/Map/PremadeMaps/MapCreator.h"
+
 
 Engine::Engine() = default;
 
@@ -88,7 +91,7 @@ void Engine::Initialize() {
 //    glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     //Map
-    this->ResourceManager.Initialize();
+    this->ResourceManager.Initialize(false);
 
     //Camera
     this->CameraMain = std::make_shared<Camera>();
@@ -153,12 +156,13 @@ void Engine::Run() {
     float angleIncrement = glm::radians(1.0f);
 
     std::shared_ptr<LightSpot> spheresSpotLight = std::dynamic_pointer_cast<LightSpot>(
-            this->ResourceManager.GetLightOnMap("Default", 0));
+            this->ResourceManager.GetLightOnMap("4 spheres", 0));
 
     std::shared_ptr<LightSpot> manyObjectsFlash = std::dynamic_pointer_cast<LightSpot>(
-            this->ResourceManager.GetLightOnMap("Many objects", 0));
+            this->ResourceManager.GetLightOnMap("Overworld", 0));
 
     this->CameraMain->MoveForwardBackward(0);
+    this->ResourceManager.ChangeMap(0);
     this->ResourceManager.ForceRefreshMaps();
     while (!glfwWindowShouldClose(Window)) {
         //Update camera position
@@ -187,14 +191,13 @@ void Engine::Run() {
         float z = radius * sin(angle);
 
         spheresSpotLight->SetDirection(glm::vec3(x, 0.0f, z));
-//        manyObjectsSpotLight->SetDirection(glm::vec3(x, 0.0f, z));
 
         //set many objects spot light to camera location and target
         manyObjectsFlash->SetPosition(this->CameraMain->GetLocation());
         manyObjectsFlash->SetDirection(this->CameraMain->GetTarget() - this->CameraMain->GetLocation());
         ResourceManager.ForceRefreshLightsOnCurrentMap();
 
-        //Render skybox
+        ////Render skybox
         if (ResourceManager.GetActiveMap()->Skybox != nullptr) {
             ShaderHandler *skyboxShader = ResourceManager.GetActiveMap()->Skybox->GetShaderProgram();
             glDepthMask(GL_FALSE);
@@ -211,7 +214,7 @@ void Engine::Run() {
             ShaderHandler::StopProgram();
         }
 
-        //Render each shader
+        ////Render each shader
         for (auto &set: this->ResourceManager.ShaderLinker) {
             set->Shader->UseProgram();
 
@@ -236,355 +239,10 @@ void Engine::KillWindow() const {
 }
 
 void Engine::TestLaunch() {
+    MapCreator::FourSpheres("4 spheres", this->Shaders, this->ResourceManager);
+    MapCreator::SolarSystem("Solar system", this->Shaders, this->ResourceManager);
+    MapCreator::Overworld("Overworld", this->Shaders, this->ResourceManager);
 
-    //Models
-
-    const float *rawmodel1_sphere = sphere;
-    int size = sizeof(sphere) / sizeof(float);
-
-    const float *rawmodel2_tree = tree;
-    int size2 = sizeof(tree) / sizeof(float);
-
-    const float *rawmodel3_suziSmooth = suziSmooth;
-    int size3 = sizeof(suziSmooth) / sizeof(float);
-
-    const float *rawmodel4_bushes = bushes;
-    int size4 = sizeof(bushes) / sizeof(float);
-
-    const float *rawmodel5_suziFlat = suziFlat;
-    int size5 = sizeof(suziFlat) / sizeof(float);
-
-    const float *rawmodel6_plain = plain;
-    int size6 = sizeof(plain) / sizeof(float);
-
-    const float *rawmodel7_gift = gift;
-    int size7 = sizeof(gift) / sizeof(float);
-
-    const float *rawmodel8_skycube = skycube;
-    int size8 = sizeof(skycube) / sizeof(float);
-
-    const float *rawmodel9_plane_text = plane_tex;
-    int size9 = sizeof(plane_tex) / sizeof(float);
-
-
-    ShaderHandler *ConstantShader = SelectShader("Constant").get();
-    ShaderHandler *PhongShader = SelectShader("Phong").get();
-    ShaderHandler *BlinnPhongShader = SelectShader("BlinnPhong").get();
-    ShaderHandler *LambertShader = SelectShader("Lambert").get();
-
-    //Map 1 - 4 spheres and light
-    std::shared_ptr<StandardisedModel> objectSphere1 = ResourceManager.ModelObjectController.UseAny(
-            "Lesson/model.obj", "Test model 1");
-
-
-    objectSphere1->SetShaderProgram(PhongShader);
-    this->ResourceManager.AddObjectToMap(0, objectSphere1);
-
-    std::shared_ptr<StandardisedModel> objectSphere2 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                    "Test model 2");
-    objectSphere2->SetShaderProgram(BlinnPhongShader);
-    this->ResourceManager.AddObjectToMap(0, objectSphere2);
-
-    std::shared_ptr<StandardisedModel> objectSphere3 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                    "Test model 3");
-    objectSphere3->SetShaderProgram(LambertShader);
-    this->ResourceManager.AddObjectToMap(0, objectSphere3);
-
-    std::shared_ptr<StandardisedModel> objectSphere4 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                    "Test model 4");
-    objectSphere4->SetShaderProgram(PhongShader);
-    this->ResourceManager.AddObjectToMap(0, objectSphere4);
-
-    std::shared_ptr<StandardisedModel> objectSphere5 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                    "Test model 5");
-    objectSphere5->SetShaderProgram(PhongShader);
-    this->ResourceManager.AddObjectToMap(0, objectSphere5);
-
-    std::shared_ptr<StandardisedModel> objectSphere6 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                    "Test model 6");
-    objectSphere6->SetShaderProgram(PhongShader);
-    this->ResourceManager.AddObjectToMap(0, objectSphere6);
-
-    std::shared_ptr<StandardisedModel> objectSphere7 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                    "Test model 7");
-    objectSphere7->SetShaderProgram(PhongShader);
-    this->ResourceManager.AddObjectToMap(0, objectSphere7);
-
-    std::shared_ptr<StandardisedModel> objectSphere8 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                    "Test model 8");
-    objectSphere8->SetShaderProgram(PhongShader);
-    this->ResourceManager.AddObjectToMap(0, objectSphere8);
-
-    std::shared_ptr<StandardisedModel> objectSphere9 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                    "Test model 9");
-    objectSphere9->SetShaderProgram(PhongShader);
-    this->ResourceManager.AddObjectToMap(0, objectSphere9);
-
-    std::shared_ptr<StandardisedModel> objectSphere10 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                     "Test model 10");
-    objectSphere10->SetShaderProgram(PhongShader);
-    this->ResourceManager.AddObjectToMap(0, objectSphere10);
-
-    std::shared_ptr<StandardisedModel> objectSphere11 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                     "Test model 11");
-    objectSphere11->SetShaderProgram(PhongShader);
-    this->ResourceManager.AddObjectToMap(0, objectSphere11);
-
-    std::shared_ptr<StandardisedModel> objectSphere12 = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                     "Test model 12");
-    objectSphere12->SetShaderProgram(PhongShader);
-    this->ResourceManager.AddObjectToMap(0, objectSphere12);
-
-    std::shared_ptr<LightSpot> spotLight = std::make_shared<LightSpot>(glm::vec3(0.0f, 0.0f, 0.0f),
-                                                                       glm::vec3(0.0f,
-                                                                                 1.0f,
-                                                                                 0));
-    spotLight->SetOuterCutOff(100.0f);
-    ResourceManager.AddLightToMap(0, spotLight);
-    ResourceManager.GetMap(0)->GetObject(0)->InsertTransfMove(glm::vec3(-2.0f, 0.0f, 0.0f)).ConsolidateTransf();
-    ResourceManager.GetMap(0)->GetObject(1)->InsertTransfMove(glm::vec3(0.0f, 0.0f, 2.0f)).ConsolidateTransf();
-    ResourceManager.GetMap(0)->GetObject(2)->InsertTransfMove(glm::vec3(2.0f, 0.0f, 0.0f)).ConsolidateTransf();
-    ResourceManager.GetMap(0)->GetObject(3)->InsertTransfMove(glm::vec3(0.0f, 0.0f, -2.0f)).ConsolidateTransf();
-
-    ResourceManager.GetMap(0)->GetObject(4)->InsertTransfMove(glm::vec3(-2.0f, 4.0f, 0.0f)).ConsolidateTransf();
-    ResourceManager.GetMap(0)->GetObject(5)->InsertTransfMove(glm::vec3(0.0f, 4.0f, 2.0f)).ConsolidateTransf();
-    ResourceManager.GetMap(0)->GetObject(6)->InsertTransfMove(glm::vec3(2.0f, 4.0f, 0.0f)).ConsolidateTransf();
-    ResourceManager.GetMap(0)->GetObject(7)->InsertTransfMove(glm::vec3(0.0f, 4.0f, -2.0f)).ConsolidateTransf();
-
-    ResourceManager.GetMap(0)->GetObject(8)->InsertTransfMove(
-            glm::vec3(-2.0f, -4.0f, 0.0f)).ConsolidateTransf();
-    ResourceManager.GetMap(0)->GetObject(9)->InsertTransfMove(glm::vec3(0.0f, -4.0f, 2.0f)).ConsolidateTransf();
-    ResourceManager.GetMap(0)->GetObject(10)->InsertTransfMove(
-            glm::vec3(2.0f, -4.0f, 0.0f)).ConsolidateTransf();
-    ResourceManager.GetObjectOnMap(0, "Test model 12")->InsertTransfMove(
-            glm::vec3(0.0f, -4.0f, -2.0f)).ConsolidateTransf();
-
-    //Map 2 - solar system
-    float earthOrbitSpeed = 0.05f;
-
-    float mercuryOrbitSpeed = 0.02f;
-    float venusOrbitSpeed = 0.06f;
-    float marsOrbitSpeed = 0.03f;
-
-    this->ResourceManager.CreateNewMap("Solar system");
-
-    this->ResourceManager.AddLightToMap(1, std::make_shared<LightPoint>(glm::vec3(0.0f, 0.0f, 0.0f)));
-
-    //Sun
-    std::shared_ptr<StandardisedModel> objectSun = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                "Sun");
-    objectSun->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(1.0f, 0.5f, 0.0f),
-                                    glm::vec3(1.0f, 0.5f, 0.0f), 32.0f));
-    objectSun->SetShaderProgram(ConstantShader);
-    this->ResourceManager.AddObjectToMap(1, objectSun);
-
-    //Mercury
-    std::shared_ptr<StandardisedModel> objectMercury = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                    "Mercury");
-    objectMercury->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0.5f, 0.5f, 0.5f),
-                                        glm::vec3(0.5f, 0.5f, 0.5f), 32.0f));
-    objectMercury->SetShaderProgram(PhongShader);
-    this->ResourceManager.AddObjectToMap(1, objectMercury);
-    //Move mercury away from the sun, and make it smaller permanently.
-    objectMercury->InsertTransfScale(glm::vec3(0.15f, 0.15f, 0.15f)).InsertTransfMove(glm::vec3(10.0f, 0.0f, 0.0f))
-            .ConsolidateTransf();
-
-    objectMercury->InsertTransfComposite(
-            TransformationFactory::CreateOrbit(glm::vec3(-10.0f, 0.0f, 0.0f), mercuryOrbitSpeed,
-                                               glm::vec3(0.0f, 1.0f, 0.0f)));
-
-    //Venus
-    std::shared_ptr<StandardisedModel> objectVenus = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                  "Venus");
-    objectVenus->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(1.0f, 0.5f, 0.0f),
-                                      glm::vec3(1.0f, 0.5f, 0.0f), 32.0f));
-    objectVenus->SetShaderProgram(PhongShader);
-    this->ResourceManager.AddObjectToMap(1, objectVenus);
-
-    //Move venus away from the sun, and make it smaller permanently.
-
-    objectVenus->InsertTransfScale(glm::vec3(0.2f, 0.2f, 0.2f)).InsertTransfMove(glm::vec3(15.0f, 0.0f, 0.0f))
-            .ConsolidateTransf();
-
-    objectVenus->InsertTransfComposite(
-            TransformationFactory::CreateOrbit(glm::vec3(-15.0f, 0.0f, 0.0f), venusOrbitSpeed,
-                                               glm::vec3(0.0f, 1.0f, 0.0f)));
-
-    //Earth
-    std::shared_ptr<StandardisedModel> objectEarth = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                  "Earth");
-    objectEarth->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0.0f, 0.5f, 1.0f),
-                                      glm::vec3(0.0f, 0.5f, 1.0f), 240.0f));
-    objectEarth->SetShaderProgram(PhongShader);
-    this->ResourceManager.AddObjectToMap(1, objectEarth);
-
-    //Move earth away from the sun, and make it smaller permanently.
-    objectEarth->InsertTransfScale(glm::vec3(0.2f, 0.2f, 0.2f)).InsertTransfMove(glm::vec3(30.0f, 0.0f, 0.0f))
-            .ConsolidateTransf();
-
-    objectEarth->InsertTransfComposite(
-            TransformationFactory::CreateOrbit(glm::vec3(-30.0f, 0.0f, 0.0f), earthOrbitSpeed,
-                                               glm::vec3(0.0f, 1.0f, 0.0f)));
-
-    //Mars
-    std::shared_ptr<StandardisedModel> objectMars = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                 "Mars");
-    objectMars->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(1.0f, 0.5f, 0.0f),
-                                     glm::vec3(1.0f, 0.5f, 0.0f), 32.0f));
-    objectMars->SetShaderProgram(PhongShader);
-
-    this->ResourceManager.AddObjectToMap(1, objectMars);
-    //Move mars away from the sun, and make it smaller permanently.
-
-    objectMars->InsertTransfScale(glm::vec3(0.2f, 0.2f, 0.2f)).InsertTransfMove(glm::vec3(45.0f, 0.0f, 0.0f))
-            .ConsolidateTransf();
-
-    objectMars->InsertTransfComposite(TransformationFactory::CreateOrbit(glm::vec3(-45.0f, 0.0f, 0.0f), marsOrbitSpeed,
-                                                                         glm::vec3(0.0f, 1.0f, 0.0f)));
-
-
-    //Map 3 - 1 sphere and light
-    this->ResourceManager.CreateNewMap("1 sphere");
-
-    std::shared_ptr<StandardisedModel> preparedModelSingleSphere = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                                "Test sphere");
-    preparedModelSingleSphere->SetShaderProgram(PhongShader);
-    this->ResourceManager.AddObjectToMap(ResourceManager.GetMap("1 sphere"), preparedModelSingleSphere);
-
-    this->ResourceManager.AddLightToMap("1 sphere", std::make_shared<LightPoint>(glm::vec3(0.0f, 0.0f, -3.0f)));
-
-    //Map 4 - Screen aspect ratio test
-    this->ResourceManager.CreateNewMap("Aspect");
-
-    std::shared_ptr<StandardisedModel> preparedModelAspectSphere = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                                "Aspect Sphere");
-
-    preparedModelAspectSphere->SetShaderProgram(PhongShader);
-    preparedModelAspectSphere->InsertTransfMove(glm::vec3(3.0f, 0.0f, 0.0f)).ConsolidateTransf();
-    this->ResourceManager.AddObjectToMap("Aspect", preparedModelAspectSphere);
-
-    std::shared_ptr<StandardisedModel> preparedModelAspectGift = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                              "Aspect Sphere 2");
-
-    preparedModelAspectGift->SetShaderProgram(PhongShader);
-    preparedModelAspectGift->InsertTransfMove(glm::vec3(-3.0f, 0.0f, 0.0f)).ConsolidateTransf();
-    this->ResourceManager.AddObjectToMap("Aspect", preparedModelAspectGift);
-
-    this->ResourceManager.AddLightToMap("Aspect", std::make_shared<LightPoint>(glm::vec3(0.0f, 0.0f, -3.0f)));
-
-    //Map 5 - many objects
-
-    const float *rawmodels[] = {rawmodel1_sphere, rawmodel2_tree, rawmodel3_suziSmooth, rawmodel4_bushes,
-                                rawmodel5_suziFlat, rawmodel6_plain, rawmodel7_gift};
-    int sizes[] = {size, size2, size3, size4, size5, size6, size7};
-    int totalArraySizes = 7;
-
-    srand(static_cast<unsigned int>(time(nullptr)));
-    auto randomModel = [&rawmodels, &sizes, &totalArraySizes]() -> std::pair<const float *, int> {
-        int index = rand() % totalArraySizes;
-        return std::make_pair(rawmodels[index], sizes[index]);
-    };
-
-    auto randomMaterial = []() -> Material {
-        Material material;
-        material.AmbientColor = glm::vec3(0.1f, 0.1f, 0.1f);
-        material.DiffuseColor = glm::vec3((float) rand() / RAND_MAX, (float) rand() / RAND_MAX,
-                                          (float) rand() / RAND_MAX);
-        material.SpecularColor = glm::vec3((float) rand() / RAND_MAX, (float) rand() / RAND_MAX,
-                                           (float) rand() / RAND_MAX);
-        material.ShineValue = (float) rand() / RAND_MAX * 245 + 10;
-        return material;
-    };
-
-
-    this->ResourceManager.CreateNewMap("Many objects");
-    ResourceManager.AddLightToMap("Many objects", std::make_shared<LightSpot>(glm::vec3(0.0f, 5.0f, 10.0f),
-                                                                              glm::vec3(0.0f, -1.0f, 0.0f)));
-
-    std::shared_ptr<LightDirectional> directionalLight = std::make_shared<LightDirectional>(
-            glm::vec3(0.0f, -1.0f, 0.0f),
-            glm::vec3(1.0f, 1.0f, 1.0f));
-    directionalLight->SetColor(glm::vec3(0.3f, 0.3f, 0.3f));
-
-    ResourceManager.AddLightToMap("Many objects", directionalLight);
-
-
-    std::dynamic_pointer_cast<LightSpot>(ResourceManager.GetLightOnMap("Many objects", 0))
-            ->SetQuadratic(0.0001f)
-            .SetIntensity(1.0f);
-
-    std::shared_ptr<StandardisedModel> preparedModelGround = ModelFactory::PositionNormalTex(rawmodel9_plane_text,
-                                                                                             size9,
-                                                                                             "Ground");
-    preparedModelGround->SetShaderProgram(SelectShader("PhongTexture").get());
-    preparedModelGround->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0.5f, 0.5f, 0.5f),
-                                              glm::vec3(0.5f, 0.5f, 0.5f), 32.0f));
-    Texture *groundTexture = ResourceManager.TextureObjectsController.UseTexture(
-            "Lesson/grass.png");
-    preparedModelGround->SetTexture(groundTexture);
-
-    preparedModelGround->InsertTransfMove(glm::vec3(0, -1.0f, 0))
-            .InsertTransfRotate(-90, glm::vec3(1, 0, 0))
-            .InsertTransfScale(glm::vec3(100, 100, 100))
-            .ConsolidateTransf();
-
-    ResourceManager.AddObjectToMap("Many objects", preparedModelGround);
-
-
-    auto add100RandomObject = [&randomModel, &randomMaterial, this](
-            const std::shared_ptr<ShaderHandler> &shader) -> void {
-        for (int i = 0; i < 100; i++) {
-            std::pair<const float *, int> randomModelPair = randomModel();
-
-            std::shared_ptr<StandardisedModel> randomObjectsPhong = ModelFactory::PositionNormal(randomModelPair.first,
-                                                                                                 randomModelPair.second,
-                                                                                                 "Random object p1, " +
-                                                                                                 std::to_string(i));
-            randomObjectsPhong->SetShaderProgram(shader.get());
-            randomObjectsPhong->SetMaterial(randomMaterial());
-            float randomScale = (float) rand() / RAND_MAX * 2 + 0.5f;
-            randomObjectsPhong->InsertTransfMove(
-                    glm::vec3((float) rand() / RAND_MAX * 100 - 50, -0.9f,
-                              (float) rand() / RAND_MAX * 100 - 50)).InsertTransfRotate(
-                    (float) rand() / RAND_MAX * 360, glm::vec3(0.0f, 1.0f, 0.0f)).
-                    InsertTransfScale(glm::vec3(randomScale, randomScale, randomScale)).ConsolidateTransf();
-            ResourceManager.AddObjectToMap("Many objects", randomObjectsPhong);
-        }
-    };
-
-    add100RandomObject(SelectShader("Phong"));
-    add100RandomObject(SelectShader("Lambert"));
-    add100RandomObject(SelectShader("BlinnPhong"));
-//    add100RandomObject(SelectShader("Constant"));
-
-    //Map 6 - textures
-    this->ResourceManager.CreateNewMap("Texture");
-
-    std::shared_ptr<StandardisedModel> starSkybox = ModelFactory::Position(rawmodel8_skycube, size8,
-                                                                           "Star skybox");
-
-    starSkybox->SetShaderProgram(SelectShader("Skybox").get());
-    Texture *starSkyboxTexture = ResourceManager.TextureObjectsController.UseCubemap(
-            "../Resources/Textures/Galaxy/stars", false);
-    starSkybox->SetTexture(starSkyboxTexture);
-
-    ResourceManager.AddSkyboxToMap("Solar system", starSkybox);
-
-    std::shared_ptr<StandardisedModel> pmSkybox = ModelFactory::Position(rawmodel8_skycube,
-                                                                         size8,
-                                                                         "Skybox");
-    pmSkybox->SetShaderProgram(SelectShader("Skybox").get());
-    Texture *skyboxTexture = ResourceManager.TextureObjectsController.UseCubemap(
-            "../Resources/Textures/Lesson/FieldSkybox/field", false);
-    pmSkybox->SetTexture(skyboxTexture);
-
-    ResourceManager.AddSkyboxToMap("Default", pmSkybox);
-    ResourceManager.AddSkyboxToMap("Many objects", pmSkybox);
-
-    std::shared_ptr<StandardisedModel> skySphereTest = ModelFactory::PositionNormal(rawmodel1_sphere, size,
-                                                                                    "Skybox sphere");
-    skySphereTest->SetShaderProgram(SelectShader("Constant").get());
-    skySphereTest->InsertTransfMove(glm::vec3(30.0f, 0.0f, 0.0f)).ConsolidateTransf();
 }
 
 void Engine::CameraLookHorizontal(double x) {
