@@ -195,6 +195,26 @@ void MapCreator::Overworld(const std::string &mapName, std::vector<std::shared_p
     }
     mapManager.AddObjectToMap(map, streetLamp);
 
+//    //Grass
+//    for(int i = 0; i < 100; i++){
+//        float x = (rand() % 100) - 50;
+//        float z = (rand() % 100) - 50;
+//
+//        std::shared_ptr<StandardisedModel> grass = mapManager.ModelObjectController.UsePositionNormalTex(
+//                "grass-block.3DS");
+//        grass->SetShaderProgram(PhongShader);
+//        grass->SetMaterial(Material(glm::vec3(0.01f, 0.01f, 0.01f),
+//                                    glm::vec3(0.0f, 0.3f, 0.0f),
+//                                    glm::vec3(0.0f, 0.5f, 0.0f),
+//                                    32.0f));
+//        grass->InsertTransfMove(glm::vec3(x, -1.0f, z))
+//                .InsertTransfScale(glm::vec3(0.09f, 0.09f, 0.09f))
+//                .InsertTransfRotate(90, glm::vec3(1.0f, 0, 0))
+//                .ConsolidateTransf();
+//        mapManager.AddObjectToMap(map, grass);
+//    }
+
+
 
     //Skybox
     const float *rawmodel_skycube = skycube;
