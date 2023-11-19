@@ -17,12 +17,14 @@ class Map {
 
     std::vector<std::shared_ptr<StandardisedModel>> Objects;
     std::shared_ptr<std::vector<std::shared_ptr<RenderableLight>>> Lights;
-
+    std::shared_ptr<StandardisedModel> Skybox;
 
     void InsertLight(const std::shared_ptr<RenderableLight> &light);
     unsigned long GetLightCount();
     std::shared_ptr<RenderableLight> &GetLight(int index);
     void ChangeLight(int index, const std::shared_ptr<RenderableLight> &light);
+    void SetSkybox(const std::shared_ptr<StandardisedModel> &skybox);
+    void InsertObject(const std::shared_ptr<StandardisedModel> &object);
 public:
     explicit Map(std::string name = "None");
 
@@ -30,11 +32,10 @@ public:
 
     friend class MapManager;
 
-    std::shared_ptr<StandardisedModel> Skybox;
+    friend class MapCreator;
 
-    void SetSkybox(const std::shared_ptr<StandardisedModel> &skybox);
-    void InsertObject(const std::shared_ptr<StandardisedModel> &object);
     unsigned long GetObjectCount();
+    [[nodiscard]] const std::shared_ptr<StandardisedModel> &GetSkybox() const;
 
     std::shared_ptr<StandardisedModel> &GetObject(int index);
     std::shared_ptr<StandardisedModel> &GetObject(const std::string &name);

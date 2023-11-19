@@ -4,8 +4,6 @@
 
 #include <iostream>
 #include "Camera.h"
-#include "glm/ext/matrix_clip_space.hpp"
-#include "glm/ext/matrix_transform.hpp"
 
 Camera::Camera(float alpha, float fi, float fov, float aspectRatio,
                float minRender, float maxRender) :

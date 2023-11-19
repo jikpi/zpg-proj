@@ -12,13 +12,13 @@ Material::Material(glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 spe
           MaterialTexture(nullptr){
 }
 
-Material::Material() : Material(glm::vec3(0.1f, 0.1f, 0.1f),
+Material::Material() : Material(glm::vec3(0.01f, 0.01f, 0.01f),
                                 glm::vec3(1.0, 1.0, 1.0),
                                 glm::vec3(0.5f, 0.5f, 0.5f),
                                 100.0f) {
 }
 
-Material::Material(glm::vec3 diffuseColor) : Material(glm::vec3(0.1f, 0.1f, 0.1f),
+Material::Material(glm::vec3 diffuseColor) : Material(glm::vec3(0.01f, 0.01f, 0.01f),
                                                       diffuseColor,
                                                       glm::vec3(1.0f, 1.0f, 1.0f),
                                                       250.0f) {

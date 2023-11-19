@@ -6,12 +6,15 @@
 #include "MapManager.h"
 #include "../../Configuration/AGlobalConfig.h"
 
-void MapManager::Initialize() {
-    this->Maps.push_back(std::make_shared<Map>(DEF_MAP_NAME));
-    this->ChangeMap(0);
+void MapManager::Initialize(bool addDefaultMap) {
+    if (addDefaultMap) {
+        this->Maps.push_back(std::make_shared<Map>(DEF_MAP_NAME));
+        this->ChangeMap(0);
 
-    MapCacheName = DEF_MAP_NAME;
-    MapCacheIndex = 0;
+        MapCacheName = DEF_MAP_NAME;
+        MapCacheIndex = 0;
+    }
+
 }
 
 void MapManager::ForceRefreshMaps() {
@@ -19,7 +22,7 @@ void MapManager::ForceRefreshMaps() {
     this->ShaderLinker.BuildWithMap(this->ActiveMap);
 
     //Reset shader units
-    ObjectTextureController.ResetTextureUnitCounter();
+    TextureObjectsController.ResetTextureUnitCounter();
 }
 
 void MapManager::CreateNewMap(const std::string &name) {
@@ -27,14 +30,27 @@ void MapManager::CreateNewMap(const std::string &name) {
 }
 
 void MapManager::InsertMap(const std::shared_ptr<Map> &map) {
+
+    if (map == nullptr) {
+        std::cerr << "ERROR: MapManager: Map is null." << std::endl;
+        return;
+    }
+
     this->Maps.push_back(map);
 }
 
 std::shared_ptr<Map> &MapManager::GetMap(const int index) {
-    if (index >= this->Maps.size()) {
-        std::cerr << "ERROR: MapManager: Map index not found." << std::endl;
+
+    if (this->Maps.empty()) {
+        std::cerr << "ERROR: MapManager: No maps found." << std::endl;
+        throw std::runtime_error("No maps found.");
+    }
+
+    if (index >= this->Maps.size() || index < 0) {
+        std::cerr << "ERROR: MapManager: Map index not found:" << index << std::endl;
         return this->Maps.at(0);
     }
+
     return this->Maps.at(index);
 }
 
@@ -52,7 +68,7 @@ std::shared_ptr<Map> &MapManager::GetMap(const std::string &name) {
     }
 
     std::cerr << "ERROR: MapManager: Map name \"" << name << "\" not found." << std::endl;
-    return this->Maps.at(0);
+    return GetMap(0);
 }
 
 std::shared_ptr<Map> &MapManager::GetActiveMap() {
@@ -69,7 +85,7 @@ void MapManager::ChangeMap(std::shared_ptr<Map> &map) {
 void MapManager::ChangeMap(int index) {
     //By index
     if (index >= this->Maps.size()) {
-        std::cerr << "ERROR: MapManager: Map index not found." << std::endl;
+        std::cerr << "ERROR: MapManager: Map index not found: " << index << std::endl;
         return;
     }
 
@@ -166,6 +182,16 @@ void MapManager::SetFallbackShader(std::shared_ptr<ShaderHandler> &shader) {
 
 std::shared_ptr<RenderableLight> &MapManager::GetLightOnMap(const std::string &mapName, int lightIndex) {
     std::shared_ptr<Map> &map = this->GetMap(mapName);
+    std::shared_ptr<RenderableLight> &light = map->GetLight(lightIndex);
+
+    if (map == this->ActiveMap) {
+        ShaderLinker.NotifyLightsOnCurrentMapChanged();
+    }
+
+    return light;
+}
+
+std::shared_ptr<RenderableLight> &MapManager::GetLightOnMap(std::shared_ptr<Map> &map, int lightIndex) {
     std::shared_ptr<RenderableLight> &light = map->GetLight(lightIndex);
 
     if (map == this->ActiveMap) {

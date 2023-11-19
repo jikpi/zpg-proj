@@ -10,6 +10,7 @@
 #include "Map.h"
 #include "../ShaderLinking/MapToShaderLinker.h"
 #include "../../../Model/Texture/Controller/TextureController.h"
+#include "../../../Model/Controller/ModelController.h"
 
 class MapManager {
 private:
@@ -21,12 +22,13 @@ private:
     std::shared_ptr<Map> ActiveMap;
     std::vector<std::shared_ptr<Map>> Maps;
 public:
-    void Initialize();
+    void Initialize(bool addDefaultMap);
     void ForceRefreshMaps();
     MapToShaderLinker ShaderLinker;
     void SetFallbackShader(std::shared_ptr<ShaderHandler> &shader);
 
-    TextureController ObjectTextureController;
+    TextureController TextureObjectsController;
+    ModelController ModelObjectController;
 
     std::shared_ptr<Map> &GetMap(const std::string &name);
     std::shared_ptr<Map> &GetMap(int index);
@@ -53,6 +55,7 @@ public:
     void ForceRefreshLightsOnCurrentMap();
     std::shared_ptr<RenderableLight> &GetLightOnMap(int mapIndex, int lightIndex);
     std::shared_ptr<RenderableLight> &GetLightOnMap(const std::string &mapName, int lightIndex);
+    std::shared_ptr<RenderableLight> &GetLightOnMap(std::shared_ptr<Map> &map, int lightIndex);
 
     void ChangeLightOnMap(int mapIndex, int lightIndex, const std::shared_ptr<RenderableLight> &light);
     void ChangeLightOnMap(const std::string &mapName, int lightIndex, const std::shared_ptr<RenderableLight> &light);

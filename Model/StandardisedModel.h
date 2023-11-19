@@ -17,7 +17,7 @@ private:
     ShaderHandler* SelectedShaderProgram;
 
 public:
-    StandardisedModel(const float *modelData, int modelDataSize, std::string stamp, std::string name = "None");
+    explicit StandardisedModel(ModelStamp stamp, std::string name = "None");
     ~StandardisedModel() override;
     StandardisedModel(const StandardisedModel &other) = delete;
     StandardisedModel &operator=(const StandardisedModel &other) = delete;
@@ -35,6 +35,10 @@ public:
 
     void SetShaderProgram(ShaderHandler *shaderProgram);
     [[nodiscard]] ShaderHandler * GetShaderProgram() const;
+
+    //Quick implementation of multiple meshes
+    std::vector<std::shared_ptr<StandardisedModel>> ChildObjects;
+    void SetChildrenTransformations();
 };
 
 

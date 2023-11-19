@@ -24,11 +24,11 @@
 #include <vector>
 #include <iostream>
 #include "../Shaders/ShaderProgram/ShaderHandler.h"
-#include "ObjectsManager/Map/Map.h"
 #include "InputHandler/MovesetInputManager.h"
 #include "../Shaders/Camera/Camera.h"
 #include "ObjectsManager/ShaderLinking/MapToShaderLinker.h"
 #include "ObjectsManager/Map/MapManager.h"
+#include "../Model/Controller/ModelController.h"
 
 class Engine : public std::enable_shared_from_this<Engine> {
 private:
@@ -40,8 +40,9 @@ private:
     float Ratio{};
 
     std::vector<std::shared_ptr<ShaderHandler>> Shaders;
+    void LoadAllShaders();
+
     MapManager ResourceManager;
-    std::shared_ptr<ShaderHandler> & SelectShader(const std::string& name);
 
     std::shared_ptr<Camera> CameraMain;
 

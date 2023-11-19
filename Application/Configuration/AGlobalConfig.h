@@ -66,4 +66,8 @@ inline constexpr const glm::vec3 DEF_LIGHT_DIRECTIONAL_DIRECTION = glm::vec3(0.0
 inline constexpr const float DEF_LIGHT_INNERCUTOFF = 10.0f;
 inline constexpr const float DEF_LIGHT_OUTERCUTOFF = 20.0f;
 
+//// ### Standard paths ###
+inline constexpr const char *DEF_PATH_TEXTURES = "../Resources/Textures/";
+inline constexpr const char *DEF_PATH_MODELS = "../Resources/Models/";
+
 #endif //ZPG_TEST_AGLOBALCONFIG_H

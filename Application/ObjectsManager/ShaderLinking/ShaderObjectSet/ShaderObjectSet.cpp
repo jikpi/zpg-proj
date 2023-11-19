@@ -4,8 +4,6 @@
 
 #include "ShaderObjectSet.h"
 
-#include <utility>
-
 ShaderObjectSet::ShaderObjectSet(ShaderHandler *shader) {
     Shader = shader;
 }

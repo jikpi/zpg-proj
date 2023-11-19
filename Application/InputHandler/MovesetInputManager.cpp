@@ -5,8 +5,6 @@
 #include "MovesetInputManager.h"
 #include "KeyCallbacks/KeyCallbacks.h"
 
-#include <utility>
-
 MovesetInputManager::MovesetInputManager() : CurrentForwardVelocity(0),
                                              CurrentSideVelocity(0),
                                              CurrentVerticalVelocity(0),
