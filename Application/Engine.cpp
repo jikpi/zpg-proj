@@ -233,7 +233,14 @@ void Engine::Run() {
                 object->DoTransf();
                 set->Shader->RequestRender(*object);
                 object->BindVertexArray();
-//                glStencilFunc(GL_ALWAYS, object->GetModelID(), 0xFF);
+
+                //Set stencil
+                if(object->DesiredContextID > 0)
+                {
+                    glStencilFunc(GL_ALWAYS, object->GetContextID(), 0xFF);
+                }
+
+
                 glDrawArrays(GL_TRIANGLES, 0, object->GetRenderingSize());
 
                 //Render inner objects
