@@ -28,6 +28,8 @@ StandardisedModel::StandardisedModel(ModelStamp stamp, std::string name)
         stamp) {
     Transformations = std::make_shared<TransfComposite>();
     SelectedShaderProgram = nullptr;
+    ContextID = 0;
+    DesiredContextID = true;
 
 }
 
@@ -97,6 +99,8 @@ StandardisedModel::StandardisedModel(StandardisedModel &&other) noexcept
     Transformations = std::move(other.Transformations);// NOLINT(*-use-after-move)
     SelectedShaderProgram = other.SelectedShaderProgram;
     material = other.material;
+    ContextID = other.ContextID;
+    DesiredContextID = other.DesiredContextID;
 
     BaseModelData::operator=(std::move(other));
 }
@@ -119,4 +123,12 @@ void StandardisedModel::SetChildrenTransformations() {
     for (auto &object : ChildObjects) {
         object->SetTransf(Transformations->GetResult());
     }
+}
+
+void StandardisedModel::SetContextID(unsigned short contextID) {
+    this->ContextID = contextID;
+}
+
+unsigned short StandardisedModel::GetContextID() const {
+    return this->ContextID;
 }
