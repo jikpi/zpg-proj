@@ -15,6 +15,7 @@
 class StandardisedModel : public BaseModelData, public RenderableObject {
 private:
     ShaderHandler* SelectedShaderProgram;
+    unsigned short ContextID;
 
 public:
     explicit StandardisedModel(ModelStamp stamp, std::string name = "None");
@@ -35,6 +36,10 @@ public:
 
     void SetShaderProgram(ShaderHandler *shaderProgram);
     [[nodiscard]] ShaderHandler * GetShaderProgram() const;
+
+    void SetContextID(unsigned short contextID);
+    [[nodiscard]] unsigned short GetContextID() const;
+    bool DesiredContextID;
 
     //Quick implementation of multiple meshes
     std::vector<std::shared_ptr<StandardisedModel>> ChildObjects;

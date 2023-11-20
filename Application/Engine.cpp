@@ -100,6 +100,10 @@ void Engine::Initialize() {
     //Shaders
     LoadAllShaders();
 
+    //Stencil test
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
 
 }
 
@@ -229,6 +233,7 @@ void Engine::Run() {
                 object->DoTransf();
                 set->Shader->RequestRender(*object);
                 object->BindVertexArray();
+//                glStencilFunc(GL_ALWAYS, object->GetModelID(), 0xFF);
                 glDrawArrays(GL_TRIANGLES, 0, object->GetRenderingSize());
 
                 //Render inner objects
