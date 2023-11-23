@@ -5,15 +5,9 @@
 #include "Engine.h"
 #include "../Model/Factory/ModelFactory.h"
 #include "DebugErrorMessages/DebugErrorMessages.h"
-#include "../Shaders/ShadersCode/Loader/ShaderFileLoader.h"
 
 #include <cmath>
-#include <utility>
 #include "InputHandler/KeyCallbacks/KeyCallbacks.h"
-#include "../Transformations/Composite/TransfComposite.h"
-#include "../Transformations/Composite/Transformations/Rotate.h"
-#include "../Transformations/Composite/Transformations/Scale.h"
-#include "../Transformations/Composite/Transformations/Move.h"
 
 //Shaders
 #include "../Shaders/ShaderProgram/ShaderHandlerFactory/ShaderHandlerFactory.h"
@@ -23,7 +17,6 @@
 
 //Models
 #include "../ExtResources/LessonResources/InclLessonModels.h"
-#include "../Shaders/Lighting/LightDirectional.h"
 #include "../Shaders/Lighting/LightSpot.h"
 
 //Map creator
@@ -52,11 +45,14 @@ void Engine::Initialize() {
     glfwWindowHint(GLFW_DEPTH_BITS, 24);
 
     //Create window
-    Window = glfwCreateWindow(1700, 900, "ZPG KOP0269", nullptr, nullptr);
+    Window = glfwCreateWindow(1700, 900, "CREATING WINDOW", nullptr, nullptr);
     if (!Window) {
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
+    glfwSetWindowOpacity(Window, 0.5f);
+    glfwSetWindowTitle(Window, "LOADING...");
+
 
     glfwMakeContextCurrent(Window);
     glfwSwapInterval(1);
@@ -163,6 +159,10 @@ void Engine::Run() {
         throw std::runtime_error("No camera available.");
     }
 
+    //Restore window visibility
+    glfwSetWindowOpacity(Window, 1.0f);
+    glfwSetWindowTitle(Window, "ZPG KOP0269");
+
     this->SetCameraLock(true);
     DebugErrorMessages::PrintGLErrors("Before run errors");
 
@@ -187,15 +187,6 @@ void Engine::Run() {
         //Clear screen
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-//        //animate mercury
-//        ResourceManager.GetObjectOnMap("Solar system", "Mercury")->DoTransf();
-//        //animate venus
-//        ResourceManager.GetObjectOnMap("Solar system", "Venus")->DoTransf();
-//        //animate earth
-//        ResourceManager.GetObjectOnMap("Solar system", "Earth")->DoTransf();
-//        //animate mars
-//        ResourceManager.GetObjectOnMap("Solar system", "Mars")->DoTransf();
 
 
         angle += angleIncrement;
@@ -223,6 +214,7 @@ void Engine::Run() {
             skyboxShader->RequestRender(*ResourceManager.GetActiveMap()->GetSkybox());
             ResourceManager.GetActiveMap()->GetSkybox()->BindVertexArray();
             glDrawArrays(GL_TRIANGLES, 0, ResourceManager.GetActiveMap()->GetSkybox()->GetRenderingSize());
+
             glDepthMask(GL_TRUE);
             glDepthFunc(GL_LESS);
             glEnable(GL_CULL_FACE);
@@ -421,7 +413,7 @@ void Engine::SaveCursorCoords(float x, float y) {
     this->SavedCursorYCoord = y;
 }
 
-void Engine::CursorClick(int button, int action, int mode) const {
+void Engine::CursorClick(int button, int action, int mode) {
     if (button == 0 && action == 1 && mode == 0) {
         GLbyte color[4];
         GLfloat depth;
@@ -450,6 +442,16 @@ void Engine::CursorClick(int button, int action, int mode) const {
         //Unproject
         glm::vec3 screenX = glm::vec3(x, convertedY, depth);
         glm::vec3 unprojected = this->CameraMain->GetUnprojectedCursor(this->Width, this->Height, screenX);
+
+        std::cout << "Unprojected: " << unprojected.x << ", " << unprojected.y << ", " << unprojected.z << std::endl;
+        std::cout << "-------" << std::endl;
+
+        //Add model at the location
+        std::shared_ptr<StandardisedModel> spawnedModel = ResourceManager.ModelObjectController.UseAny("Lesson/zombie.obj", "Zombie");
+        spawnedModel->InsertTransfMove(glm::vec3 (unprojected.x, unprojected.y, unprojected.z)).ConsolidateTransf();
+
+        spawnedModel->SetDefaultMaterial();
+        ResourceManager.AddObjectToCurrentMap(spawnedModel);
     }
 
 }

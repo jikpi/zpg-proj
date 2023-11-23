@@ -117,14 +117,16 @@ void KeyCallbacks::key_callback(GLFWwindow *window, int key, int scancode, int a
 
 }
 
-void KeyCallbacks::window_focus_callback(GLFWwindow *window, int focused) { printf("window_focus_callback \n"); }
+void KeyCallbacks::window_focus_callback(GLFWwindow *window, int focused) {
+//    printf("window_focus_callback \n");
+}
 
 void KeyCallbacks::window_iconify_callback(GLFWwindow *window, int iconified) {
-    printf("window_iconify_callback \n");
+//    printf("window_iconify_callback \n");
 }
 
 void KeyCallbacks::window_size_callback(GLFWwindow *window, int width, int height) {
-    printf("resize %d, %d \n", width, height);
+//    printf("resize %d, %d \n", width, height);
     glViewport(0, 0, width, height);
 
     if (!Engines.expired()) {
@@ -169,6 +171,4 @@ void KeyCallbacks::button_callback(GLFWwindow *window, int button, int action, i
         auto engine = Engines.lock();
         engine->CursorClick(button, action, mode);
     }
-
-
 }

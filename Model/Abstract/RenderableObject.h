@@ -28,6 +28,7 @@ public:
     void ResetTransf();
     void SetTransf(glm::mat4 transformation);
 
+    void SetDefaultMaterial();
     void SetMaterial(Material newMaterial);
     [[nodiscard]] Material GetMaterial() const;
 

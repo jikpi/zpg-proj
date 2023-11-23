@@ -5,20 +5,6 @@
 #ifndef ZPG_TEST_ENGINE_H
 #define ZPG_TEST_ENGINE_H
 
-//Include GLM
-#include <glm/vec3.hpp> // glm::vec3
-#include <glm/vec4.hpp> // glm::vec4
-#include <glm/mat4x4.hpp> // glm::mat4
-#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
-#include <glm/gtc/type_ptr.hpp> // glm::value_ptr
-
-//Include GLM
-#include "glm/vec3.hpp" // glm::vec3
-#include "glm/vec4.hpp" // glm::vec4
-#include "glm/mat4x4.hpp" // glm::mat4
-#include "glm/gtc/matrix_transform.hpp" // glm::translate, glm::rotate, glm::scale, glm::perspective
-#include "glm/gtc/type_ptr.hpp" // glm::value_ptr
-
 #include <cstdlib>
 #include <cstdio>
 #include <vector>
@@ -28,7 +14,6 @@
 #include "../Shaders/Camera/Camera.h"
 #include "ObjectsManager/ShaderLinking/MapToShaderLinker.h"
 #include "ObjectsManager/Map/MapManager.h"
-#include "../Model/Controller/ModelController.h"
 
 class Engine : public std::enable_shared_from_this<Engine> {
 private:
@@ -72,7 +57,7 @@ public:
     void RequestMapChange(int index);
     void RequestMapChange(const std::string &name);
 
-    void CursorClick(int button, int action, int mode) const;
+    void CursorClick(int button, int action, int mode);
 
 
     void AddShader(const std::shared_ptr<ShaderHandler> &shader);

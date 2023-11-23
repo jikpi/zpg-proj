@@ -131,16 +131,14 @@ void Camera::ChangeFi(float change) {
 }
 
 void Camera::LookSphericalSide(float degrees) {
-    if(IsUnlocked)
-    {
+    if (IsUnlocked) {
         return;
     }
     ChangeFi(glm::radians(degrees));
 }
 
 void Camera::LookSphericalVertical(float degrees) {
-    if(IsUnlocked)
-    {
+    if (IsUnlocked) {
         return;
     }
 
@@ -148,8 +146,7 @@ void Camera::LookSphericalVertical(float degrees) {
 }
 
 void Camera::MoveForwardBackward(float distance) {
-    if(IsUnlocked)
-    {
+    if (IsUnlocked) {
         return;
     }
 
@@ -171,8 +168,7 @@ void Camera::MoveForwardBackward(float distance) {
 }
 
 void Camera::MoveSideToSide(float distance) {
-    if(IsUnlocked)
-    {
+    if (IsUnlocked) {
         return;
     }
 
@@ -191,8 +187,7 @@ void Camera::MoveSideToSide(float distance) {
 }
 
 void Camera::MoveUpDown(float distance) {
-    if(IsUnlocked)
-    {
+    if (IsUnlocked) {
         return;
     }
 

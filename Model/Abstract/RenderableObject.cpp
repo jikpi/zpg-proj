@@ -52,6 +52,10 @@ void RenderableObject::SetMaterial(Material newMaterial) {
     this->material = newMaterial;
 }
 
+void RenderableObject::SetDefaultMaterial() {
+    this->material = Material();
+}
+
 Material RenderableObject::GetMaterial() const {
     return this->material;
 }

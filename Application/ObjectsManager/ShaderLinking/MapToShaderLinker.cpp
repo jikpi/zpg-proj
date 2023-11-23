@@ -70,7 +70,7 @@ unsigned short MapToShaderLinker::GetNextContextID() {
         return DEF_CONTEXT_ERROR_ID;
     }
 
-
+    std::cout << "MapToShaderLinker: Context ID: " << this->NextContextID << std::endl;
     return this->NextContextID++;
 }
 
@@ -144,6 +144,13 @@ void MapToShaderLinker::BuildWithMapSingleObject(const std::shared_ptr<Map> &map
     if (!containsShader) {
         this->AddShader(objectsShader);
         this->AddObjectToShader(objectsShader, object);
+    }
+
+    //Set context ID
+    if (object->DesiredContextID) {
+        object->SetContextID(this->GetNextContextID());
+    } else {
+        object->SetContextID(0);
     }
 }
 
