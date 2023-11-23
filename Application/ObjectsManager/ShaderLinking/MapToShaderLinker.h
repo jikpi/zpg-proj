@@ -25,7 +25,7 @@ private:
     static void PrintBuildingObjectError(const std::shared_ptr<StandardisedModel> &object);
 
     void LinkLightsToShader(std::shared_ptr<ShaderHandler> &shader, const std::shared_ptr<Map> &map);
-    unsigned short NextContextID;
+    unsigned short NextContextID{};
     unsigned short GetNextContextID();
 public:
     MapToShaderLinker();

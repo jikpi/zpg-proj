@@ -213,7 +213,6 @@ void Engine::Run() {
             glDepthMask(GL_FALSE);
             glDepthFunc(GL_LEQUAL);
             glDisable(GL_CULL_FACE);
-//    glCullFace(GL_BACK);
             skyboxShader->UseProgram();
             skyboxShader->RequestRender(*ResourceManager.GetActiveMap()->GetSkybox());
             ResourceManager.GetActiveMap()->GetSkybox()->BindVertexArray();

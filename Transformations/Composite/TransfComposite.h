@@ -15,6 +15,7 @@ private:
     std::vector<std::shared_ptr<Transformation>> Transformations;
     glm::mat4 Result = glm::mat4(1.0f);
 
+    glm::mat4 MasterUseAndRemember(const glm::mat4 &input, bool isIdentity);
 public:
     void Insert(const std::shared_ptr<Transformation> &transformation);
     void ClearTransformations();

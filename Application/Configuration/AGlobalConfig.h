@@ -70,4 +70,9 @@ inline constexpr const float DEF_LIGHT_OUTERCUTOFF = 20.0f;
 inline constexpr const char *DEF_PATH_TEXTURES = "../Resources/Textures/";
 inline constexpr const char *DEF_PATH_MODELS = "../Resources/Models/";
 
+//// ### Stencil / Context ###
+inline constexpr const unsigned short DEF_CONTEXT_DEFAULT_ID = 1;
+inline constexpr const unsigned short DEF_CONTEXT_ERROR_ID = 0;
+inline constexpr const unsigned int DEF_CONTEXT_MAX = 255;
+
 #endif //ZPG_TEST_AGLOBALCONFIG_H

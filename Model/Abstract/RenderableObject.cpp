@@ -10,10 +10,15 @@ glm::mat4 RenderableObject::GetTransf() const {
 
 void RenderableObject::ConsolidateTransf(glm::mat4 transformation) const {
     Transformations->Consolidate(transformation);
+
 }
 
 void RenderableObject::DoTransf(glm::mat4 transformation) const {
     this->Transformations->UseAndRemember(transformation);
+}
+
+void RenderableObject::DoTransf() const {
+    this->Transformations->UseAndRemember();
 }
 
 void RenderableObject::SetTransf(glm::mat4 transformation) const {
@@ -46,5 +51,17 @@ Texture *RenderableObject::GetTexture() {
 
 void RenderableObject::SetTexture(Texture *texture) {
     material.SetTexture(texture);
+}
+
+bool RenderableObject::NotifyRender() {
+    if(HasBeenTransformed) {
+        HasBeenTransformed = false;
+
+        this->NormalMatrix = glm::mat3(glm::transpose(glm::inverse(Transformations->GetResult())));
+
+        return true;
+    }
+
+    return false;
 }
 

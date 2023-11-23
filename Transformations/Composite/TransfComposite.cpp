@@ -22,8 +22,19 @@ glm::mat4 TransfComposite::Use() {
     return this->Use(glm::mat4(1.0f));
 }
 
-glm::mat4 TransfComposite::UseAndRemember(const glm::mat4 &input) {
-    glm::mat4 result = Result * input;
+glm::mat4 TransfComposite::MasterUseAndRemember(const glm::mat4 &input, bool isIdentity) {
+    if(Transformations.empty()) {
+        return Result;
+    }
+
+    glm::mat4 result;
+
+    if (isIdentity) {
+        result = Result;
+    } else {
+        result = Result * input;
+    }
+
     for (const auto &transform: Transformations) {
         result = transform->Use(result);
     }
@@ -32,8 +43,12 @@ glm::mat4 TransfComposite::UseAndRemember(const glm::mat4 &input) {
     return Result;
 }
 
+glm::mat4 TransfComposite::UseAndRemember(const glm::mat4 &input) {
+    return this->MasterUseAndRemember(input, false);
+}
+
 glm::mat4 TransfComposite::UseAndRemember() {
-    return this->UseAndRemember(glm::mat4(1.0f));
+    return this->MasterUseAndRemember(glm::mat4(), true);
 }
 
 void TransfComposite::ClearTransformations() {

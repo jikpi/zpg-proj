@@ -3,8 +3,8 @@
 //
 
 #include <iostream>
-#include <limits.h>
 #include "MapToShaderLinker.h"
+#include "../../Configuration/AGlobalConfig.h"
 
 MapToShaderLinker::MapToShaderLinker() {
     ShaderObjectSets = std::vector<std::shared_ptr<ShaderObjectSet>>();
@@ -65,9 +65,9 @@ void MapToShaderLinker::LinkLightsToShader(std::shared_ptr<ShaderHandler> &shade
 
 unsigned short MapToShaderLinker::GetNextContextID() {
     //check if larger than unsigned short
-    if (this->NextContextID == USHRT_MAX) {
+    if (this->NextContextID >= DEF_CONTEXT_MAX) {
         std::cerr << "WARNING: MapToShaderLinker: Context ID overflow." << std::endl;
-        return 0;
+        return DEF_CONTEXT_ERROR_ID;
     }
 
 
@@ -80,7 +80,7 @@ void MapToShaderLinker::BuildWithMap(const std::shared_ptr<Map> &map) {
     this->ShaderObjectSets.clear();
 
     //Reset context ID
-    this->NextContextID = 1;
+    this->NextContextID = DEF_CONTEXT_DEFAULT_ID;
 
     for (auto &object: map->Objects) {
 
