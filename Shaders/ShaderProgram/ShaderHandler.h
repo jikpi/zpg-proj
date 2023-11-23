@@ -37,7 +37,7 @@ private:
 
     void RenderBase(const glm::mat4 &modelMatrix);
     void RenderCameraLocation() const;
-    void RenderNormalMatrix(const glm::mat4 &modelMatrix) const;
+    void RenderNormalMatrix(const glm::mat3 &normalMatrix) const;
     void RenderLightsArray(const std::shared_ptr<std::vector<std::shared_ptr<RenderableLight>>> &lightsVector) const;
     void RenderObjectMaterial(Material objectMaterial) const;
     void RenderPhongLight(Material objectMaterial) const;

@@ -25,6 +25,8 @@ public:
     glm::mat4 UseAndRemember(const glm::mat4 &input);
     glm::mat4 UseAndRemember();
 
+    [[nodiscard]] bool TransformationsEmpty() const;
+
     glm::mat4 Consolidate(const glm::mat4 &input);
     glm::mat4 Consolidate();
 

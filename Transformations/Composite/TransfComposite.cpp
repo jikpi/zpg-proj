@@ -83,3 +83,7 @@ void TransfComposite::SetResult(glm::mat4 result) {
     Result = result;
 }
 
+bool TransfComposite::TransformationsEmpty() const {
+    return Transformations.empty();
+}
+

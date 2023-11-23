@@ -241,9 +241,8 @@ void ShaderHandler::RenderBase(const glm::mat4 &modelMatrix) {
     SendToShader(ProjectionMatrixLocation, this->ProjectionMatrix);
 }
 
-void ShaderHandler::RenderNormalMatrix(const glm::mat4 &modelMatrix) const {
-    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelMatrix)));
-//    glm::mat3 normalMatrix = glm::mat3(1.0f);
+void ShaderHandler::RenderNormalMatrix(const glm::mat3 &normalMatrix) const {
+    // Normal matrix calculated only once, and after all transformations were applied, if any were used / added.
     SendToShader(NormalMatrixLocation, normalMatrix);
 }
 
@@ -400,7 +399,7 @@ void ShaderHandler::RequestRender(RenderableObject &object) {
     }
 
     if (NormalMatrixLocation != -2) {
-        RenderNormalMatrix(modelMatrix);
+        RenderNormalMatrix(object.GetNormalMatrix());
     }
 
     if (AmbientColorLocation != -2 && DiffuseColorLocation != -2) {
