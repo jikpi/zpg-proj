@@ -234,7 +234,7 @@ void Engine::Run() {
                 object->BindVertexArray();
 
                 //Set stencil
-                if (object->DesiredContextID > 0) {
+                if (object->DesiredContextID != DEF_CONTEXT_ERROR_ID) {
                     glStencilFunc(GL_ALWAYS, object->GetContextID(), 0xFF);
                 }
 
