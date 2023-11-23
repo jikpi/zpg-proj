@@ -44,7 +44,7 @@ private:
 
     MapManager ResourceManager;
 
-    std::shared_ptr<Camera> CameraMain;
+    std::unique_ptr<Camera> CameraMain;
 
     std::shared_ptr<MovesetInputManager> MovesetManager;
 

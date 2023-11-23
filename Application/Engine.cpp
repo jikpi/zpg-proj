@@ -94,7 +94,7 @@ void Engine::Initialize() {
     this->ResourceManager.Initialize(false);
 
     //Camera
-    this->CameraMain = std::make_shared<Camera>();
+    this->CameraMain = std::make_unique<Camera>();
     this->CameraMain->SetAspectRatio(this->Ratio);
 
     //Shaders
@@ -157,6 +157,12 @@ void Engine::TestLaunch() {
 }
 
 void Engine::Run() {
+    if(this->CameraMain == nullptr)
+    {
+        std::cerr << "FATAL: Engine: No camera available." << std::endl;
+        throw std::runtime_error("No camera available.");
+    }
+
     this->SetCameraLock(true);
     DebugErrorMessages::PrintGLErrors("Before run errors");
 
@@ -309,6 +315,12 @@ void Engine::UpdateMoveset() {
 }
 
 void Engine::SetCameraLock(bool lock) {
+
+    if(this->CameraMain == nullptr)
+    {
+        return;
+    }
+
     if (lock) {
         glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         this->CameraMain->UnlockSet(true);
@@ -433,6 +445,11 @@ void Engine::CursorClick(int button, int action, int mode) const {
                   << (int) color[3]
                   << ", depth " << depth
                   << std::endl;
+
+
+        //Unproject
+        glm::vec3 screenX = glm::vec3(x, convertedY, depth);
+        glm::vec3 unprojected = this->CameraMain->GetUnprojectedCursor(this->Width, this->Height, screenX);
     }
 
 }

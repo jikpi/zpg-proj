@@ -254,6 +254,12 @@ glm::vec3 Camera::GetTarget() const {
     return Target;
 }
 
+glm::vec3 Camera::GetUnprojectedCursor(int width, int height, glm::vec3 screenX) {
+    glm::vec4 viewport = glm::vec4(0.0f, 0.0f, width, height);
+    glm::vec3 unprojected = glm::unProject(screenX, ViewMatrix, ProjectionMatrix, viewport);
+    return unprojected;
+}
+
 
 
 

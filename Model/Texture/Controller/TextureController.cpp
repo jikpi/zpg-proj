@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "TextureController.h"
-#include "../../Application/Configuration/AGlobalConfig.h"
+#include "../../../Application/Configuration/AGlobalConfig.h"
 
 Texture *TextureController::UseTexture(const std::string &path, bool standardPath) {
 
