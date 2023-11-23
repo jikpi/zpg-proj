@@ -50,6 +50,9 @@ private:
 
     void UpdateMoveset();
 
+    float SavedCursorXCoord;
+    float SavedCursorYCoord;
+
 public:
     explicit Engine();
 
@@ -61,12 +64,15 @@ public:
     void NotifyWindowResize(int newWidth, int newHeight);
     void CameraLookHorizontal(double x);
     void CameraLookVertical(double y);
+    void SaveCursorCoords(float x, float y);
     void SetCameraLock(bool lock);
     void ToggleCameraLock();
     void ToggleCameraPerspective();
     void ToggleCameraYDirection();
     void RequestMapChange(int index);
     void RequestMapChange(const std::string &name);
+
+    void CursorClick(int button, int action, int mode) const;
 
 
     void AddShader(const std::shared_ptr<ShaderHandler> &shader);

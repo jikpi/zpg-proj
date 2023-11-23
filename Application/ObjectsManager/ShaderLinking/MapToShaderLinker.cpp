@@ -80,7 +80,7 @@ void MapToShaderLinker::BuildWithMap(const std::shared_ptr<Map> &map) {
     this->ShaderObjectSets.clear();
 
     //Reset context ID
-    this->NextContextID = 0;
+    this->NextContextID = 1;
 
     for (auto &object: map->Objects) {
 

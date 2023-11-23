@@ -243,6 +243,7 @@ void ShaderHandler::RenderBase(const glm::mat4 &modelMatrix) {
 
 void ShaderHandler::RenderNormalMatrix(const glm::mat4 &modelMatrix) const {
     glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelMatrix)));
+//    glm::mat3 normalMatrix = glm::mat3(1.0f);
     SendToShader(NormalMatrixLocation, normalMatrix);
 }
 

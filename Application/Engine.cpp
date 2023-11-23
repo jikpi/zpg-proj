@@ -235,8 +235,7 @@ void Engine::Run() {
                 object->BindVertexArray();
 
                 //Set stencil
-                if(object->DesiredContextID > 0)
-                {
+                if (object->DesiredContextID > 0) {
                     glStencilFunc(GL_ALWAYS, object->GetContextID(), 0xFF);
                 }
 
@@ -405,6 +404,40 @@ void Engine::LoadAllShaders() {
 
     this->ResourceManager.SetFallbackShader(this->Shaders.at(0));
 }
+
+void Engine::SaveCursorCoords(float x, float y) {
+    this->SavedCursorXCoord = x;
+    this->SavedCursorYCoord = y;
+}
+
+void Engine::CursorClick(int button, int action, int mode) const {
+    if (button == 0 && action == 1 && mode == 0) {
+        GLbyte color[4];
+        GLfloat depth;
+        GLuint index;
+
+        auto x = static_cast<GLint>(this->SavedCursorXCoord);
+        auto y = static_cast<GLint>(this->SavedCursorYCoord);
+
+        // Convert from window coordinates to pixel coordinates
+        int convertedY = this->Height - y;
+
+        glReadPixels(x, convertedY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
+        glReadPixels(x, convertedY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+        glReadPixels(x, convertedY, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
+
+        std::cout << "stencil index " << index
+                  << ", clicked on pixel " << x << ", " << y
+                  << ", color " << (int) color[0] << ", "
+                  << (int) color[1] << ", "
+                  << (int) color[2] << ", "
+                  << (int) color[3]
+                  << ", depth " << depth
+                  << std::endl;
+    }
+
+}
+
 
 
 
