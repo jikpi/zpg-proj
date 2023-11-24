@@ -153,8 +153,7 @@ void Engine::TestLaunch() {
 }
 
 void Engine::Run() {
-    if(this->CameraMain == nullptr)
-    {
+    if (this->CameraMain == nullptr) {
         std::cerr << "FATAL: Engine: No camera available." << std::endl;
         throw std::runtime_error("No camera available.");
     }
@@ -308,8 +307,7 @@ void Engine::UpdateMoveset() {
 
 void Engine::SetCameraLock(bool lock) {
 
-    if(this->CameraMain == nullptr)
-    {
+    if (this->CameraMain == nullptr) {
         return;
     }
 
@@ -414,29 +412,52 @@ void Engine::SaveCursorCoords(float x, float y) {
 }
 
 void Engine::CursorClick(int button, int action, int mode) {
+    GLbyte color[4]{};
+    GLfloat depth{};
+    GLuint index{};
+
+    auto x = static_cast<GLint>(this->SavedCursorXCoord);
+    auto y = static_cast<GLint>(this->SavedCursorYCoord);
+
+    // Convert from window coordinates to pixel coordinates
+    int convertedY = this->Height - y;
+
+    glReadPixels(x, convertedY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
+    glReadPixels(x, convertedY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+    glReadPixels(x, convertedY, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
+
+    std::cout << "stencil index " << index
+              << ", clicked on pixel " << x << ", " << y
+              << ", color " << (int) color[0] << ", "
+              << (int) color[1] << ", "
+              << (int) color[2] << ", "
+              << (int) color[3]
+              << ", depth " << depth
+              << std::endl;
+
+
     if (button == 0 && action == 1 && mode == 0) {
-        GLbyte color[4];
-        GLfloat depth;
-        GLuint index;
 
-        auto x = static_cast<GLint>(this->SavedCursorXCoord);
-        auto y = static_cast<GLint>(this->SavedCursorYCoord);
 
-        // Convert from window coordinates to pixel coordinates
-        int convertedY = this->Height - y;
+        srand(static_cast<unsigned int>(time(nullptr)));
+        auto randomMaterial = []() -> Material {
+            Material material;
+            material.AmbientColor = glm::vec3(0.1f, 0.1f, 0.1f);
+            material.DiffuseColor = glm::vec3((float) rand() / RAND_MAX, (float) rand() / RAND_MAX,
+                                              (float) rand() / RAND_MAX);
+            material.SpecularColor = glm::vec3((float) rand() / RAND_MAX, (float) rand() / RAND_MAX,
+                                               (float) rand() / RAND_MAX);
+            material.ShineValue = (float) rand() / RAND_MAX * 245 + 10;
+            return material;
+        };
 
-        glReadPixels(x, convertedY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
-        glReadPixels(x, convertedY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
-        glReadPixels(x, convertedY, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
+        StandardisedModel *pointedObj = this->ResourceManager.GetObjectByContextID(index);
+        if (pointedObj != nullptr) {
+            pointedObj->SetMaterial(randomMaterial());
+        }
+    }
 
-        std::cout << "stencil index " << index
-                  << ", clicked on pixel " << x << ", " << y
-                  << ", color " << (int) color[0] << ", "
-                  << (int) color[1] << ", "
-                  << (int) color[2] << ", "
-                  << (int) color[3]
-                  << ", depth " << depth
-                  << std::endl;
+    if (button == 1 && action == 1 && mode == 0) {
 
 
         //Unproject
@@ -446,18 +467,14 @@ void Engine::CursorClick(int button, int action, int mode) {
         std::cout << "Unprojected: " << unprojected.x << ", " << unprojected.y << ", " << unprojected.z << std::endl;
         std::cout << "-------" << std::endl;
 
-        //Add model at the location
+//        Add model at the location
         std::shared_ptr<StandardisedModel> spawnedModel = ResourceManager.ModelObjectController.UseAny("Lesson/zombie.obj", "Zombie");
-        spawnedModel->InsertTransfMove(glm::vec3 (unprojected.x, unprojected.y, unprojected.z)).ConsolidateTransf();
+        spawnedModel->InsertTransfMove(glm::vec3(unprojected.x, unprojected.y, unprojected.z)).ConsolidateTransf();
 
         spawnedModel->SetDefaultMaterial();
         ResourceManager.AddObjectToCurrentMap(spawnedModel);
+
     }
 
+
 }
-
-
-
-
-
-

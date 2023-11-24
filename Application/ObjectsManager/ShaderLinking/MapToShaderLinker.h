@@ -14,13 +14,15 @@
 class MapToShaderLinker {
 private:
     std::vector<std::shared_ptr<ShaderObjectSet>> ShaderObjectSets;
+    std::vector<StandardisedModel*> StandardisedModelsByContextID;
+
     void AddShader(ShaderHandler *shader);
 
     std::weak_ptr<ShaderHandler> FallbackShader;
     bool TryUseFallbackShader();
 
     void AddObjectToShader(ShaderHandler *shader, const std::shared_ptr<StandardisedModel> &object);
-    void AddObjectToShaderWithName(const std::string& name, std::shared_ptr<StandardisedModel> &object);
+    void AddObjectToShaderWithName(const std::string &name, std::shared_ptr<StandardisedModel> &object);
 
     static void PrintBuildingObjectError(const std::shared_ptr<StandardisedModel> &object);
 
@@ -32,12 +34,15 @@ public:
     void SetFallbackShader(std::shared_ptr<ShaderHandler> &shader);
 
     std::vector<std::shared_ptr<ShaderObjectSet>>::iterator begin() { return ShaderObjectSets.begin(); }
+
     std::vector<std::shared_ptr<ShaderObjectSet>>::iterator end() { return ShaderObjectSets.end(); }
 
     void BuildWithMap(const std::shared_ptr<Map> &map);
     void BuildWithMapSingleObject(const std::shared_ptr<Map> &map, const std::shared_ptr<StandardisedModel> &object);
 
     void NotifyLightsOnCurrentMapChanged();
+
+    StandardisedModel * GetObjectByContextID(unsigned short contextID);
 };
 
 
