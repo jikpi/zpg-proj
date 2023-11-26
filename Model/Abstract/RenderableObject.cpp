@@ -8,24 +8,40 @@ glm::mat4 RenderableObject::GetTransf() const {
     return Transformations->GetResult();
 }
 
-void RenderableObject::ConsolidateTransf(glm::mat4 transformation) const {
+void RenderableObject::ConsolidateTransf(glm::mat4 transformation) {
     Transformations->Consolidate(transformation);
+    this->HasBeenTransformed = true;
+
 }
 
-void RenderableObject::DoTransf(glm::mat4 transformation) const {
+void RenderableObject::DoTransf(glm::mat4 transformation) {
     this->Transformations->UseAndRemember(transformation);
+    this->HasBeenTransformed = true;
 }
 
-void RenderableObject::SetTransf(glm::mat4 transformation) const {
+void RenderableObject::DoTransf() {
+    //Dont call transformations at all if nothing to do, and no transformation is sent.
+    if (this->Transformations->TransformationsEmpty()) {
+        return;
+    }
+
+    this->Transformations->UseAndRemember();
+    this->HasBeenTransformed = true;
+}
+
+void RenderableObject::SetTransf(glm::mat4 transformation) {
     Transformations->SetResult(transformation);
+    this->HasBeenTransformed = true;
 }
 
-void RenderableObject::ClearTransf() const {
+void RenderableObject::ClearTransf() {
     Transformations->ClearTransformations();
+    this->HasBeenTransformed = true;
 }
 
-void RenderableObject::ResetTransf() const {
+void RenderableObject::ResetTransf() {
     Transformations->ResetResult();
+    this->HasBeenTransformed = true;
 }
 
 void RenderableObject::SetMaterial(Material newMaterial) {
@@ -34,6 +50,10 @@ void RenderableObject::SetMaterial(Material newMaterial) {
     }
 
     this->material = newMaterial;
+}
+
+void RenderableObject::SetDefaultMaterial() {
+    this->material = Material();
 }
 
 Material RenderableObject::GetMaterial() const {
@@ -46,5 +66,17 @@ Texture *RenderableObject::GetTexture() {
 
 void RenderableObject::SetTexture(Texture *texture) {
     material.SetTexture(texture);
+}
+
+glm::mat3 & RenderableObject::GetNormalMatrix() {
+    if (HasBeenTransformed) {
+        HasBeenTransformed = false;
+
+        this->NormalMatrix = glm::mat3(glm::transpose(glm::inverse(Transformations->GetResult())));
+
+        return this->NormalMatrix;
+    }
+
+    return this->NormalMatrix;
 }
 

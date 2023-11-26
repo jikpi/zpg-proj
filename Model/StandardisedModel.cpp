@@ -31,6 +31,8 @@ StandardisedModel::StandardisedModel(ModelStamp stamp, std::string name)
     ContextID = 0;
     DesiredContextID = true;
 
+    HasBeenTransformed = true;
+    NormalMatrix = glm::mat3(1.0f);
 }
 
 std::string StandardisedModel::Info() const {

@@ -3,8 +3,8 @@
 //
 
 #include <iostream>
-#include <limits.h>
 #include "MapToShaderLinker.h"
+#include "../../Configuration/AGlobalConfig.h"
 
 MapToShaderLinker::MapToShaderLinker() {
     ShaderObjectSets = std::vector<std::shared_ptr<ShaderObjectSet>>();
@@ -65,12 +65,12 @@ void MapToShaderLinker::LinkLightsToShader(std::shared_ptr<ShaderHandler> &shade
 
 unsigned short MapToShaderLinker::GetNextContextID() {
     //check if larger than unsigned short
-    if (this->NextContextID == USHRT_MAX) {
+    if (this->NextContextID >= DEF_CONTEXT_MAX) {
         std::cerr << "WARNING: MapToShaderLinker: Context ID overflow." << std::endl;
-        return 0;
+        return DEF_CONTEXT_ERROR_ID;
     }
 
-
+//    std::cout << "MapToShaderLinker: Context ID: " << this->NextContextID << std::endl;
     return this->NextContextID++;
 }
 
@@ -78,9 +78,10 @@ unsigned short MapToShaderLinker::GetNextContextID() {
 void MapToShaderLinker::BuildWithMap(const std::shared_ptr<Map> &map) {
     //Clear previous data
     this->ShaderObjectSets.clear();
+    this->StandardisedModelsByContextID.clear();
 
     //Reset context ID
-    this->NextContextID = 0;
+    this->NextContextID = DEF_CONTEXT_DEFAULT_ID;
 
     for (auto &object: map->Objects) {
 
@@ -110,6 +111,7 @@ void MapToShaderLinker::BuildWithMap(const std::shared_ptr<Map> &map) {
         //Set context ID
         if (object->DesiredContextID) {
             object->SetContextID(this->GetNextContextID());
+            this->StandardisedModelsByContextID.push_back(object.get());
         } else {
             object->SetContextID(0);
         }
@@ -145,10 +147,29 @@ void MapToShaderLinker::BuildWithMapSingleObject(const std::shared_ptr<Map> &map
         this->AddShader(objectsShader);
         this->AddObjectToShader(objectsShader, object);
     }
+
+    //Set context ID
+    if (object->DesiredContextID) {
+        object->SetContextID(this->GetNextContextID());
+        this->StandardisedModelsByContextID.push_back(object.get());
+    } else {
+        object->SetContextID(0);
+    }
 }
 
 void MapToShaderLinker::NotifyLightsOnCurrentMapChanged() {
     for (auto &set: this->ShaderObjectSets) {
         set->Shader->NotifyLightsChanged();
     }
+}
+
+StandardisedModel *MapToShaderLinker::GetObjectByContextID(unsigned short contextID) {
+    if (contextID < DEF_CONTEXT_DEFAULT_ID ||
+        contextID >= DEF_CONTEXT_MAX ||
+        contextID > this->StandardisedModelsByContextID.size()) {
+        std::cerr << "ERROR: MapToShaderLinker: Context ID out of range." << std::endl;
+        return nullptr;
+    }
+
+    return this->StandardisedModelsByContextID.at(contextID - DEF_CONTEXT_DEFAULT_ID);
 }

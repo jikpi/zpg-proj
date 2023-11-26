@@ -117,14 +117,16 @@ void KeyCallbacks::key_callback(GLFWwindow *window, int key, int scancode, int a
 
 }
 
-void KeyCallbacks::window_focus_callback(GLFWwindow *window, int focused) { printf("window_focus_callback \n"); }
+void KeyCallbacks::window_focus_callback(GLFWwindow *window, int focused) {
+//    printf("window_focus_callback \n");
+}
 
 void KeyCallbacks::window_iconify_callback(GLFWwindow *window, int iconified) {
-    printf("window_iconify_callback \n");
+//    printf("window_iconify_callback \n");
 }
 
 void KeyCallbacks::window_size_callback(GLFWwindow *window, int width, int height) {
-    printf("resize %d, %d \n", width, height);
+//    printf("resize %d, %d \n", width, height);
     glViewport(0, 0, width, height);
 
     if (!Engines.expired()) {
@@ -152,14 +154,21 @@ void KeyCallbacks::cursor_callback(GLFWwindow *window, double x, double y) {
     xChanged *= sensitivity;
     yChanged *= sensitivity;
 
+    std::shared_ptr<Engine> engine = Engines.lock();
 
-    KeyCallbacks::Engines.lock()->CameraLookHorizontal(xChanged);
-    KeyCallbacks::Engines.lock()->CameraLookVertical(yChanged);
+
+    engine->CameraLookHorizontal(xChanged);
+    engine->CameraLookVertical(yChanged);
+
+    engine->SaveCursorCoords(x, y);
 }
 
 void KeyCallbacks::button_callback(GLFWwindow *window, int button, int action, int mode) {
     if (action == GLFW_PRESS)
         printf("button_callback [%d,%d,%d]\n", button, action, mode);
 
-
+    if (!Engines.expired()) {
+        auto engine = Engines.lock();
+        engine->CursorClick(button, action, mode);
+    }
 }

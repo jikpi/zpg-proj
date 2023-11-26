@@ -15,20 +15,27 @@ class RenderableObject {
 protected:
     std::shared_ptr<TransfComposite> Transformations;
     Material material;
+
+    glm::mat3 NormalMatrix;
+    bool HasBeenTransformed;
 public:
     virtual ~RenderableObject() = default;
     [[nodiscard]] virtual glm::mat4 GetTransf() const;
-    void ConsolidateTransf(glm::mat4 transformation = glm::mat4(1.0f)) const;
-    void DoTransf(glm::mat4 transformation = glm::mat4(1.0f)) const;
-    void ClearTransf() const;
-    void ResetTransf() const;
-    void SetTransf(glm::mat4 transformation) const;
+    void ConsolidateTransf(glm::mat4 transformation = glm::mat4(1.0f));
+    void DoTransf(glm::mat4 transformation);
+    void DoTransf();
+    void ClearTransf();
+    void ResetTransf();
+    void SetTransf(glm::mat4 transformation);
 
+    void SetDefaultMaterial();
     void SetMaterial(Material newMaterial);
     [[nodiscard]] Material GetMaterial() const;
 
-    void SetTexture(Texture* texture);
-    Texture* GetTexture();
+    void SetTexture(Texture *texture);
+    Texture *GetTexture();
+
+    glm::mat3 &GetNormalMatrix();
 };
 
 

@@ -131,16 +131,14 @@ void Camera::ChangeFi(float change) {
 }
 
 void Camera::LookSphericalSide(float degrees) {
-    if(IsUnlocked)
-    {
+    if (IsUnlocked) {
         return;
     }
     ChangeFi(glm::radians(degrees));
 }
 
 void Camera::LookSphericalVertical(float degrees) {
-    if(IsUnlocked)
-    {
+    if (IsUnlocked) {
         return;
     }
 
@@ -148,8 +146,7 @@ void Camera::LookSphericalVertical(float degrees) {
 }
 
 void Camera::MoveForwardBackward(float distance) {
-    if(IsUnlocked)
-    {
+    if (IsUnlocked) {
         return;
     }
 
@@ -171,8 +168,7 @@ void Camera::MoveForwardBackward(float distance) {
 }
 
 void Camera::MoveSideToSide(float distance) {
-    if(IsUnlocked)
-    {
+    if (IsUnlocked) {
         return;
     }
 
@@ -191,8 +187,7 @@ void Camera::MoveSideToSide(float distance) {
 }
 
 void Camera::MoveUpDown(float distance) {
-    if(IsUnlocked)
-    {
+    if (IsUnlocked) {
         return;
     }
 
@@ -252,6 +247,12 @@ glm::vec3 Camera::GetLocation() const {
 
 glm::vec3 Camera::GetTarget() const {
     return Target;
+}
+
+glm::vec3 Camera::GetUnprojectedCursor(int width, int height, glm::vec3 screenX) {
+    glm::vec4 viewport = glm::vec4(0.0f, 0.0f, width, height);
+    glm::vec3 unprojected = glm::unProject(screenX, ViewMatrix, ProjectionMatrix, viewport);
+    return unprojected;
 }
 
 

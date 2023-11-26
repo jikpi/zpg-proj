@@ -64,6 +64,8 @@ public:
     void ChangeMap(int index);
     void ChangeMap(const std::string &name);
 
+    StandardisedModel* GetObjectByContextID(unsigned short contextID);
+
     template<typename T, typename U>
     std::shared_ptr<StandardisedModel> &GetObjectOnMap(T mapTemplate, U objectTemplate) {
         static_assert(std::is_integral<T>::value || std::is_same<T, const char *>::value, "T must be an int or string");

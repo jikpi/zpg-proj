@@ -92,6 +92,8 @@ public:
 
     glm::mat4 GetViewMatrix();
     glm::mat4 GetProjectionMatrix();
+
+    glm::vec3 GetUnprojectedCursor(int width, int height, glm::vec3 screenX);
 };
 
 

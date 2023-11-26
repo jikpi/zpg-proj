@@ -1,23 +1,14 @@
 cmake_minimum_required(VERSION 3.26)
-set(GLM_VERSION "0.9.9")
 
 project(zpg_test)
 
 set(CMAKE_CXX_STANDARD 17)
 
-
-
-
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(GLEW REQUIRED)
-add_subdirectory(libraries/glm)
+find_package(glm REQUIRED)
 find_package(assimp REQUIRED)
-
-include_directories(${ASSIMP_INCLUDE_DIRS})
-include_directories(${OPENGL_INCLUDE_DIRS})
-include_directories(${GLEW_INCLUDE_DIRS})
-include_directories("/usr/include/stb/")
 
 add_executable(zpg_test main.cpp
         Model/Abstract/BaseModelData.cpp
@@ -100,5 +91,13 @@ add_executable(zpg_test main.cpp
         Application/ObjectsManager/Map/PremadeMaps/MapCreator_4Spheres.cpp
         Application/ObjectsManager/Map/PremadeMaps/MapCreator_SolarSystem.cpp
         Application/ObjectsManager/Map/PremadeMaps/MapCreator_Overworld.cpp
+        Shaders/ShaderProgram/ShaderHandler_SaveLocation.cpp
+        Shaders/ShaderProgram/ShaderHandler_Render.cpp
 )
-target_link_libraries(zpg_test ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES}  glfw glm::glm assimp::assimp)
+
+target_include_directories(zpg_test PRIVATE ${ASSIMP_INCLUDE_DIRS})
+target_include_directories(zpg_test PRIVATE ${OPENGL_INCLUDE_DIRS})
+target_include_directories(zpg_test PRIVATE ${GLEW_INCLUDE_DIRS})
+target_include_directories(zpg_test PRIVATE "/usr/include/stb/")
+
+target_link_libraries(zpg_test OpenGL::GL GLEW::GLEW glfw assimp::assimp)

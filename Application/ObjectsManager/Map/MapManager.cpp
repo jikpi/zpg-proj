@@ -232,3 +232,7 @@ void MapManager::AddSkyboxToMap(const std::string &name, const std::shared_ptr<S
 void MapManager::AddSkyboxToCurrentMap(const std::shared_ptr<StandardisedModel> &skybox) {
     this->ActiveMap->SetSkybox(skybox);
 }
+
+StandardisedModel *MapManager::GetObjectByContextID(unsigned short contextID) {
+    return this->ShaderLinker.GetObjectByContextID(contextID);
+}
