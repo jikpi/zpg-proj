@@ -24,6 +24,7 @@ private:
     void MasterAddLightToMap(std::shared_ptr<Map> &map, const std::shared_ptr<RenderableLight> &light);
     std::shared_ptr<Map> ActiveMap;
     std::vector<std::shared_ptr<Map>> Maps;
+    std::vector<std::unique_ptr<AnyGameLogic>> GameLogics;
 public:
     void Initialize(bool addDefaultMap);
     void ForceRefreshMaps();
@@ -81,7 +82,7 @@ public:
         return object;
     }
 
-    AnyGameLogic *CurrentGameLogic{};
+    AnyGameLogic *ActiveGameLogic{};
     void
     MouseCursorClickEvent(float xCursorCoords, float yCursorCoords, int windowHeight, int windowWidth, int button, int action,
                           int mods) const;

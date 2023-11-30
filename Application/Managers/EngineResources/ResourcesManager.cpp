@@ -23,6 +23,21 @@ void ResourcesManager::ForceRefreshMaps() {
 
     //Reset shader units
     TextureObjectsController.ResetTextureUnitCounter();
+
+    //Connect logic to map
+    this->ActiveGameLogic = nullptr;
+    bool found = false;
+    for (auto &logic: this->GameLogics) {
+        if (this->ActiveMap->Name == logic->GetMapName()) {
+            this->ActiveGameLogic = logic.get();
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        std::cerr << "WARNING: ResourcesManager: No logic found for map: " << this->ActiveMap->Name << std::endl;
+    }
 }
 
 void ResourcesManager::CreateNewMap(const std::string &name) {
@@ -239,18 +254,16 @@ StandardisedModel *ResourcesManager::GetObjectByContextID(unsigned short context
 
 void ResourcesManager::MouseCursorClickEvent(float xCursorCoords, float yCursorCoords, int windowHeight, int windowWidth, int button,
                                              int action, int mods) const {
-    if(this->CurrentGameLogic == nullptr)
-    {
+    if (this->ActiveGameLogic == nullptr) {
         return;
     }
-    this->CurrentGameLogic->MouseCursorClickEvent(xCursorCoords, yCursorCoords, windowHeight, windowWidth, button, action, mods);
+    this->ActiveGameLogic->MouseCursorClickEvent(xCursorCoords, yCursorCoords, windowHeight, windowWidth, button, action, mods);
 }
 
 void ResourcesManager::KeyPressEvent(int key, int scancode, int action, int mods) const {
-    if(this->CurrentGameLogic == nullptr)
-    {
+    if (this->ActiveGameLogic == nullptr) {
         return;
     }
 
-    this->CurrentGameLogic->KeyPressEvent(key, scancode, action, mods);
+    this->ActiveGameLogic->KeyPressEvent(key, scancode, action, mods);
 }

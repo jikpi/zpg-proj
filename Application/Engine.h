@@ -37,6 +37,8 @@ private:
     float SavedCursorXCoord{};
     float SavedCursorYCoord{};
 
+    int MapChangeFrameLock{};
+
 public:
     explicit Engine();
 

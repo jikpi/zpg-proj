@@ -15,6 +15,7 @@ inline constexpr float DEF_CAMERA_MAXRENDER = 1000.0f;
 
 //// ### Map ###
 inline constexpr const char *DEF_MAP_NAME = "Default";
+inline constexpr const int DEF_MAP_CHANGE_TIMEOUT = 10;
 
 //// ### ShaderProgram ###
 // model matrix, view matrix, projection matrix

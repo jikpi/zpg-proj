@@ -187,7 +187,10 @@ void Engine::Run() {
         //Update camera position
         UpdateMoveset();
 
-
+        //Decrease map change lock
+        if(this->MapChangeFrameLock > 0){
+            this->MapChangeFrameLock--;
+        }
 
         //Clear screen
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -381,11 +384,21 @@ void Engine::RandomMaterialsTest() {
 }
 
 void Engine::RequestMapChange(int index) {
+    if(this->MapChangeFrameLock > 0){
+        return;
+    }
+
+    MapChangeFrameLock = DEF_MAP_CHANGE_TIMEOUT;
     this->Resources->ChangeMap(index);
     std::cout << "Map changed to " << this->Resources->GetActiveMap()->GetName() << std::endl;
 }
 
 void Engine::RequestMapChange(const std::string &name) {
+    if(this->MapChangeFrameLock > 0){
+        return;
+    }
+
+    MapChangeFrameLock = DEF_MAP_CHANGE_TIMEOUT;
     this->Resources->ChangeMap(name);
     std::cout << "Map changed to " << this->Resources->GetActiveMap()->GetName() << std::endl;
 }
