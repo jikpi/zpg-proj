@@ -12,7 +12,7 @@
 #include "../../../../Transformations/Composite/Transformations/Scale.h"
 #include "../../../../Transformations/Composite/Factory/TransformationFactory.h"
 
-void MapCreator::Overworld(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, MapManager &mapManager) {
+void MapCreator::Overworld(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, ResourcesManager &mapManager) {
     mapManager.CreateNewMap(mapName);
     std::shared_ptr<Map> &map = mapManager.GetMap(mapName);
 
@@ -226,5 +226,5 @@ void MapCreator::Overworld(const std::string &mapName, std::vector<std::shared_p
     Texture *starSkyboxTexture = mapManager.TextureObjectsController.UseCubemap(
             "starbox");
     starSkybox->SetTexture(starSkyboxTexture);
-    MapManager::AddSkyboxToMap(map, starSkybox);
+    ResourcesManager::AddSkyboxToMap(map, starSkybox);
 }

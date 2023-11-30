@@ -20,7 +20,7 @@
 #include "../Shaders/Lighting/LightSpot.h"
 
 //Map creator
-#include "ObjectsManager/Map/PremadeMaps/MapCreator.h"
+#include "Managers/Map/PremadeMaps/MapCreator.h"
 
 
 Engine::Engine() = default;
@@ -87,7 +87,7 @@ void Engine::Initialize() {
 //    glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     //Map
-    this->ResourceManager.Initialize(false);
+    this->Resources.Initialize(false);
 
     //Camera
     this->CameraMain = std::make_unique<Camera>();
@@ -147,9 +147,9 @@ void Engine::PrintVersionInfo() {
 }
 
 void Engine::TestLaunch() {
-    MapCreator::FourSpheres("4 spheres", this->Shaders, this->ResourceManager);
-    MapCreator::SolarSystem("Solar system", this->Shaders, this->ResourceManager);
-    MapCreator::Overworld("Overworld", this->Shaders, this->ResourceManager);
+    MapCreator::FourSpheres("4 spheres", this->Shaders, this->Resources);
+    MapCreator::SolarSystem("Solar system", this->Shaders, this->Resources);
+    MapCreator::Overworld("Overworld", this->Shaders, this->Resources);
 }
 
 void Engine::Run() {
@@ -171,17 +171,17 @@ void Engine::Run() {
     float angleIncrement = glm::radians(1.0f);
 
     std::shared_ptr<LightSpot> spheresSpotLight = std::dynamic_pointer_cast<LightSpot>(
-            this->ResourceManager.GetLightOnMap("4 spheres", 0));
+            this->Resources.GetLightOnMap("4 spheres", 0));
 
     std::shared_ptr<LightSpot> manyObjectsFlash = std::dynamic_pointer_cast<LightSpot>(
-            this->ResourceManager.GetLightOnMap("Overworld", 0));
+            this->Resources.GetLightOnMap("Overworld", 0));
 
-    std::shared_ptr<StandardisedModel> movingModel = this->ResourceManager.GetObjectOnMap(0, 0);
+    std::shared_ptr<StandardisedModel> movingModel = this->Resources.GetObjectOnMap(0, 0);
 
 
     this->CameraMain->MoveForwardBackward(0);
-    this->ResourceManager.ChangeMap(0);
-    this->ResourceManager.ForceRefreshMaps();
+    this->Resources.ChangeMap(0);
+    this->Resources.ForceRefreshMaps();
     while (!glfwWindowShouldClose(Window)) {
         //Update camera position
         UpdateMoveset();
@@ -206,18 +206,18 @@ void Engine::Run() {
         //set many objects spot light to camera location and target
         manyObjectsFlash->SetPosition(this->CameraMain->GetLocation());
         manyObjectsFlash->SetDirection(this->CameraMain->GetTarget() - this->CameraMain->GetLocation());
-        ResourceManager.ForceRefreshLightsOnCurrentMap();
+        Resources.ForceRefreshLightsOnCurrentMap();
 
-        ////Render skybox
-        if (ResourceManager.GetActiveMap()->GetSkybox() != nullptr) {
-            ShaderHandler *skyboxShader = ResourceManager.GetActiveMap()->GetSkybox()->GetShaderProgram();
+        ////NextRender skybox
+        if (Resources.GetActiveMap()->GetSkybox() != nullptr) {
+            ShaderHandler *skyboxShader = Resources.GetActiveMap()->GetSkybox()->GetShaderProgram();
             glDepthMask(GL_FALSE);
             glDepthFunc(GL_LEQUAL);
             glDisable(GL_CULL_FACE);
             skyboxShader->UseProgram();
-            skyboxShader->RequestRender(*ResourceManager.GetActiveMap()->GetSkybox());
-            ResourceManager.GetActiveMap()->GetSkybox()->BindVertexArray();
-            glDrawArrays(GL_TRIANGLES, 0, ResourceManager.GetActiveMap()->GetSkybox()->GetRenderingSize());
+            skyboxShader->RequestRender(*Resources.GetActiveMap()->GetSkybox());
+            Resources.GetActiveMap()->GetSkybox()->BindVertexArray();
+            glDrawArrays(GL_TRIANGLES, 0, Resources.GetActiveMap()->GetSkybox()->GetRenderingSize());
 
             glDepthMask(GL_TRUE);
             glDepthFunc(GL_LESS);
@@ -225,8 +225,8 @@ void Engine::Run() {
             ShaderHandler::StopProgram();
         }
 
-        ////Render each shader
-        for (auto &set: this->ResourceManager.ShaderLinker) {
+        ////NextRender each shader
+        for (auto &set: this->Resources.ShaderLinker) {
             set->Shader->UseProgram();
 
             //Render objects for chosen shader
@@ -374,19 +374,19 @@ void Engine::RandomMaterialsTest() {
         return material;
     };
 
-    for (int i = 0; i < this->ResourceManager.GetActiveMap()->GetObjectCount(); i++) {
-        this->ResourceManager.GetActiveMap()->GetObject(i)->SetMaterial(randomMaterial());
+    for (int i = 0; i < this->Resources.GetActiveMap()->GetObjectCount(); i++) {
+        this->Resources.GetActiveMap()->GetObject(i)->SetMaterial(randomMaterial());
     }
 }
 
 void Engine::RequestMapChange(int index) {
-    this->ResourceManager.ChangeMap(index);
-    std::cout << "Map changed to " << this->ResourceManager.GetActiveMap()->GetName() << std::endl;
+    this->Resources.ChangeMap(index);
+    std::cout << "Map changed to " << this->Resources.GetActiveMap()->GetName() << std::endl;
 }
 
 void Engine::RequestMapChange(const std::string &name) {
-    this->ResourceManager.ChangeMap(name);
-    std::cout << "Map changed to " << this->ResourceManager.GetActiveMap()->GetName() << std::endl;
+    this->Resources.ChangeMap(name);
+    std::cout << "Map changed to " << this->Resources.GetActiveMap()->GetName() << std::endl;
 }
 
 void Engine::LoadAllShaders() {
@@ -408,7 +408,7 @@ void Engine::LoadAllShaders() {
     }
 
 
-    this->ResourceManager.SetFallbackShader(this->Shaders.at(0));
+    this->Resources.SetFallbackShader(this->Shaders.at(0));
 }
 
 void Engine::SaveCursorCoords(float x, float y) {
@@ -456,7 +456,7 @@ void Engine::CursorClick(int button, int action, int mode) {
             return material;
         };
 
-        StandardisedModel *pointedObj = this->ResourceManager.GetObjectByContextID(index);
+        StandardisedModel *pointedObj = this->Resources.GetObjectByContextID(index);
         if (pointedObj != nullptr) {
             pointedObj->SetMaterial(randomMaterial());
         }
@@ -473,11 +473,11 @@ void Engine::CursorClick(int button, int action, int mode) {
         std::cout << "-------" << std::endl;
 
 //        Add model at the location
-        std::shared_ptr<StandardisedModel> spawnedModel = ResourceManager.ModelObjectController.UseAny("Lesson/zombie.obj", "Zombie");
+        std::shared_ptr<StandardisedModel> spawnedModel = Resources.ModelObjectController.UseAny("Lesson/zombie.obj", "Zombie");
         spawnedModel->InsertTransfMove(glm::vec3(unprojected.x, unprojected.y, unprojected.z)).ConsolidateTransf();
 
         spawnedModel->SetDefaultMaterial();
-        ResourceManager.AddObjectToCurrentMap(spawnedModel);
+        Resources.AddObjectToCurrentMap(spawnedModel);
 
     }
 

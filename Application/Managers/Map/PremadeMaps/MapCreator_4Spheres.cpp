@@ -10,7 +10,7 @@
 #include "../../../../Shaders/Lighting/LightDirectional.h"
 
 void
-MapCreator::FourSpheres(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, MapManager &mapManager) {
+MapCreator::FourSpheres(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, ResourcesManager &mapManager) {
 
     mapManager.CreateNewMap(mapName);
     std::shared_ptr<Map> &map = mapManager.GetMap(mapName);

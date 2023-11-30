@@ -10,7 +10,7 @@
 #include "../Map.h"
 #include "../../../../Model/Texture/Controller/TextureController.h"
 #include "../../../../Model/Controller/ModelController.h"
-#include "../MapManager.h"
+#include "../ResourcesManager.h"
 
 class MapCreator {
 private:
@@ -19,11 +19,11 @@ public:
 
 
     static void
-    FourSpheres(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, MapManager &mapManager);
+    FourSpheres(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, ResourcesManager &mapManager);
     static void
-    SolarSystem(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, MapManager &mapManager);
+    SolarSystem(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, ResourcesManager &mapManager);
     static void
-    Overworld(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, MapManager &mapManager);
+    Overworld(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, ResourcesManager &mapManager);
 
 };
 

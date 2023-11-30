@@ -12,8 +12,8 @@
 #include "../Shaders/ShaderProgram/ShaderHandler.h"
 #include "InputHandler/MovesetInputManager.h"
 #include "../Shaders/Camera/Camera.h"
-#include "ObjectsManager/ShaderLinking/MapToShaderLinker.h"
-#include "ObjectsManager/Map/MapManager.h"
+#include "Managers/ShaderLinking/MapToShaderLinker.h"
+#include "Managers/Map/ResourcesManager.h"
 
 class Engine : public std::enable_shared_from_this<Engine> {
 private:
@@ -27,7 +27,7 @@ private:
     std::vector<std::shared_ptr<ShaderHandler>> Shaders;
     void LoadAllShaders();
 
-    MapManager ResourceManager;
+    ResourcesManager Resources;
 
     std::unique_ptr<Camera> CameraMain;
 
@@ -35,8 +35,8 @@ private:
 
     void UpdateMoveset();
 
-    float SavedCursorXCoord;
-    float SavedCursorYCoord;
+    float SavedCursorXCoord{};
+    float SavedCursorYCoord{};
 
 public:
     explicit Engine();

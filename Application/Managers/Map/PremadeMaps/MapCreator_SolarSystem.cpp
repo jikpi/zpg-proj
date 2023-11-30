@@ -9,7 +9,7 @@
 #include "../../../../ExtResources/LessonResources/TextureResources/skycube.h"
 
 void
-MapCreator::SolarSystem(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, MapManager &mapManager) {
+MapCreator::SolarSystem(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, ResourcesManager &mapManager) {
     mapManager.CreateNewMap(mapName);
     std::shared_ptr<Map> &map = mapManager.GetMap(mapName);
 
@@ -120,5 +120,5 @@ MapCreator::SolarSystem(const std::string &mapName, std::vector<std::shared_ptr<
     Texture *starSkyboxTexture = mapManager.TextureObjectsController.UseCubemap(
             "../Resources/Textures/Galaxy/stars", false);
     starSkybox->SetTexture(starSkyboxTexture);
-    MapManager::AddSkyboxToMap(map, starSkybox);
+    ResourcesManager::AddSkyboxToMap(map, starSkybox);
 }

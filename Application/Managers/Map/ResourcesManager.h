@@ -2,8 +2,8 @@
 // Created by KOP0269 on 10/28/23.
 //
 
-#ifndef ZPG_TEST_MAPMANAGER_H
-#define ZPG_TEST_MAPMANAGER_H
+#ifndef ZPG_TEST_RESOURCESMANAGER_H
+#define ZPG_TEST_RESOURCESMANAGER_H
 
 
 #include <memory>
@@ -12,7 +12,7 @@
 #include "../../../Model/Texture/Controller/TextureController.h"
 #include "../../../Model/Controller/ModelController.h"
 
-class MapManager {
+class ResourcesManager {
 private:
     std::string MapCacheName;
     int MapCacheIndex;
@@ -80,4 +80,4 @@ public:
 };
 
 
-#endif //ZPG_TEST_MAPMANAGER_H
+#endif //ZPG_TEST_RESOURCESMANAGER_H

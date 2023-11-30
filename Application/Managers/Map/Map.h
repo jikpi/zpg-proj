@@ -30,7 +30,7 @@ public:
 
     friend class MapToShaderLinker;
 
-    friend class MapManager;
+    friend class ResourcesManager;
 
     friend class MapCreator;
 

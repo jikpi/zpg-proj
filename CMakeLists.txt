@@ -23,8 +23,8 @@ add_executable(zpg_test main.cpp
         Model/Factory/ModelFactory.h
         Model/StandardisedModel.cpp
         Model/StandardisedModel.h
-        Application/ObjectsManager/Map/Map.cpp
-        Application/ObjectsManager/Map/Map.h
+        Application/Managers/Map/Map.cpp
+        Application/Managers/Map/Map.h
         Application/InputHandler/KeyCallbacks/KeyCallbacks.cpp
         Application/InputHandler/KeyCallbacks/KeyCallbacks.h
         Application/DebugErrorMessages/DebugErrorMessages.cpp
@@ -52,10 +52,10 @@ add_executable(zpg_test main.cpp
         Shaders/ShadersCode/Loader/ShaderFileLoader.h
         Shaders/Lighting/LightPoint.cpp
         Shaders/Lighting/LightPoint.h
-        Application/ObjectsManager/ShaderLinking/MapToShaderLinker.cpp
-        Application/ObjectsManager/ShaderLinking/MapToShaderLinker.h
-        Application/ObjectsManager/ShaderLinking/ShaderObjectSet/ShaderObjectSet.cpp
-        Application/ObjectsManager/ShaderLinking/ShaderObjectSet/ShaderObjectSet.h
+        Application/Managers/ShaderLinking/MapToShaderLinker.cpp
+        Application/Managers/ShaderLinking/MapToShaderLinker.h
+        Application/Managers/ShaderLinking/ShaderObjectSet/ShaderObjectSet.cpp
+        Application/Managers/ShaderLinking/ShaderObjectSet/ShaderObjectSet.h
         Shaders/ShaderType.h
         Model/Material.cpp
         Model/Material.h
@@ -66,8 +66,8 @@ add_executable(zpg_test main.cpp
         Shaders/Lighting/Uniforms/LightsArrayPointUniform.h
         Shaders/ShaderProgram/ShaderBase/ShaderBase.cpp
         Shaders/ShaderProgram/ShaderBase/ShaderBase.h
-        Application/ObjectsManager/Map/MapManager.cpp
-        Application/ObjectsManager/Map/MapManager.h
+        Application/Managers/Map/ResourcesManager.cpp
+        Application/Managers/Map/ResourcesManager.h
         ExtResources/LessonResources/InclLessonModels.h
         Shaders/Lighting/Abstract/RenderableLight.cpp
         Shaders/Lighting/Abstract/RenderableLight.h
@@ -86,17 +86,19 @@ add_executable(zpg_test main.cpp
         Model/Controller/ModelController.cpp
         Model/Controller/ModelController.h
         Model/ModelStamp.h
-        Application/ObjectsManager/Map/PremadeMaps/MapCreator.cpp
-        Application/ObjectsManager/Map/PremadeMaps/MapCreator.h
-        Application/ObjectsManager/Map/PremadeMaps/MapCreator_4Spheres.cpp
-        Application/ObjectsManager/Map/PremadeMaps/MapCreator_SolarSystem.cpp
-        Application/ObjectsManager/Map/PremadeMaps/MapCreator_Overworld.cpp
+        Application/Managers/Map/PremadeMaps/MapCreator.cpp
+        Application/Managers/Map/PremadeMaps/MapCreator.h
+        Application/Managers/Map/PremadeMaps/MapCreator_4Spheres.cpp
+        Application/Managers/Map/PremadeMaps/MapCreator_SolarSystem.cpp
+        Application/Managers/Map/PremadeMaps/MapCreator_Overworld.cpp
         Shaders/ShaderProgram/ShaderHandler_SaveLocation.cpp
         Shaders/ShaderProgram/ShaderHandler_Render.cpp
         Model/Animation/Abstract/AnyAnimation.cpp
         Model/Animation/Abstract/AnyAnimation.h
         Model/Animation/BezierAnimation.cpp
         Model/Animation/BezierAnimation.h
+        Application/GameLogic/Abstract/AnyGameLogic.cpp
+        Application/GameLogic/Abstract/AnyGameLogic.h
 )
 
 target_include_directories(zpg_test PRIVATE ${ASSIMP_INCLUDE_DIRS})
