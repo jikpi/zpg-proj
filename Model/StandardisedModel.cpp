@@ -27,6 +27,9 @@ StandardisedModel::StandardisedModel(ModelStamp stamp, std::string name)
         std::move(name),
         stamp) {
     Transformations = std::make_shared<TransfComposite>();
+    AnimationTransformations = std::make_shared<TransfComposite>();
+    this->Transformations->SetAdditiveTransformation(this->AnimationTransformations);
+
     SelectedShaderProgram = nullptr;
     ContextID = 0;
     DesiredContextID = true;

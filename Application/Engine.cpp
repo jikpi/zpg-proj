@@ -152,22 +152,6 @@ void Engine::TestLaunch() {
     MapCreator::Overworld("Overworld", this->Shaders, this->ResourceManager);
 }
 
-// Function to calculate a point on a Bezier curve defined by four control points
-glm::vec3 CalculateBezierPoint(float t, const glm::vec3 &p0, const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3) {
-    float u = 1 - t;
-    float tt = t * t;
-    float uu = u * u;
-    float uuu = uu * u;
-    float ttt = tt * t;
-
-    glm::vec3 p = uuu * p0; //first term
-    p += 3 * uu * t * p1; //second term
-    p += 3 * u * tt * p2; //third term
-    p += ttt * p3; //fourth term
-
-    return p;
-}
-
 void Engine::Run() {
     if (this->CameraMain == nullptr) {
         std::cerr << "FATAL: Engine: No camera available." << std::endl;
@@ -180,26 +164,6 @@ void Engine::Run() {
 
     this->SetCameraLock(true);
     DebugErrorMessages::PrintGLErrors("Before run errors");
-
-
-    ////Bezier points
-    std::vector<glm::vec3> controlPoints = {
-            glm::vec3(0, 0, 0),     // First segment
-            glm::vec3(2, 2, 0),
-            glm::vec3(-4, 4, 0),
-            glm::vec3(6, 0, 0),     // Second segment starts
-            glm::vec3(8, -10, 0),
-            glm::vec3(10, 4, 0),
-            glm::vec3(12, 0, 0),    // Third segment starts
-            glm::vec3(14, 20, 20),  // New points for the third segment
-            glm::vec3(16, 25, 15),
-            glm::vec3(18, 15, 10),
-            glm::vec3(20, 10, 5)
-    };
-
-
-    float t = 0;
-    float tchange = 0.001f;
 
 
     float radius = 1.0f;
@@ -221,35 +185,6 @@ void Engine::Run() {
     while (!glfwWindowShouldClose(Window)) {
         //Update camera position
         UpdateMoveset();
-
-
-        ////Bezier
-        // Determine which segment of the curve t is in
-        int numSegments = (controlPoints.size() - 1) / 3;
-        int currentSegment = std::min(static_cast<int>(t * numSegments), numSegments - 1);
-
-        // Calculate the local t for the segment
-        float localT = (t * numSegments) - currentSegment;
-
-        // Calculate the point on the current Bezier segment
-        glm::vec3 p0 = controlPoints[currentSegment * 3];
-        glm::vec3 p1 = controlPoints[currentSegment * 3 + 1];
-        glm::vec3 p2 = controlPoints[currentSegment * 3 + 2];
-        glm::vec3 p3 = controlPoints[currentSegment * 3 + 3];
-
-        glm::vec3 p = CalculateBezierPoint(localT, p0, p1, p2, p3);
-
-        // Bezier test
-        std::cout << "t = " << t << " P=[ " << p[0] << ", " << p[1] << ", " << p[2] << "]" << std::endl;
-        t += tchange;
-        if (t >= 1.0f || t <= 0.0f) {
-            tchange = -tchange;
-        }
-
-        // Apply transformation to the moving model based on the Bezier curve point
-        movingModel->ClearTransf();
-        movingModel->ResetTransf();
-        movingModel->InsertTransfMove(glm::vec3(p[0], p[1], p[2]));
 
 
 
@@ -296,7 +231,7 @@ void Engine::Run() {
 
             //Render objects for chosen shader
             for (auto &object: set->Objects) {
-                object->DoTransf();
+                object->DoAnyAnimation(0);
                 set->Shader->RequestRender(*object);
                 object->BindVertexArray();
 
