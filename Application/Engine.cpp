@@ -20,7 +20,7 @@
 #include "../Shaders/Lighting/LightSpot.h"
 
 //Map creator
-#include "Managers/Map/PremadeMaps/MapCreator.h"
+#include "Managers/EngineResources/PremadeMaps/MapCreator.h"
 
 
 Engine::Engine() = default;

@@ -6,7 +6,7 @@
 #define ZPG_TEST_ANYGAMELOGIC_H
 
 
-#include "../../Managers/Map/ResourcesManager.h"
+#include "../../Managers/EngineResources/ResourcesManager.h"
 
 class AnyGameLogic {
 private:

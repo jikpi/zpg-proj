@@ -23,8 +23,8 @@ add_executable(zpg_test main.cpp
         Model/Factory/ModelFactory.h
         Model/StandardisedModel.cpp
         Model/StandardisedModel.h
-        Application/Managers/Map/Map.cpp
-        Application/Managers/Map/Map.h
+        Application/Managers/EngineResources/Map.cpp
+        Application/Managers/EngineResources/Map.h
         Application/InputHandler/KeyCallbacks/KeyCallbacks.cpp
         Application/InputHandler/KeyCallbacks/KeyCallbacks.h
         Application/DebugErrorMessages/DebugErrorMessages.cpp
@@ -66,8 +66,8 @@ add_executable(zpg_test main.cpp
         Shaders/Lighting/Uniforms/LightsArrayPointUniform.h
         Shaders/ShaderProgram/ShaderBase/ShaderBase.cpp
         Shaders/ShaderProgram/ShaderBase/ShaderBase.h
-        Application/Managers/Map/ResourcesManager.cpp
-        Application/Managers/Map/ResourcesManager.h
+        Application/Managers/EngineResources/ResourcesManager.cpp
+        Application/Managers/EngineResources/ResourcesManager.h
         ExtResources/LessonResources/InclLessonModels.h
         Shaders/Lighting/Abstract/RenderableLight.cpp
         Shaders/Lighting/Abstract/RenderableLight.h
@@ -86,11 +86,11 @@ add_executable(zpg_test main.cpp
         Model/Controller/ModelController.cpp
         Model/Controller/ModelController.h
         Model/ModelStamp.h
-        Application/Managers/Map/PremadeMaps/MapCreator.cpp
-        Application/Managers/Map/PremadeMaps/MapCreator.h
-        Application/Managers/Map/PremadeMaps/MapCreator_4Spheres.cpp
-        Application/Managers/Map/PremadeMaps/MapCreator_SolarSystem.cpp
-        Application/Managers/Map/PremadeMaps/MapCreator_Overworld.cpp
+        Application/Managers/EngineResources/PremadeMaps/MapCreator.cpp
+        Application/Managers/EngineResources/PremadeMaps/MapCreator.h
+        Application/Managers/EngineResources/PremadeMaps/MapCreator_4Spheres.cpp
+        Application/Managers/EngineResources/PremadeMaps/MapCreator_SolarSystem.cpp
+        Application/Managers/EngineResources/PremadeMaps/MapCreator_Overworld.cpp
         Shaders/ShaderProgram/ShaderHandler_SaveLocation.cpp
         Shaders/ShaderProgram/ShaderHandler_Render.cpp
         Model/Animation/Abstract/AnyAnimation.cpp
