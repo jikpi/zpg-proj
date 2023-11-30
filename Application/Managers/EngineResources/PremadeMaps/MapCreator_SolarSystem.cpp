@@ -9,9 +9,9 @@
 #include "../../../../ExtResources/LessonResources/TextureResources/skycube.h"
 
 void
-MapCreator::SolarSystem(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, ResourcesManager &mapManager) {
-    mapManager.CreateNewMap(mapName);
-    std::shared_ptr<Map> &map = mapManager.GetMap(mapName);
+MapCreator::SolarSystem(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, ResourcesManager *mapManager) {
+    mapManager->CreateNewMap(mapName);
+    std::shared_ptr<Map> &map = mapManager->GetMap(mapName);
 
     ShaderHandler *ConstantShader = SelectShader(shaders, "Constant");
     ShaderHandler *PhongShader = SelectShader(shaders, "Phong");
@@ -26,7 +26,7 @@ MapCreator::SolarSystem(const std::string &mapName, std::vector<std::shared_ptr<
     float marsOrbitSpeed = 0.03f;
 
 //    this->ResourceManager.AddLightToMap(1, std::make_shared<LightPoint>(glm::vec3(0.0f, 0.0f, 0.0f)));
-    mapManager.AddLightToMap(map, std::make_shared<LightPoint>(glm::vec3(0.0f, 0.0f, 0.0f)));
+    mapManager->AddLightToMap(map, std::make_shared<LightPoint>(glm::vec3(0.0f, 0.0f, 0.0f)));
 
     //Sun
     std::shared_ptr<StandardisedModel> objectSun = ModelFactory::PositionNormal(rawmodel1_sphere, size, "Sun");
@@ -35,7 +35,7 @@ MapCreator::SolarSystem(const std::string &mapName, std::vector<std::shared_ptr<
                                     glm::vec3(1.0f, 0.5f, 0.0f),
                                     32.0f));
     objectSun->SetShaderProgram(ConstantShader);
-    mapManager.AddObjectToMap(map, objectSun);
+    mapManager->AddObjectToMap(map, objectSun);
 
     //Mercury
     std::shared_ptr<StandardisedModel> objectMercury = ModelFactory::PositionNormal(rawmodel1_sphere, size, "Mercury");
@@ -44,7 +44,7 @@ MapCreator::SolarSystem(const std::string &mapName, std::vector<std::shared_ptr<
                                         glm::vec3(0.5f, 0.5f, 0.5f),
                                         32.0f));
     objectMercury->SetShaderProgram(PhongShader);
-    mapManager.AddObjectToMap(map, objectMercury);
+    mapManager->AddObjectToMap(map, objectMercury);
     //Move mercury away from the sun, and make it smaller permanently.
     objectMercury->InsertTransfScale(glm::vec3(0.15f, 0.15f, 0.15f))
             .InsertTransfMove(glm::vec3(10.0f, 0.0f, 0.0f))
@@ -60,7 +60,7 @@ MapCreator::SolarSystem(const std::string &mapName, std::vector<std::shared_ptr<
     objectVenus->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(1.0f, 0.5f, 0.0f),
                                       glm::vec3(1.0f, 0.5f, 0.0f), 32.0f));
     objectVenus->SetShaderProgram(PhongShader);
-    mapManager.AddObjectToMap(map, objectVenus);
+    mapManager->AddObjectToMap(map, objectVenus);
 
     //Move venus away from the sun, and make it smaller permanently.
     objectVenus->InsertTransfScale(glm::vec3(0.2f, 0.2f, 0.2f))
@@ -79,7 +79,7 @@ MapCreator::SolarSystem(const std::string &mapName, std::vector<std::shared_ptr<
             glm::vec3(0.0f, 0.5f, 1.0f),
             glm::vec3(0.0f, 0.5f, 1.0f), 240.0f));
     objectEarth->SetShaderProgram(PhongShader);
-    mapManager.AddObjectToMap(map, objectEarth);
+    mapManager->AddObjectToMap(map, objectEarth);
 
     //Move earth away from the sun, and make it smaller permanently.
     objectEarth->InsertTransfScale(glm::vec3(0.2f, 0.2f, 0.2f))
@@ -99,7 +99,7 @@ MapCreator::SolarSystem(const std::string &mapName, std::vector<std::shared_ptr<
             glm::vec3(1.0f, 0.5f, 0.0f),
             32.0f));
     objectMars->SetShaderProgram(PhongShader);
-    mapManager.AddObjectToMap(map, objectMars);
+    mapManager->AddObjectToMap(map, objectMars);
 
     //Move mars away from the sun, and make it smaller permanently.
     objectMars->InsertTransfScale(glm::vec3(0.2f, 0.2f, 0.2f))
@@ -117,7 +117,7 @@ MapCreator::SolarSystem(const std::string &mapName, std::vector<std::shared_ptr<
                                                                            "Star skybox");
 
     starSkybox->SetShaderProgram(Skybox);
-    Texture *starSkyboxTexture = mapManager.TextureObjectsController.UseCubemap(
+    Texture *starSkyboxTexture = mapManager->TextureObjectsController.UseCubemap(
             "../Resources/Textures/Galaxy/stars", false);
     starSkybox->SetTexture(starSkyboxTexture);
     ResourcesManager::AddSkyboxToMap(map, starSkybox);

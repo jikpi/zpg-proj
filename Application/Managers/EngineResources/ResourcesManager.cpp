@@ -236,3 +236,21 @@ void ResourcesManager::AddSkyboxToCurrentMap(const std::shared_ptr<StandardisedM
 StandardisedModel *ResourcesManager::GetObjectByContextID(unsigned short contextID) {
     return this->ShaderLinker.GetObjectByContextID(contextID);
 }
+
+void ResourcesManager::MouseCursorClickEvent(float xCursorCoords, float yCursorCoords, int windowHeight, int windowWidth, int button,
+                                             int action, int mods) const {
+    if(this->CurrentGameLogic == nullptr)
+    {
+        return;
+    }
+    this->CurrentGameLogic->MouseCursorClickEvent(xCursorCoords, yCursorCoords, windowHeight, windowWidth, button, action, mods);
+}
+
+void ResourcesManager::KeyPressEvent(int key, int scancode, int action, int mods) const {
+    if(this->CurrentGameLogic == nullptr)
+    {
+        return;
+    }
+
+    this->CurrentGameLogic->KeyPressEvent(key, scancode, action, mods);
+}

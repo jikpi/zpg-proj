@@ -10,73 +10,73 @@
 #include "../../../../Shaders/Lighting/LightDirectional.h"
 
 void
-MapCreator::FourSpheres(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, ResourcesManager &mapManager) {
+MapCreator::FourSpheres(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, ResourcesManager *mapManager) {
 
-    mapManager.CreateNewMap(mapName);
-    std::shared_ptr<Map> &map = mapManager.GetMap(mapName);
+    mapManager->CreateNewMap(mapName);
+    std::shared_ptr<Map> &map = mapManager->GetMap(mapName);
 
     ShaderHandler *PhongShader = SelectShader(shaders, "Phong");
     ShaderHandler *Skybox = SelectShader(shaders, "Skybox");
 
-    std::shared_ptr<StandardisedModel> objectSphere1 = mapManager.ModelObjectController.UseAny("Lesson/cube.obj",
+    std::shared_ptr<StandardisedModel> objectSphere1 = mapManager->ModelObjectController.UseAny("Lesson/cube.obj",
                                                                                                "Test model 1");
     objectSphere1->SetShaderProgram(PhongShader);
-    mapManager.AddObjectToMap(map, objectSphere1);
+    mapManager->AddObjectToMap(map, objectSphere1);
 
-    std::shared_ptr<StandardisedModel> objectSphere2 = mapManager.ModelObjectController.UseAny("Lesson/cube.obj",
+    std::shared_ptr<StandardisedModel> objectSphere2 = mapManager->ModelObjectController.UseAny("Lesson/cube.obj",
                                                                                                "Test model 2");
     objectSphere2->SetShaderProgram(PhongShader);
-    mapManager.AddObjectToMap(map, objectSphere2);
+    mapManager->AddObjectToMap(map, objectSphere2);
 
-    std::shared_ptr<StandardisedModel> objectSphere3 = mapManager.ModelObjectController.UseAny("Lesson/cube.obj",
+    std::shared_ptr<StandardisedModel> objectSphere3 = mapManager->ModelObjectController.UseAny("Lesson/cube.obj",
                                                                                                "Test model 3");
     objectSphere3->SetShaderProgram(PhongShader);
-    mapManager.AddObjectToMap(map, objectSphere3);
+    mapManager->AddObjectToMap(map, objectSphere3);
 
-    std::shared_ptr<StandardisedModel> objectSphere4 = mapManager.ModelObjectController.UseAny("Lesson/cube.obj",
+    std::shared_ptr<StandardisedModel> objectSphere4 = mapManager->ModelObjectController.UseAny("Lesson/cube.obj",
                                                                                                "Test model 4");
     objectSphere4->SetShaderProgram(PhongShader);
-    mapManager.AddObjectToMap(map, objectSphere4);
+    mapManager->AddObjectToMap(map, objectSphere4);
 
-    std::shared_ptr<StandardisedModel> objectSphere5 = mapManager.ModelObjectController.UseAny("Lesson/cube.obj",
+    std::shared_ptr<StandardisedModel> objectSphere5 = mapManager->ModelObjectController.UseAny("Lesson/cube.obj",
                                                                                                "Test model 5");
     objectSphere5->SetShaderProgram(PhongShader);
-    mapManager.AddObjectToMap(map, objectSphere5);
+    mapManager->AddObjectToMap(map, objectSphere5);
 
-    std::shared_ptr<StandardisedModel> objectSphere6 = mapManager.ModelObjectController.UseAny("Lesson/cube.obj",
+    std::shared_ptr<StandardisedModel> objectSphere6 = mapManager->ModelObjectController.UseAny("Lesson/cube.obj",
                                                                                                "Test model 6");
     objectSphere6->SetShaderProgram(PhongShader);
-    mapManager.AddObjectToMap(map, objectSphere6);
+    mapManager->AddObjectToMap(map, objectSphere6);
 
-    std::shared_ptr<StandardisedModel> objectSphere7 = mapManager.ModelObjectController.UseAny("Lesson/cube.obj",
+    std::shared_ptr<StandardisedModel> objectSphere7 = mapManager->ModelObjectController.UseAny("Lesson/cube.obj",
                                                                                                "Test model 7");
     objectSphere7->SetShaderProgram(PhongShader);
-    mapManager.AddObjectToMap(map, objectSphere7);
+    mapManager->AddObjectToMap(map, objectSphere7);
 
-    std::shared_ptr<StandardisedModel> objectSphere8 = mapManager.ModelObjectController.UseAny("Lesson/cube.obj",
+    std::shared_ptr<StandardisedModel> objectSphere8 = mapManager->ModelObjectController.UseAny("Lesson/cube.obj",
                                                                                                "Test model 8");
     objectSphere8->SetShaderProgram(PhongShader);
-    mapManager.AddObjectToMap(map, objectSphere8);
+    mapManager->AddObjectToMap(map, objectSphere8);
 
-    std::shared_ptr<StandardisedModel> objectSphere9 = mapManager.ModelObjectController.UseAny("Lesson/cube.obj",
+    std::shared_ptr<StandardisedModel> objectSphere9 = mapManager->ModelObjectController.UseAny("Lesson/cube.obj",
                                                                                                "Test model 9");
     objectSphere9->SetShaderProgram(PhongShader);
-    mapManager.AddObjectToMap(map, objectSphere9);
+    mapManager->AddObjectToMap(map, objectSphere9);
 
-    std::shared_ptr<StandardisedModel> objectSphere10 = mapManager.ModelObjectController.UseAny("Lesson/cube.obj",
+    std::shared_ptr<StandardisedModel> objectSphere10 = mapManager->ModelObjectController.UseAny("Lesson/cube.obj",
                                                                                                 "Test model 10");
     objectSphere10->SetShaderProgram(PhongShader);
-    mapManager.AddObjectToMap(map, objectSphere10);
+    mapManager->AddObjectToMap(map, objectSphere10);
 
-    std::shared_ptr<StandardisedModel> objectSphere11 = mapManager.ModelObjectController.UseAny("Lesson/cube.obj",
+    std::shared_ptr<StandardisedModel> objectSphere11 = mapManager->ModelObjectController.UseAny("Lesson/cube.obj",
                                                                                                 "Test model 11");
     objectSphere11->SetShaderProgram(PhongShader);
-    mapManager.AddObjectToMap(map, objectSphere11);
+    mapManager->AddObjectToMap(map, objectSphere11);
 
-    std::shared_ptr<StandardisedModel> objectSphere12 = mapManager.ModelObjectController.UseAny("Lesson/cube.obj",
+    std::shared_ptr<StandardisedModel> objectSphere12 = mapManager->ModelObjectController.UseAny("Lesson/cube.obj",
                                                                                                 "Test model 12");
     objectSphere12->SetShaderProgram(PhongShader);
-    mapManager.AddObjectToMap(map, objectSphere12);
+    mapManager->AddObjectToMap(map, objectSphere12);
 
     std::shared_ptr<LightSpot> spotLight = std::make_shared<LightSpot>(glm::vec3(0.0f, 0.0f, 0.0f),
                                                                        glm::vec3(0.0f, 1.0f, 0));
@@ -90,7 +90,7 @@ MapCreator::FourSpheres(const std::string &mapName, std::vector<std::shared_ptr<
             glm::vec3(1.0f, 1.0f, 1.0f));
     directionalLight->SetColor(glm::vec3(0.9f, 0.9f, 0.9f));
 
-    mapManager.AddLightToMap(map, directionalLight);
+    mapManager->AddLightToMap(map, directionalLight);
 
 
     ////Objects transformations
@@ -139,7 +139,7 @@ MapCreator::FourSpheres(const std::string &mapName, std::vector<std::shared_ptr<
     int skycube_size = sizeof(skycube) / sizeof(float);
     std::shared_ptr<StandardisedModel> pmSkybox = ModelFactory::Position(rawmodel_skycube, skycube_size, "Skybox");
     pmSkybox->SetShaderProgram(Skybox);
-    Texture *skyboxTexture = mapManager.TextureObjectsController.UseCubemap("Lesson/FieldSkybox/field");
+    Texture *skyboxTexture = mapManager->TextureObjectsController.UseCubemap("Lesson/FieldSkybox/field");
     pmSkybox->SetTexture(skyboxTexture);
     map->SetSkybox(pmSkybox);
 }

@@ -11,6 +11,9 @@
 #include "../ShaderLinking/MapToShaderLinker.h"
 #include "../../../Model/Texture/Controller/TextureController.h"
 #include "../../../Model/Controller/ModelController.h"
+#include "../../GameLogic/Abstract/AnyGameLogic.h"
+
+class AnyGameLogic;
 
 class ResourcesManager {
 private:
@@ -64,7 +67,7 @@ public:
     void ChangeMap(int index);
     void ChangeMap(const std::string &name);
 
-    StandardisedModel* GetObjectByContextID(unsigned short contextID);
+    StandardisedModel *GetObjectByContextID(unsigned short contextID);
 
     template<typename T, typename U>
     std::shared_ptr<StandardisedModel> &GetObjectOnMap(T mapTemplate, U objectTemplate) {
@@ -77,6 +80,13 @@ public:
 
         return object;
     }
+
+    AnyGameLogic *CurrentGameLogic{};
+    void
+    MouseCursorClickEvent(float xCursorCoords, float yCursorCoords, int windowHeight, int windowWidth, int button, int action,
+                          int mods) const;
+
+    void KeyPressEvent(int key, int scancode, int action, int mods) const;
 };
 
 

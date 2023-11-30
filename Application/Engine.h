@@ -14,6 +14,7 @@
 #include "../Shaders/Camera/Camera.h"
 #include "Managers/ShaderLinking/MapToShaderLinker.h"
 #include "Managers/EngineResources/ResourcesManager.h"
+#include "GameLogic/Abstract/AnyGameLogic.h"
 
 class Engine : public std::enable_shared_from_this<Engine> {
 private:
@@ -27,10 +28,8 @@ private:
     std::vector<std::shared_ptr<ShaderHandler>> Shaders;
     void LoadAllShaders();
 
-    ResourcesManager Resources;
-
+    std::unique_ptr<ResourcesManager> Resources;
     std::unique_ptr<Camera> CameraMain;
-
     std::shared_ptr<MovesetInputManager> MovesetManager;
 
     void UpdateMoveset();
@@ -58,6 +57,7 @@ public:
     void RequestMapChange(const std::string &name);
 
     void CursorClick(int button, int action, int mode);
+    void KeyPress(int key, int scancode, int action, int mods);
 
 
     void AddShader(const std::shared_ptr<ShaderHandler> &shader);

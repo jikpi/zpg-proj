@@ -86,8 +86,9 @@ void Engine::Initialize() {
     glfwSetCursorPosCallback(Window, KeyCallbacks::cursor_callback);
 //    glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    //Map
-    this->Resources.Initialize(false);
+    //Resources
+    this->Resources = std::make_unique<ResourcesManager>();
+    this->Resources->Initialize(false);
 
     //Camera
     this->CameraMain = std::make_unique<Camera>();
@@ -147,9 +148,9 @@ void Engine::PrintVersionInfo() {
 }
 
 void Engine::TestLaunch() {
-    MapCreator::FourSpheres("4 spheres", this->Shaders, this->Resources);
-    MapCreator::SolarSystem("Solar system", this->Shaders, this->Resources);
-    MapCreator::Overworld("Overworld", this->Shaders, this->Resources);
+    MapCreator::FourSpheres("4 spheres", this->Shaders, this->Resources.get());
+    MapCreator::SolarSystem("Solar system", this->Shaders, this->Resources.get());
+    MapCreator::Overworld("Overworld", this->Shaders, this->Resources.get());
 }
 
 void Engine::Run() {
@@ -171,17 +172,17 @@ void Engine::Run() {
     float angleIncrement = glm::radians(1.0f);
 
     std::shared_ptr<LightSpot> spheresSpotLight = std::dynamic_pointer_cast<LightSpot>(
-            this->Resources.GetLightOnMap("4 spheres", 0));
+            this->Resources->GetLightOnMap("4 spheres", 0));
 
     std::shared_ptr<LightSpot> manyObjectsFlash = std::dynamic_pointer_cast<LightSpot>(
-            this->Resources.GetLightOnMap("Overworld", 0));
+            this->Resources->GetLightOnMap("Overworld", 0));
 
-    std::shared_ptr<StandardisedModel> movingModel = this->Resources.GetObjectOnMap(0, 0);
+    std::shared_ptr<StandardisedModel> movingModel = this->Resources->GetObjectOnMap(0, 0);
 
 
     this->CameraMain->MoveForwardBackward(0);
-    this->Resources.ChangeMap(0);
-    this->Resources.ForceRefreshMaps();
+    this->Resources->ChangeMap(0);
+    this->Resources->ForceRefreshMaps();
     while (!glfwWindowShouldClose(Window)) {
         //Update camera position
         UpdateMoveset();
@@ -206,18 +207,18 @@ void Engine::Run() {
         //set many objects spot light to camera location and target
         manyObjectsFlash->SetPosition(this->CameraMain->GetLocation());
         manyObjectsFlash->SetDirection(this->CameraMain->GetTarget() - this->CameraMain->GetLocation());
-        Resources.ForceRefreshLightsOnCurrentMap();
+        Resources->ForceRefreshLightsOnCurrentMap();
 
         ////NextRender skybox
-        if (Resources.GetActiveMap()->GetSkybox() != nullptr) {
-            ShaderHandler *skyboxShader = Resources.GetActiveMap()->GetSkybox()->GetShaderProgram();
+        if (Resources->GetActiveMap()->GetSkybox() != nullptr) {
+            ShaderHandler *skyboxShader = Resources->GetActiveMap()->GetSkybox()->GetShaderProgram();
             glDepthMask(GL_FALSE);
             glDepthFunc(GL_LEQUAL);
             glDisable(GL_CULL_FACE);
             skyboxShader->UseProgram();
-            skyboxShader->RequestRender(*Resources.GetActiveMap()->GetSkybox());
-            Resources.GetActiveMap()->GetSkybox()->BindVertexArray();
-            glDrawArrays(GL_TRIANGLES, 0, Resources.GetActiveMap()->GetSkybox()->GetRenderingSize());
+            skyboxShader->RequestRender(*Resources->GetActiveMap()->GetSkybox());
+            Resources->GetActiveMap()->GetSkybox()->BindVertexArray();
+            glDrawArrays(GL_TRIANGLES, 0, Resources->GetActiveMap()->GetSkybox()->GetRenderingSize());
 
             glDepthMask(GL_TRUE);
             glDepthFunc(GL_LESS);
@@ -226,7 +227,7 @@ void Engine::Run() {
         }
 
         ////NextRender each shader
-        for (auto &set: this->Resources.ShaderLinker) {
+        for (auto &set: this->Resources->ShaderLinker) {
             set->Shader->UseProgram();
 
             //Render objects for chosen shader
@@ -374,19 +375,19 @@ void Engine::RandomMaterialsTest() {
         return material;
     };
 
-    for (int i = 0; i < this->Resources.GetActiveMap()->GetObjectCount(); i++) {
-        this->Resources.GetActiveMap()->GetObject(i)->SetMaterial(randomMaterial());
+    for (int i = 0; i < this->Resources->GetActiveMap()->GetObjectCount(); i++) {
+        this->Resources->GetActiveMap()->GetObject(i)->SetMaterial(randomMaterial());
     }
 }
 
 void Engine::RequestMapChange(int index) {
-    this->Resources.ChangeMap(index);
-    std::cout << "Map changed to " << this->Resources.GetActiveMap()->GetName() << std::endl;
+    this->Resources->ChangeMap(index);
+    std::cout << "Map changed to " << this->Resources->GetActiveMap()->GetName() << std::endl;
 }
 
 void Engine::RequestMapChange(const std::string &name) {
-    this->Resources.ChangeMap(name);
-    std::cout << "Map changed to " << this->Resources.GetActiveMap()->GetName() << std::endl;
+    this->Resources->ChangeMap(name);
+    std::cout << "Map changed to " << this->Resources->GetActiveMap()->GetName() << std::endl;
 }
 
 void Engine::LoadAllShaders() {
@@ -408,7 +409,7 @@ void Engine::LoadAllShaders() {
     }
 
 
-    this->Resources.SetFallbackShader(this->Shaders.at(0));
+    this->Resources->SetFallbackShader(this->Shaders.at(0));
 }
 
 void Engine::SaveCursorCoords(float x, float y) {
@@ -417,69 +418,79 @@ void Engine::SaveCursorCoords(float x, float y) {
 }
 
 void Engine::CursorClick(int button, int action, int mode) {
-    GLbyte color[4]{};
-    GLfloat depth{};
-    GLuint index{};
+    Resources->MouseCursorClickEvent(this->SavedCursorXCoord,
+                                     this->SavedCursorYCoord,
+                                     this->Height,
+                                     this->Width, button,
+                                     action, mode);
 
-    auto x = static_cast<GLint>(this->SavedCursorXCoord);
-    auto y = static_cast<GLint>(this->SavedCursorYCoord);
+//    GLbyte color[4]{};
+//    GLfloat depth{};
+//    GLuint index{};
+//
+//    auto x = static_cast<GLint>(this->SavedCursorXCoord);
+//    auto y = static_cast<GLint>(this->SavedCursorYCoord);
+//
+//    // Convert from window coordinates to pixel coordinates
+//    int convertedY = this->Height - y;
+//
+//    glReadPixels(x, convertedY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
+//    glReadPixels(x, convertedY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+//    glReadPixels(x, convertedY, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
+//
+//    std::cout << "stencil index " << index
+//              << ", clicked on pixel " << x << ", " << y
+//              << ", color " << (int) color[0] << ", "
+//              << (int) color[1] << ", "
+//              << (int) color[2] << ", "
+//              << (int) color[3]
+//              << ", depth " << depth
+//              << std::endl;
+//
+//
+//    if (button == 0 && action == 1 && mode == 0) {
+//
+//
+//        srand(static_cast<unsigned int>(time(nullptr)));
+//        auto randomMaterial = []() -> Material {
+//            Material material;
+//            material.AmbientColor = glm::vec3(0.1f, 0.1f, 0.1f);
+//            material.DiffuseColor = glm::vec3((float) rand() / RAND_MAX, (float) rand() / RAND_MAX,
+//                                              (float) rand() / RAND_MAX);
+//            material.SpecularColor = glm::vec3((float) rand() / RAND_MAX, (float) rand() / RAND_MAX,
+//                                               (float) rand() / RAND_MAX);
+//            material.ShineValue = (float) rand() / RAND_MAX * 245 + 10;
+//            return material;
+//        };
+//
+//        StandardisedModel *pointedObj = this->Resources->GetObjectByContextID(index);
+//        if (pointedObj != nullptr) {
+//            pointedObj->SetMaterial(randomMaterial());
+//        }
+//    }
+//
+//    if (button == 1 && action == 1 && mode == 0) {
+//
+//
+//        //Unproject
+//        glm::vec3 screenX = glm::vec3(x, convertedY, depth);
+//        glm::vec3 unprojected = this->CameraMain->GetUnprojectedCursor(this->Width, this->Height, screenX);
+//
+//        std::cout << "Unprojected: " << unprojected.x << ", " << unprojected.y << ", " << unprojected.z << std::endl;
+//        std::cout << "-------" << std::endl;
+//
+////        Add model at the location
+//        std::shared_ptr<StandardisedModel> spawnedModel = Resources->ModelObjectController.UseAny("Lesson/zombie.obj", "Zombie");
+//        spawnedModel->InsertTransfMove(glm::vec3(unprojected.x, unprojected.y, unprojected.z)).ConsolidateTransf();
+//
+//        spawnedModel->SetDefaultMaterial();
+//        Resources->AddObjectToCurrentMap(spawnedModel);
+//
+//    }
+//
 
-    // Convert from window coordinates to pixel coordinates
-    int convertedY = this->Height - y;
+}
 
-    glReadPixels(x, convertedY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
-    glReadPixels(x, convertedY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
-    glReadPixels(x, convertedY, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
-
-    std::cout << "stencil index " << index
-              << ", clicked on pixel " << x << ", " << y
-              << ", color " << (int) color[0] << ", "
-              << (int) color[1] << ", "
-              << (int) color[2] << ", "
-              << (int) color[3]
-              << ", depth " << depth
-              << std::endl;
-
-
-    if (button == 0 && action == 1 && mode == 0) {
-
-
-        srand(static_cast<unsigned int>(time(nullptr)));
-        auto randomMaterial = []() -> Material {
-            Material material;
-            material.AmbientColor = glm::vec3(0.1f, 0.1f, 0.1f);
-            material.DiffuseColor = glm::vec3((float) rand() / RAND_MAX, (float) rand() / RAND_MAX,
-                                              (float) rand() / RAND_MAX);
-            material.SpecularColor = glm::vec3((float) rand() / RAND_MAX, (float) rand() / RAND_MAX,
-                                               (float) rand() / RAND_MAX);
-            material.ShineValue = (float) rand() / RAND_MAX * 245 + 10;
-            return material;
-        };
-
-        StandardisedModel *pointedObj = this->Resources.GetObjectByContextID(index);
-        if (pointedObj != nullptr) {
-            pointedObj->SetMaterial(randomMaterial());
-        }
-    }
-
-    if (button == 1 && action == 1 && mode == 0) {
-
-
-        //Unproject
-        glm::vec3 screenX = glm::vec3(x, convertedY, depth);
-        glm::vec3 unprojected = this->CameraMain->GetUnprojectedCursor(this->Width, this->Height, screenX);
-
-        std::cout << "Unprojected: " << unprojected.x << ", " << unprojected.y << ", " << unprojected.z << std::endl;
-        std::cout << "-------" << std::endl;
-
-//        Add model at the location
-        std::shared_ptr<StandardisedModel> spawnedModel = Resources.ModelObjectController.UseAny("Lesson/zombie.obj", "Zombie");
-        spawnedModel->InsertTransfMove(glm::vec3(unprojected.x, unprojected.y, unprojected.z)).ConsolidateTransf();
-
-        spawnedModel->SetDefaultMaterial();
-        Resources.AddObjectToCurrentMap(spawnedModel);
-
-    }
-
-
+void Engine::KeyPress(int key, int scancode, int action, int mods) {
+    Resources->KeyPressEvent(key, scancode, action, mods);
 }
