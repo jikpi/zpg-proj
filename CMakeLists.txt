@@ -93,6 +93,10 @@ add_executable(zpg_test main.cpp
         Application/ObjectsManager/Map/PremadeMaps/MapCreator_Overworld.cpp
         Shaders/ShaderProgram/ShaderHandler_SaveLocation.cpp
         Shaders/ShaderProgram/ShaderHandler_Render.cpp
+        Model/Animation/Abstract/AnyAnimation.cpp
+        Model/Animation/Abstract/AnyAnimation.h
+        Model/Animation/BezierAnimation.cpp
+        Model/Animation/BezierAnimation.h
 )
 
 target_include_directories(zpg_test PRIVATE ${ASSIMP_INCLUDE_DIRS})

@@ -15,16 +15,21 @@ glm::mat4 TransfComposite::Use(const glm::mat4 &input) {
     }
 
     Result = result;
-    return Result;
+    return ReturnWithAdditiveTransformation(result);
 }
 
 glm::mat4 TransfComposite::Use() {
     return this->Use(glm::mat4(1.0f));
 }
 
+void TransfComposite::SingleUse(const std::shared_ptr<Transformation> &transformation) {
+    glm::mat4 result = transformation->Use(glm::mat4(1.0f));
+    Result = result;
+}
+
 glm::mat4 TransfComposite::MasterUseAndRemember(const glm::mat4 &input, bool isIdentity) {
-    if(Transformations.empty()) {
-        return Result;
+    if (Transformations.empty()) {
+        return ReturnWithAdditiveTransformation(input);
     }
 
     glm::mat4 result;
@@ -40,7 +45,7 @@ glm::mat4 TransfComposite::MasterUseAndRemember(const glm::mat4 &input, bool isI
     }
 
     Result = result;
-    return Result;
+    return ReturnWithAdditiveTransformation(result);
 }
 
 glm::mat4 TransfComposite::UseAndRemember(const glm::mat4 &input) {
@@ -62,7 +67,7 @@ void TransfComposite::ResetResult() {
 glm::mat4 TransfComposite::Consolidate(const glm::mat4 &input) {
     glm::mat4 result;
     if (Transformations.empty()) {
-        return Result;
+        return ReturnWithAdditiveTransformation(input);
     } else {
         result = this->UseAndRemember(input);
         this->ClearTransformations();
@@ -75,8 +80,8 @@ glm::mat4 TransfComposite::Consolidate() {
     return this->Consolidate(glm::mat4(1.0f));
 }
 
-glm::mat4 TransfComposite::GetResult() const {
-    return Result;
+glm::mat4 TransfComposite::GetResult() {
+    return ReturnWithAdditiveTransformation(Result);
 }
 
 void TransfComposite::SetResult(glm::mat4 result) {
@@ -85,5 +90,26 @@ void TransfComposite::SetResult(glm::mat4 result) {
 
 bool TransfComposite::TransformationsEmpty() const {
     return Transformations.empty();
+}
+
+void TransfComposite::SetAdditiveTransformation(const std::shared_ptr<Transformation> &additiveTransformation) {
+    this->AdditiveTransformation = additiveTransformation.get();
+}
+
+void TransfComposite::ClearAdditiveTransformation() {
+    this->AdditiveTransformation = nullptr;
+}
+
+Transformation * TransfComposite::GetAdditiveTransformation() const {
+    return this->AdditiveTransformation;
+}
+
+glm::mat4 TransfComposite::ReturnWithAdditiveTransformation(const glm::mat4 &input) {
+    if (this->AdditiveTransformation == nullptr) {
+        return input;
+    }
+
+    glm::mat4 result = this->AdditiveTransformation->Use(glm::mat4(1.0f));
+    return result * input;
 }
 

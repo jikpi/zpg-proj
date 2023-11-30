@@ -75,4 +75,7 @@ inline constexpr const unsigned short DEF_CONTEXT_DEFAULT_ID = 1;
 inline constexpr const unsigned short DEF_CONTEXT_ERROR_ID = 0;
 inline constexpr const unsigned int DEF_CONTEXT_MAX = 255;
 
+//// ### Animations ###
+inline constexpr const float DEF_ANIMATION_BEZIER_SMOOTH_T_DIFF = 0.05f;
+
 #endif //ZPG_TEST_AGLOBALCONFIG_H

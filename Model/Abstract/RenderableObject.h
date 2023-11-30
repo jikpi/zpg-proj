@@ -10,10 +10,12 @@
 #include "glm/ext/matrix_float4x4.hpp"
 #include "../Material.h"
 #include "../../Transformations/Composite/TransfComposite.h"
+#include "../Animation/Abstract/AnyAnimation.h"
 
 class RenderableObject {
 protected:
     std::shared_ptr<TransfComposite> Transformations;
+    std::shared_ptr<TransfComposite> AnimationTransformations;
     Material material;
 
     glm::mat3 NormalMatrix;
@@ -36,6 +38,13 @@ public:
     Texture *GetTexture();
 
     glm::mat3 &GetNormalMatrix();
+
+    std::vector <std::unique_ptr<AnyAnimation>> Animations;
+    void InsertAnimation(std::unique_ptr<AnyAnimation> animation);
+    void DoAnyAnimation(float t); //Does animation if there is one, if not, does next step of saved transformations ("DoTransf()")
+    void ClearAnimations();
+
+
 };
 
 

@@ -2,6 +2,7 @@
 // Created by KOP0269 on 10/27/23.
 //
 
+#include <iostream>
 #include "RenderableObject.h"
 
 glm::mat4 RenderableObject::GetTransf() const {
@@ -68,7 +69,7 @@ void RenderableObject::SetTexture(Texture *texture) {
     material.SetTexture(texture);
 }
 
-glm::mat3 & RenderableObject::GetNormalMatrix() {
+glm::mat3 &RenderableObject::GetNormalMatrix() {
     if (HasBeenTransformed) {
         HasBeenTransformed = false;
 
@@ -78,5 +79,33 @@ glm::mat3 & RenderableObject::GetNormalMatrix() {
     }
 
     return this->NormalMatrix;
+}
+
+void RenderableObject::InsertAnimation(std::unique_ptr<AnyAnimation> animation) {
+    this->Animations.push_back(std::move(animation));
+}
+
+void RenderableObject::ClearAnimations() {
+    this->Animations.clear();
+}
+
+void RenderableObject::DoAnyAnimation(float t) {
+    if (!this->Animations.empty()) {
+        for (auto &animation: this->Animations) {
+            animation->DoAnimation(t);
+        }
+
+        this->AnimationTransformations->ResetResult();
+        this->AnimationTransformations->ClearTransformations();
+
+        for (auto &animation: this->Animations) {
+            if (animation->Enabled) {
+                this->AnimationTransformations->Insert(animation->GetResult());
+            }
+        }
+        this->DoTransf();
+    } else {
+        this->DoTransf();
+    }
 }
 

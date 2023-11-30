@@ -176,12 +176,17 @@ void Engine::Run() {
     std::shared_ptr<LightSpot> manyObjectsFlash = std::dynamic_pointer_cast<LightSpot>(
             this->ResourceManager.GetLightOnMap("Overworld", 0));
 
+    std::shared_ptr<StandardisedModel> movingModel = this->ResourceManager.GetObjectOnMap(0, 0);
+
+
     this->CameraMain->MoveForwardBackward(0);
     this->ResourceManager.ChangeMap(0);
     this->ResourceManager.ForceRefreshMaps();
     while (!glfwWindowShouldClose(Window)) {
         //Update camera position
         UpdateMoveset();
+
+
 
         //Clear screen
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -226,7 +231,7 @@ void Engine::Run() {
 
             //Render objects for chosen shader
             for (auto &object: set->Objects) {
-                object->DoTransf();
+                object->DoAnyAnimation(0);
                 set->Shader->RequestRender(*object);
                 object->BindVertexArray();
 
