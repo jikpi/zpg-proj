@@ -166,6 +166,23 @@ void Engine::Run() {
     DebugErrorMessages::PrintGLErrors("Before run errors");
 
 
+    ////Bezier curve
+    glm::mat4 A = glm::mat4(glm::vec4(-1.0, 3.0, -3.0, 1.0),
+                            glm::vec4(3.0, -6.0, 3.0, 0),
+                            glm::vec4(-3.0, 3.0, 0, 0),
+                            glm::vec4(1, 0, 0, 0));
+//    std::cout << glm::to_string(A) << std::endl;
+    glm::mat4x3 B = glm::mat4x3(glm::vec3(0, 0, 0),
+                                glm::vec3(2, 2, 0),
+                                glm::vec3(-4, 4, 0),
+                                glm::vec3(6, 0, 0));
+    float t = 0.5f;
+    glm::vec4 parameters = glm::vec4(t * t * t, t * t, t, 1.0f);
+    glm::vec3 p = parameters * A * glm::transpose(B);
+    std::cout << "t = " << t << " P=[ " << p[0] << ", " << p[1] << ", " << p[2] << "]" << std::endl;
+    /*Bezier curve*/
+
+
     float radius = 1.0f;
     float angle = 0.0f;
     float angleIncrement = glm::radians(1.0f);
@@ -176,12 +193,34 @@ void Engine::Run() {
     std::shared_ptr<LightSpot> manyObjectsFlash = std::dynamic_pointer_cast<LightSpot>(
             this->ResourceManager.GetLightOnMap("Overworld", 0));
 
+    std::shared_ptr<StandardisedModel> movingModel = this->ResourceManager.GetObjectOnMap(0, 0);
+
     this->CameraMain->MoveForwardBackward(0);
     this->ResourceManager.ChangeMap(0);
     this->ResourceManager.ForceRefreshMaps();
     while (!glfwWindowShouldClose(Window)) {
         //Update camera position
         UpdateMoveset();
+
+
+        ////Bezier test
+        std::cout << "t = " << t << " P=[ " << p[0] << ", " << p[1] << ", " << p[2] << "]" << std::endl;
+        t += 0.01f;
+        if (t >= 1.0f) {
+            t = 0.0f;
+        }
+        parameters = glm::vec4(t * t * t, t * t, t, 1.0f);
+        p = parameters * A * glm::transpose(B);
+
+//        this->CameraMain->SetLocation(glm::vec3(p[0], p[1], p[2]));
+//        this->CameraMain->SetTarget(glm::vec3(0, 0, 0));
+
+        movingModel->ClearTransf();
+        movingModel->ResetTransf();
+        movingModel->InsertTransfMove(glm::vec3(p[0], p[1], p[2]));
+        /*Bezier test*/
+
+
 
         //Clear screen
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
