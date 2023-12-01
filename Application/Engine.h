@@ -11,9 +11,9 @@
 #include <iostream>
 #include "../Shaders/ShaderProgram/ShaderHandler.h"
 #include "InputHandler/MovesetInputManager.h"
-#include "../Shaders/Camera/Camera.h"
-#include "ObjectsManager/ShaderLinking/MapToShaderLinker.h"
-#include "ObjectsManager/Map/MapManager.h"
+#include "Managers/ShaderLinking/MapToShaderLinker.h"
+#include "Managers/EngineResources/ResourcesManager.h"
+#include "GameLogic/Abstract/AnyGameLogic.h"
 
 class Engine : public std::enable_shared_from_this<Engine> {
 private:
@@ -24,24 +24,22 @@ private:
     int Height{};
     float Ratio{};
 
-    std::vector<std::shared_ptr<ShaderHandler>> Shaders;
-    void LoadAllShaders();
-
-    MapManager ResourceManager;
-
-    std::unique_ptr<Camera> CameraMain;
-
+    std::unique_ptr<ResourcesManager> Resources;
     std::shared_ptr<MovesetInputManager> MovesetManager;
+
+    void LoadAllShaders();
 
     void UpdateMoveset();
 
-    float SavedCursorXCoord;
-    float SavedCursorYCoord;
+    float SavedCursorXCoord{};
+    float SavedCursorYCoord{};
+
+    int MapChangeFrameLock{};
 
 public:
     explicit Engine();
 
-    void Initialize();
+    void InitializeBase();
     static void PrintVersionInfo();
     void Run();
     void KillWindow() const;
@@ -58,12 +56,16 @@ public:
     void RequestMapChange(const std::string &name);
 
     void CursorClick(int button, int action, int mode);
+    void KeyPress(int key, int scancode, int action, int mods);
 
 
-    void AddShader(const std::shared_ptr<ShaderHandler> &shader);
-
-    void TestLaunch();
+    void InitializeRendering();
     void RandomMaterialsTest();
+
+    bool IsLogicPaused{};
+    void ResetLogic();
+
+    void RestartEngine();
 };
 
 

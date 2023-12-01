@@ -114,6 +114,29 @@ void KeyCallbacks::key_callback(GLFWwindow *window, int key, int scancode, int a
         }
     }
 
+    //Pause
+    if (key == GLFW_KEY_LEFT_ALT && action == GLFW_PRESS) {
+        if (!Engines.expired()) {
+            auto engine = Engines.lock();
+            engine->IsLogicPaused = !engine->IsLogicPaused;
+        }
+    }
+
+    //Reset logic
+    if (key == GLFW_KEY_RIGHT_ALT && action == GLFW_PRESS) {
+        if (!Engines.expired()) {
+            auto engine = Engines.lock();
+            engine->ResetLogic();
+        }
+    }
+
+    //Restart engine
+    if (key == GLFW_KEY_BACKSPACE && action == GLFW_PRESS) {
+        if (!Engines.expired()) {
+            auto engine = Engines.lock();
+            engine->RestartEngine();
+        }
+    }
 
 }
 

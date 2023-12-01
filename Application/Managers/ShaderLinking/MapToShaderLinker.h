@@ -9,7 +9,7 @@
 #include <vector>
 #include <memory>
 #include "ShaderObjectSet/ShaderObjectSet.h"
-#include "../Map/Map.h"
+#include "../EngineResources/Map.h"
 
 class MapToShaderLinker {
 private:

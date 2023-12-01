@@ -12,20 +12,19 @@
 //Shaders
 #include "../Shaders/ShaderProgram/ShaderHandlerFactory/ShaderHandlerFactory.h"
 
-//Transformations
-#include "../Transformations/Composite/Factory/TransformationFactory.h"
-
 //Models
-#include "../ExtResources/LessonResources/InclLessonModels.h"
 #include "../Shaders/Lighting/LightSpot.h"
 
 //Map creator
-#include "ObjectsManager/Map/PremadeMaps/MapCreator.h"
+#include "Managers/EngineResources/PremadeMaps/MapCreator.h"
+#include "GameLogic/Solar system/GameLogic_SolarSystem.h"
+#include "GameLogic/Overworld/GameLogic_Overworld.h"
+#include "GameLogic/4 Spheres/GameLogic_4Spheres.h"
 
 
 Engine::Engine() = default;
 
-void Engine::Initialize() {
+void Engine::InitializeBase() {
     glfwSetErrorCallback(KeyCallbacks::error_callback);
 
     if (!glfwInit()) {
@@ -86,12 +85,12 @@ void Engine::Initialize() {
     glfwSetCursorPosCallback(Window, KeyCallbacks::cursor_callback);
 //    glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    //Map
-    this->ResourceManager.Initialize(false);
+    //Resources
+    this->Resources = std::make_unique<ResourcesManager>();
+    this->Resources->Initialize(false);
 
     //Camera
-    this->CameraMain = std::make_unique<Camera>();
-    this->CameraMain->SetAspectRatio(this->Ratio);
+    Resources->CameraMain->SetAspectRatio(this->Ratio);
 
     //Shaders
     LoadAllShaders();
@@ -100,7 +99,8 @@ void Engine::Initialize() {
     glEnable(GL_STENCIL_TEST);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-
+    //Unpause
+    this->IsLogicPaused = false;
 }
 
 void Engine::InitializeInputHandling() {
@@ -128,8 +128,8 @@ void Engine::NotifyWindowResize(int newWidth, int newHeight) {
     this->Ratio = newWidth / (float) newHeight;
     glViewport(0, 0, newWidth, newHeight);
 
-    if (this->CameraMain != nullptr) {
-        this->CameraMain->SetAspectRatio(this->Ratio);
+    if (Resources->CameraMain != nullptr) {
+        Resources->CameraMain->SetAspectRatio(this->Ratio);
     }
 }
 
@@ -146,14 +146,20 @@ void Engine::PrintVersionInfo() {
     printf("Move camera with 'wasd' and 'r,f', press 'c' to toggle camera, 'y' to toggle movement method, '1-9' to change the map, 'p' to toggle perspective, 'm' to set random materials for objects.\n");
 }
 
-void Engine::TestLaunch() {
-    MapCreator::FourSpheres("4 spheres", this->Shaders, this->ResourceManager);
-    MapCreator::SolarSystem("Solar system", this->Shaders, this->ResourceManager);
-    MapCreator::Overworld("Overworld", this->Shaders, this->ResourceManager);
+void Engine::InitializeRendering() {
+
+    std::unique_ptr<AnyGameLogic> fourSpheresLogic = std::make_unique<GameLogic_4Spheres>();
+    this->Resources->InsertGameLogic(std::move(fourSpheresLogic));
+
+    std::unique_ptr<AnyGameLogic> solarsystemLogic = std::make_unique<GameLogic_SolarSystem>();
+    this->Resources->InsertGameLogic(std::move(solarsystemLogic));
+
+    std::unique_ptr<AnyGameLogic> overworldLogic = std::make_unique<GameLogic_Overworld>();
+    this->Resources->InsertGameLogic(std::move(overworldLogic));
 }
 
 void Engine::Run() {
-    if (this->CameraMain == nullptr) {
+    if (Resources->CameraMain == nullptr) {
         std::cerr << "FATAL: Engine: No camera available." << std::endl;
         throw std::runtime_error("No camera available.");
     }
@@ -165,60 +171,41 @@ void Engine::Run() {
     this->SetCameraLock(true);
     DebugErrorMessages::PrintGLErrors("Before run errors");
 
-
-    float radius = 1.0f;
-    float angle = 0.0f;
-    float angleIncrement = glm::radians(1.0f);
-
-    std::shared_ptr<LightSpot> spheresSpotLight = std::dynamic_pointer_cast<LightSpot>(
-            this->ResourceManager.GetLightOnMap("4 spheres", 0));
-
     std::shared_ptr<LightSpot> manyObjectsFlash = std::dynamic_pointer_cast<LightSpot>(
-            this->ResourceManager.GetLightOnMap("Overworld", 0));
-
-    std::shared_ptr<StandardisedModel> movingModel = this->ResourceManager.GetObjectOnMap(0, 0);
+            this->Resources->GetLightOnMap("Overworld", 0));
 
 
-    this->CameraMain->MoveForwardBackward(0);
-    this->ResourceManager.ChangeMap(0);
-    this->ResourceManager.ForceRefreshMaps();
+    Resources->CameraMain->MoveForwardBackward(0);
+    this->Resources->ChangeMap(0);
+    this->Resources->ForceRefreshMaps();
     while (!glfwWindowShouldClose(Window)) {
         //Update camera position
         UpdateMoveset();
-
-
 
         //Clear screen
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-        angle += angleIncrement;
-        if (angle > 2 * glm::pi<float>()) {
-            angle -= 2 * glm::pi<float>();
+        //Decrease map change lock
+        if (this->MapChangeFrameLock > 0) {
+            this->MapChangeFrameLock--;
         }
 
-        float x = radius * cos(angle);
-        float z = radius * sin(angle);
-
-        spheresSpotLight->SetDirection(glm::vec3(x, 0.0f, z));
-
-        //set many objects spot light to camera location and target
-        manyObjectsFlash->SetPosition(this->CameraMain->GetLocation());
-        manyObjectsFlash->SetDirection(this->CameraMain->GetTarget() - this->CameraMain->GetLocation());
-        ResourceManager.ForceRefreshLightsOnCurrentMap();
+        //Do logic
+        if (!this->IsLogicPaused) {
+            this->Resources->NextRender();
+        }
 
         ////Render skybox
-        if (ResourceManager.GetActiveMap()->GetSkybox() != nullptr) {
-            ShaderHandler *skyboxShader = ResourceManager.GetActiveMap()->GetSkybox()->GetShaderProgram();
+        if (Resources->GetActiveMap()->GetSkybox() != nullptr) {
+            ShaderHandler *skyboxShader = Resources->GetActiveMap()->GetSkybox()->GetShaderProgram();
             glDepthMask(GL_FALSE);
             glDepthFunc(GL_LEQUAL);
             glDisable(GL_CULL_FACE);
             skyboxShader->UseProgram();
-            skyboxShader->RequestRender(*ResourceManager.GetActiveMap()->GetSkybox());
-            ResourceManager.GetActiveMap()->GetSkybox()->BindVertexArray();
-            glDrawArrays(GL_TRIANGLES, 0, ResourceManager.GetActiveMap()->GetSkybox()->GetRenderingSize());
-
+            skyboxShader->RequestRender(*Resources->GetActiveMap()->GetSkybox());
+            Resources->GetActiveMap()->GetSkybox()->BindVertexArray();
+            glDrawArrays(GL_TRIANGLES, 0, Resources->GetActiveMap()->GetSkybox()->GetRenderingSize());
             glDepthMask(GL_TRUE);
             glDepthFunc(GL_LESS);
             glEnable(GL_CULL_FACE);
@@ -226,12 +213,17 @@ void Engine::Run() {
         }
 
         ////Render each shader
-        for (auto &set: this->ResourceManager.ShaderLinker) {
+        for (auto &set: this->Resources->ShaderLinker) {
             set->Shader->UseProgram();
 
             //Render objects for chosen shader
             for (auto &object: set->Objects) {
-                object->DoAnyAnimation(0);
+
+                //Pausing logic also pauses animations/transformations
+                if (!this->IsLogicPaused) {
+                    object->DoAnyAnimation(0);
+                }
+
                 set->Shader->RequestRender(*object);
                 object->BindVertexArray();
 
@@ -268,14 +260,14 @@ void Engine::KillWindow() const {
 }
 
 void Engine::CameraLookHorizontal(double x) {
-    if (this->CameraMain != nullptr) {
-        this->CameraMain->LookSphericalSide(x);
+    if (Resources->CameraMain != nullptr) {
+        Resources->CameraMain->LookSphericalSide(x);
     }
 }
 
 void Engine::CameraLookVertical(double y) {
-    if (this->CameraMain != nullptr) {
-        this->CameraMain->LookSphericalVertical(y);
+    if (Resources->CameraMain != nullptr) {
+        Resources->CameraMain->LookSphericalVertical(y);
     }
 }
 
@@ -288,7 +280,7 @@ void Engine::UpdateMoveset() {
         return;
     }
 
-    if (this->CameraMain == nullptr) {
+    if (Resources->CameraMain == nullptr) {
         return;
     }
 
@@ -296,68 +288,64 @@ void Engine::UpdateMoveset() {
     float reading;
     reading = this->MovesetManager->ReadForward();
     if (reading != 0) {
-        this->CameraMain->MoveForwardBackward(reading);
+        Resources->CameraMain->MoveForwardBackward(reading);
     }
 
     reading = this->MovesetManager->ReadSide();
     if (reading != 0) {
-        this->CameraMain->MoveSideToSide(reading);
+        Resources->CameraMain->MoveSideToSide(reading);
     }
 
     reading = this->MovesetManager->ReadVertical();
     if (reading != 0) {
-        this->CameraMain->MoveUpDown(reading);
+        Resources->CameraMain->MoveUpDown(reading);
     }
 }
 
 void Engine::SetCameraLock(bool lock) {
 
-    if (this->CameraMain == nullptr) {
+    if (Resources->CameraMain == nullptr) {
         return;
     }
 
     if (lock) {
         glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        this->CameraMain->UnlockSet(true);
+        Resources->CameraMain->UnlockSet(true);
     } else {
         glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        this->CameraMain->UnlockSet(false);
+        Resources->CameraMain->UnlockSet(false);
     }
 }
 
 void Engine::ToggleCameraLock() {
-    if (this->CameraMain->UnlockState()) {
+    if (Resources->CameraMain->UnlockState()) {
         this->SetCameraLock(false);
     } else {
         this->SetCameraLock(true);
     }
 }
 
-void Engine::AddShader(const std::shared_ptr<ShaderHandler> &shader) {
-    this->Shaders.push_back(shader);
-}
-
 void Engine::ToggleCameraPerspective() {
-    if (this->CameraMain == nullptr) {
+    if (Resources->CameraMain == nullptr) {
         return;
     }
 
-    if (this->CameraMain->GetPerspectiveProjection()) {
-        this->CameraMain->SetPerspectiveProjection(false);
+    if (Resources->CameraMain->GetPerspectiveProjection()) {
+        Resources->CameraMain->SetPerspectiveProjection(false);
     } else {
-        this->CameraMain->SetPerspectiveProjection(true);
+        Resources->CameraMain->SetPerspectiveProjection(true);
     }
 }
 
 void Engine::ToggleCameraYDirection() {
-    if (this->CameraMain == nullptr) {
+    if (Resources->CameraMain == nullptr) {
         return;
     }
 
-    if (this->CameraMain->GetFollowYDirection()) {
-        this->CameraMain->SetFollowYDirection(false);
+    if (Resources->CameraMain->GetFollowYDirection()) {
+        Resources->CameraMain->SetFollowYDirection(false);
     } else {
-        this->CameraMain->SetFollowYDirection(true);
+        Resources->CameraMain->SetFollowYDirection(true);
     }
 }
 
@@ -374,41 +362,40 @@ void Engine::RandomMaterialsTest() {
         return material;
     };
 
-    for (int i = 0; i < this->ResourceManager.GetActiveMap()->GetObjectCount(); i++) {
-        this->ResourceManager.GetActiveMap()->GetObject(i)->SetMaterial(randomMaterial());
+    for (int i = 0; i < this->Resources->GetActiveMap()->GetObjectCount(); i++) {
+        this->Resources->GetActiveMap()->GetObject(i)->SetMaterial(randomMaterial());
     }
 }
 
 void Engine::RequestMapChange(int index) {
-    this->ResourceManager.ChangeMap(index);
-    std::cout << "Map changed to " << this->ResourceManager.GetActiveMap()->GetName() << std::endl;
+    if (this->MapChangeFrameLock > 0) {
+        return;
+    }
+
+    MapChangeFrameLock = DEF_MAP_CHANGE_TIMEOUT;
+    this->Resources->ChangeMap(index);
+    std::cout << "Map changed to " << this->Resources->GetActiveMap()->GetName() << std::endl;
 }
 
 void Engine::RequestMapChange(const std::string &name) {
-    this->ResourceManager.ChangeMap(name);
-    std::cout << "Map changed to " << this->ResourceManager.GetActiveMap()->GetName() << std::endl;
+    if (this->MapChangeFrameLock > 0) {
+        return;
+    }
+
+    MapChangeFrameLock = DEF_MAP_CHANGE_TIMEOUT;
+    this->Resources->ChangeMap(name);
+    std::cout << "Map changed to " << this->Resources->GetActiveMap()->GetName() << std::endl;
 }
 
 void Engine::LoadAllShaders() {
-    this->Shaders.push_back(ShaderHandlerFactory::Phong());
-    this->Shaders.push_back(ShaderHandlerFactory::Lambert());
-    this->Shaders.push_back(ShaderHandlerFactory::ConstantColored());
-    this->Shaders.push_back(ShaderHandlerFactory::BlinnPhong());
-    this->Shaders.push_back(ShaderHandlerFactory::PhongTexture());
-    this->Shaders.push_back(ShaderHandlerFactory::Skybox());
 
+    this->Resources->AddShader(ShaderHandlerFactory::Phong());
+    this->Resources->AddShader(ShaderHandlerFactory::Lambert());
+    this->Resources->AddShader(ShaderHandlerFactory::ConstantColored());
+    this->Resources->AddShader(ShaderHandlerFactory::BlinnPhong());
+    this->Resources->AddShader(ShaderHandlerFactory::PhongTexture());
+    this->Resources->AddShader(ShaderHandlerFactory::Skybox());
 
-    if (this->CameraMain != nullptr) {
-        for (auto &shader: this->Shaders) {
-            this->CameraMain->RegisterCameraObserver(shader);
-        }
-    } else {
-        std::cerr << "FATAL: Engine: No camera available." << std::endl;
-        throw std::runtime_error("No camera available.");
-    }
-
-
-    this->ResourceManager.SetFallbackShader(this->Shaders.at(0));
 }
 
 void Engine::SaveCursorCoords(float x, float y) {
@@ -417,69 +404,96 @@ void Engine::SaveCursorCoords(float x, float y) {
 }
 
 void Engine::CursorClick(int button, int action, int mode) {
-    GLbyte color[4]{};
-    GLfloat depth{};
-    GLuint index{};
+    Resources->MouseCursorClickEvent(this->SavedCursorXCoord,
+                                     this->SavedCursorYCoord,
+                                     this->Height,
+                                     this->Width, button,
+                                     action, mode);
 
-    auto x = static_cast<GLint>(this->SavedCursorXCoord);
-    auto y = static_cast<GLint>(this->SavedCursorYCoord);
+//    GLbyte color[4]{};
+//    GLfloat depth{};
+//    GLuint index{};
+//
+//    auto x = static_cast<GLint>(this->SavedCursorXCoord);
+//    auto y = static_cast<GLint>(this->SavedCursorYCoord);
+//
+//    // Convert from window coordinates to pixel coordinates
+//    int convertedY = this->Height - y;
+//
+//    glReadPixels(x, convertedY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
+//    glReadPixels(x, convertedY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+//    glReadPixels(x, convertedY, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
+//
+//    std::cout << "stencil index " << index
+//              << ", clicked on pixel " << x << ", " << y
+//              << ", color " << (int) color[0] << ", "
+//              << (int) color[1] << ", "
+//              << (int) color[2] << ", "
+//              << (int) color[3]
+//              << ", depth " << depth
+//              << std::endl;
+//
+//
+//    if (button == 0 && action == 1 && mode == 0) {
+//
+//
+//        srand(static_cast<unsigned int>(time(nullptr)));
+//        auto randomMaterial = []() -> Material {
+//            Material material;
+//            material.AmbientColor = glm::vec3(0.1f, 0.1f, 0.1f);
+//            material.DiffuseColor = glm::vec3((float) rand() / RAND_MAX, (float) rand() / RAND_MAX,
+//                                              (float) rand() / RAND_MAX);
+//            material.SpecularColor = glm::vec3((float) rand() / RAND_MAX, (float) rand() / RAND_MAX,
+//                                               (float) rand() / RAND_MAX);
+//            material.ShineValue = (float) rand() / RAND_MAX * 245 + 10;
+//            return material;
+//        };
+//
+//        StandardisedModel *pointedObj = this->Resources->GetObjectByContextID(index);
+//        if (pointedObj != nullptr) {
+//            pointedObj->SetMaterial(randomMaterial());
+//        }
+//    }
+//
+//    if (button == 1 && action == 1 && mode == 0) {
+//
+//
+//        //Unproject
+//        glm::vec3 screenX = glm::vec3(x, convertedY, depth);
+//        glm::vec3 unprojected = this->CameraMain->GetUnprojectedCursor(this->Width, this->Height, screenX);
+//
+//        std::cout << "Unprojected: " << unprojected.x << ", " << unprojected.y << ", " << unprojected.z << std::endl;
+//        std::cout << "-------" << std::endl;
+//
+////        Add model at the location
+//        std::shared_ptr<StandardisedModel> spawnedModel = Resources->ModelObjectController.UseAny("Lesson/zombie.obj", "Zombie");
+//        spawnedModel->InsertTransfMove(glm::vec3(unprojected.x, unprojected.y, unprojected.z)).ConsolidateTransf();
+//
+//        spawnedModel->SetDefaultMaterial();
+//        Resources->AddObjectToCurrentMap(spawnedModel);
+//
+//    }
+//
 
-    // Convert from window coordinates to pixel coordinates
-    int convertedY = this->Height - y;
+}
 
-    glReadPixels(x, convertedY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
-    glReadPixels(x, convertedY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
-    glReadPixels(x, convertedY, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
+void Engine::KeyPress(int key, int scancode, int action, int mods) {
+    Resources->KeyPressEvent(key, scancode, action, mods);
+}
 
-    std::cout << "stencil index " << index
-              << ", clicked on pixel " << x << ", " << y
-              << ", color " << (int) color[0] << ", "
-              << (int) color[1] << ", "
-              << (int) color[2] << ", "
-              << (int) color[3]
-              << ", depth " << depth
-              << std::endl;
-
-
-    if (button == 0 && action == 1 && mode == 0) {
-
-
-        srand(static_cast<unsigned int>(time(nullptr)));
-        auto randomMaterial = []() -> Material {
-            Material material;
-            material.AmbientColor = glm::vec3(0.1f, 0.1f, 0.1f);
-            material.DiffuseColor = glm::vec3((float) rand() / RAND_MAX, (float) rand() / RAND_MAX,
-                                              (float) rand() / RAND_MAX);
-            material.SpecularColor = glm::vec3((float) rand() / RAND_MAX, (float) rand() / RAND_MAX,
-                                               (float) rand() / RAND_MAX);
-            material.ShineValue = (float) rand() / RAND_MAX * 245 + 10;
-            return material;
-        };
-
-        StandardisedModel *pointedObj = this->ResourceManager.GetObjectByContextID(index);
-        if (pointedObj != nullptr) {
-            pointedObj->SetMaterial(randomMaterial());
-        }
+void Engine::ResetLogic() {
+    if (this->Resources->ActiveGameLogic == nullptr) {
+        return;
     }
 
-    if (button == 1 && action == 1 && mode == 0) {
+    this->Resources->ActiveGameLogic->Reset();
+}
 
+void Engine::RestartEngine() {
+    this->KillWindow();
+    this->Resources.reset();
 
-        //Unproject
-        glm::vec3 screenX = glm::vec3(x, convertedY, depth);
-        glm::vec3 unprojected = this->CameraMain->GetUnprojectedCursor(this->Width, this->Height, screenX);
-
-        std::cout << "Unprojected: " << unprojected.x << ", " << unprojected.y << ", " << unprojected.z << std::endl;
-        std::cout << "-------" << std::endl;
-
-//        Add model at the location
-        std::shared_ptr<StandardisedModel> spawnedModel = ResourceManager.ModelObjectController.UseAny("Lesson/zombie.obj", "Zombie");
-        spawnedModel->InsertTransfMove(glm::vec3(unprojected.x, unprojected.y, unprojected.z)).ConsolidateTransf();
-
-        spawnedModel->SetDefaultMaterial();
-        ResourceManager.AddObjectToCurrentMap(spawnedModel);
-
-    }
-
-
+    this->InitializeBase();
+    this->InitializeRendering();
+    this->Run();
 }

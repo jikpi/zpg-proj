@@ -15,6 +15,7 @@ inline constexpr float DEF_CAMERA_MAXRENDER = 1000.0f;
 
 //// ### Map ###
 inline constexpr const char *DEF_MAP_NAME = "Default";
+inline constexpr const int DEF_MAP_CHANGE_TIMEOUT = 10;
 
 //// ### ShaderProgram ###
 // model matrix, view matrix, projection matrix
@@ -65,6 +66,12 @@ inline constexpr const glm::vec3 DEF_LIGHT_COLOR = glm::vec3(1.0f, 1.0f, 1.0f);
 inline constexpr const glm::vec3 DEF_LIGHT_DIRECTIONAL_DIRECTION = glm::vec3(0.0f, -1.0f, 0.0f);
 inline constexpr const float DEF_LIGHT_INNERCUTOFF = 10.0f;
 inline constexpr const float DEF_LIGHT_OUTERCUTOFF = 20.0f;
+
+//// ### Material ###
+inline constexpr const glm::vec3 DEF_MATERIAL_COLOR_AMBIENT = glm::vec3(0.01f, 0.01f, 0.01f);
+inline constexpr const glm::vec3 DEF_MATERIAL_COLOR_DIFFUSE = glm::vec3(1.0f, 1.0f, 1.0f);
+inline constexpr const glm::vec3 DEF_MATERIAL_COLOR_SPECULAR = glm::vec3(0.5f, 0.5f, 0.5f);
+inline constexpr const float DEF_MATERIAL_SHINEVALUE = 100.0f;
 
 //// ### Standard paths ###
 inline constexpr const char *DEF_PATH_TEXTURES = "../Resources/Textures/";

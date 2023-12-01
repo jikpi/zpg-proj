@@ -23,8 +23,8 @@ add_executable(zpg_test main.cpp
         Model/Factory/ModelFactory.h
         Model/StandardisedModel.cpp
         Model/StandardisedModel.h
-        Application/ObjectsManager/Map/Map.cpp
-        Application/ObjectsManager/Map/Map.h
+        Application/Managers/EngineResources/Map.cpp
+        Application/Managers/EngineResources/Map.h
         Application/InputHandler/KeyCallbacks/KeyCallbacks.cpp
         Application/InputHandler/KeyCallbacks/KeyCallbacks.h
         Application/DebugErrorMessages/DebugErrorMessages.cpp
@@ -52,10 +52,10 @@ add_executable(zpg_test main.cpp
         Shaders/ShadersCode/Loader/ShaderFileLoader.h
         Shaders/Lighting/LightPoint.cpp
         Shaders/Lighting/LightPoint.h
-        Application/ObjectsManager/ShaderLinking/MapToShaderLinker.cpp
-        Application/ObjectsManager/ShaderLinking/MapToShaderLinker.h
-        Application/ObjectsManager/ShaderLinking/ShaderObjectSet/ShaderObjectSet.cpp
-        Application/ObjectsManager/ShaderLinking/ShaderObjectSet/ShaderObjectSet.h
+        Application/Managers/ShaderLinking/MapToShaderLinker.cpp
+        Application/Managers/ShaderLinking/MapToShaderLinker.h
+        Application/Managers/ShaderLinking/ShaderObjectSet/ShaderObjectSet.cpp
+        Application/Managers/ShaderLinking/ShaderObjectSet/ShaderObjectSet.h
         Shaders/ShaderType.h
         Model/Material.cpp
         Model/Material.h
@@ -66,9 +66,8 @@ add_executable(zpg_test main.cpp
         Shaders/Lighting/Uniforms/LightsArrayPointUniform.h
         Shaders/ShaderProgram/ShaderBase/ShaderBase.cpp
         Shaders/ShaderProgram/ShaderBase/ShaderBase.h
-        Application/ObjectsManager/Map/MapManager.cpp
-        Application/ObjectsManager/Map/MapManager.h
-        ExtResources/LessonResources/InclLessonModels.h
+        Application/Managers/EngineResources/ResourcesManager.cpp
+        Application/Managers/EngineResources/ResourcesManager.h
         Shaders/Lighting/Abstract/RenderableLight.cpp
         Shaders/Lighting/Abstract/RenderableLight.h
         Shaders/Lighting/Abstract/LightType.h
@@ -78,7 +77,6 @@ add_executable(zpg_test main.cpp
         Shaders/Lighting/LightSpot.h
         Shaders/Lighting/Uniforms/LightArrayDirectionalUniform.h
         Shaders/Lighting/Uniforms/LightsArraySpotUniform.h
-        ExtResources/LessonResources/TextureResources/plane_tex.h
         Model/Texture/Controller/TextureController.cpp
         Model/Texture/Controller/TextureController.h
         Model/Texture/Texture.cpp
@@ -86,17 +84,28 @@ add_executable(zpg_test main.cpp
         Model/Controller/ModelController.cpp
         Model/Controller/ModelController.h
         Model/ModelStamp.h
-        Application/ObjectsManager/Map/PremadeMaps/MapCreator.cpp
-        Application/ObjectsManager/Map/PremadeMaps/MapCreator.h
-        Application/ObjectsManager/Map/PremadeMaps/MapCreator_4Spheres.cpp
-        Application/ObjectsManager/Map/PremadeMaps/MapCreator_SolarSystem.cpp
-        Application/ObjectsManager/Map/PremadeMaps/MapCreator_Overworld.cpp
+        Application/Managers/EngineResources/PremadeMaps/MapCreator.cpp
+        Application/Managers/EngineResources/PremadeMaps/MapCreator.h
+        Application/Managers/EngineResources/PremadeMaps/MapCreator_4Spheres.cpp
+        Application/Managers/EngineResources/PremadeMaps/MapCreator_SolarSystem.cpp
+        Application/Managers/EngineResources/PremadeMaps/MapCreator_Overworld.cpp
         Shaders/ShaderProgram/ShaderHandler_SaveLocation.cpp
         Shaders/ShaderProgram/ShaderHandler_Render.cpp
         Model/Animation/Abstract/AnyAnimation.cpp
         Model/Animation/Abstract/AnyAnimation.h
         Model/Animation/BezierAnimation.cpp
         Model/Animation/BezierAnimation.h
+        Application/GameLogic/Abstract/AnyGameLogic.cpp
+        Application/GameLogic/Abstract/AnyGameLogic.h
+        "Application/GameLogic/Solar system/GameLogic_SolarSystem.cpp"
+        "Application/GameLogic/Solar system/GameLogic_SolarSystem.h"
+        Application/GameLogic/Overworld/GameLogic_Overworld.cpp
+        Application/GameLogic/Overworld/GameLogic_Overworld.h
+        "Application/GameLogic/Solar system/GameLogic_SolarSystem_LoadMap.cpp"
+        Application/GameLogic/Overworld/GameLogic_Overworld_LoadMap.cpp
+        "Application/GameLogic/4 Spheres/GameLogic_4Spheres.cpp"
+        "Application/GameLogic/4 Spheres/GameLogic_4Spheres.h"
+        Application/GameLogic/Abstract/GameLogic_4Spheres_LoadMap.cpp
 )
 
 target_include_directories(zpg_test PRIVATE ${ASSIMP_INCLUDE_DIRS})

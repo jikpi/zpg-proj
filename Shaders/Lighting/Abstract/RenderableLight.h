@@ -7,6 +7,7 @@
 
 
 #include "glm/vec3.hpp"
+#include <string>
 #include "LightType.h"
 #include "../../../Model/Abstract/RenderableObject.h"
 
@@ -24,6 +25,8 @@ public:
     explicit RenderableLight(LightType type);
     RenderableLight();
     virtual ~RenderableLight() = default;
+
+    std::string Name{};
 
     [[nodiscard]] const glm::vec3 &GetColor() const;
     [[nodiscard]] float GetIntensity() const;

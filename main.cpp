@@ -3,8 +3,8 @@
 int main() {
 
     std::shared_ptr<Engine> MyEngine = std::make_shared<Engine>();
-    MyEngine->Initialize();
-    MyEngine->TestLaunch();
+    MyEngine->InitializeBase();
+    MyEngine->InitializeRendering();
 
     MyEngine->PrintVersionInfo();
     MyEngine->Run();

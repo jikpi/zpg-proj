@@ -42,12 +42,12 @@ LightType RenderableLight::GetType() const {
     return Type;
 }
 
-RenderableLight & RenderableLight::SetColor(const glm::vec3 &newColor) {
+RenderableLight &RenderableLight::SetColor(const glm::vec3 &newColor) {
     Color = newColor;
     return *this;
 }
 
-RenderableLight & RenderableLight::SetIntensity(float newIntensity) {
+RenderableLight &RenderableLight::SetIntensity(float newIntensity) {
     Intensity = newIntensity;
     return *this;
 }

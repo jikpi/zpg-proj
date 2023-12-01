@@ -21,7 +21,7 @@ class Map {
 
     void InsertLight(const std::shared_ptr<RenderableLight> &light);
     unsigned long GetLightCount();
-    std::shared_ptr<RenderableLight> &GetLight(int index);
+    std::shared_ptr<RenderableLight> &MasterGetLight(int index);
     void ChangeLight(int index, const std::shared_ptr<RenderableLight> &light);
     void SetSkybox(const std::shared_ptr<StandardisedModel> &skybox);
     void InsertObject(const std::shared_ptr<StandardisedModel> &object);
@@ -30,15 +30,15 @@ public:
 
     friend class MapToShaderLinker;
 
-    friend class MapManager;
-
-    friend class MapCreator;
+    friend class ResourcesManager;
 
     unsigned long GetObjectCount();
     [[nodiscard]] const std::shared_ptr<StandardisedModel> &GetSkybox() const;
 
     std::shared_ptr<StandardisedModel> &GetObject(int index);
     std::shared_ptr<StandardisedModel> &GetObject(const std::string &name);
+
+    std::shared_ptr<RenderableLight> &GetLight(const std::string &lightName);
 
 
     [[nodiscard]] std::string GetName() const;

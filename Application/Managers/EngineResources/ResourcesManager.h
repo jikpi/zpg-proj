@@ -2,8 +2,8 @@
 // Created by KOP0269 on 10/28/23.
 //
 
-#ifndef ZPG_TEST_MAPMANAGER_H
-#define ZPG_TEST_MAPMANAGER_H
+#ifndef ZPG_TEST_RESOURCESMANAGER_H
+#define ZPG_TEST_RESOURCESMANAGER_H
 
 
 #include <memory>
@@ -11,8 +11,12 @@
 #include "../ShaderLinking/MapToShaderLinker.h"
 #include "../../../Model/Texture/Controller/TextureController.h"
 #include "../../../Model/Controller/ModelController.h"
+#include "../../GameLogic/Abstract/AnyGameLogic.h"
+#include "../../../Shaders/Camera/Camera.h"
 
-class MapManager {
+class AnyGameLogic;
+
+class ResourcesManager {
 private:
     std::string MapCacheName;
     int MapCacheIndex;
@@ -21,11 +25,16 @@ private:
     void MasterAddLightToMap(std::shared_ptr<Map> &map, const std::shared_ptr<RenderableLight> &light);
     std::shared_ptr<Map> ActiveMap;
     std::vector<std::shared_ptr<Map>> Maps;
+    std::vector<std::unique_ptr<AnyGameLogic>> GameLogics;
 public:
     void Initialize(bool addDefaultMap);
+    std::unique_ptr<Camera> CameraMain;
     void ForceRefreshMaps();
     MapToShaderLinker ShaderLinker;
     void SetFallbackShader(std::shared_ptr<ShaderHandler> &shader);
+
+    std::vector<std::shared_ptr<ShaderHandler>> Shaders;
+    void AddShader(const std::shared_ptr<ShaderHandler> &shader);
 
     TextureController TextureObjectsController;
     ModelController ModelObjectController;
@@ -40,22 +49,26 @@ public:
     void AddObjectToMap(int mapIndex, const std::shared_ptr<StandardisedModel> &object);
     void AddObjectToMap(std::shared_ptr<Map> &map, const std::shared_ptr<StandardisedModel> &object);
     void AddObjectToMap(const std::string &mapName, const std::shared_ptr<StandardisedModel> &object);
+    void AddObjectToMap(const Map *map, const std::shared_ptr<StandardisedModel> &object);
     void AddObjectToCurrentMap(const std::shared_ptr<StandardisedModel> &object);
 
     void AddLightToMap(int index, const std::shared_ptr<RenderableLight> &light);
     void AddLightToMap(std::shared_ptr<Map> &map, const std::shared_ptr<RenderableLight> &light);
     void AddLightToMap(const std::string &name, const std::shared_ptr<RenderableLight> &light);
+    void AddLightToMap(const Map *map, const std::shared_ptr<RenderableLight> &light);
     void AddLightToCurrentMap(const std::shared_ptr<RenderableLight> &light);
 
     void AddSkyboxToMap(int index, const std::shared_ptr<StandardisedModel> &skybox);
     static void AddSkyboxToMap(std::shared_ptr<Map> &map, const std::shared_ptr<StandardisedModel> &skybox);
     void AddSkyboxToMap(const std::string &name, const std::shared_ptr<StandardisedModel> &skybox);
+    void AddSkyboxToMap(const Map *map, const std::shared_ptr<StandardisedModel> &skybox);
     void AddSkyboxToCurrentMap(const std::shared_ptr<StandardisedModel> &skybox);
 
     void ForceRefreshLightsOnCurrentMap();
     std::shared_ptr<RenderableLight> &GetLightOnMap(int mapIndex, int lightIndex);
     std::shared_ptr<RenderableLight> &GetLightOnMap(const std::string &mapName, int lightIndex);
     std::shared_ptr<RenderableLight> &GetLightOnMap(std::shared_ptr<Map> &map, int lightIndex);
+    std::shared_ptr<RenderableLight> &GetLightOnMap(const Map *map, int lightIndex);
 
     void ChangeLightOnMap(int mapIndex, int lightIndex, const std::shared_ptr<RenderableLight> &light);
     void ChangeLightOnMap(const std::string &mapName, int lightIndex, const std::shared_ptr<RenderableLight> &light);
@@ -64,7 +77,7 @@ public:
     void ChangeMap(int index);
     void ChangeMap(const std::string &name);
 
-    StandardisedModel* GetObjectByContextID(unsigned short contextID);
+    StandardisedModel *GetObjectByContextID(unsigned short contextID);
 
     template<typename T, typename U>
     std::shared_ptr<StandardisedModel> &GetObjectOnMap(T mapTemplate, U objectTemplate) {
@@ -77,7 +90,17 @@ public:
 
         return object;
     }
+
+    AnyGameLogic *ActiveGameLogic{};
+    void InsertGameLogic(std::unique_ptr<AnyGameLogic> &&gameLogic, const std::string &mapName = "");
+    void NextRender() const;
+
+    void
+    MouseCursorClickEvent(float xCursorCoords, float yCursorCoords, int windowHeight, int windowWidth, int button, int action,
+                          int mods) const;
+
+    void KeyPressEvent(int key, int scancode, int action, int mods) const;
 };
 
 
-#endif //ZPG_TEST_MAPMANAGER_H
+#endif //ZPG_TEST_RESOURCESMANAGER_H
