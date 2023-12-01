@@ -3,7 +3,6 @@
 //
 
 #include "MapCreator.h"
-#include "../../../../ExtResources/LessonResources/SecondModels/sphere.h"
 #include "../../../../Model/Factory/ModelFactory.h"
 #include "../../../../Transformations/Composite/Factory/TransformationFactory.h"
 

@@ -68,7 +68,6 @@ add_executable(zpg_test main.cpp
         Shaders/ShaderProgram/ShaderBase/ShaderBase.h
         Application/Managers/EngineResources/ResourcesManager.cpp
         Application/Managers/EngineResources/ResourcesManager.h
-        ExtResources/LessonResources/InclLessonModels.h
         Shaders/Lighting/Abstract/RenderableLight.cpp
         Shaders/Lighting/Abstract/RenderableLight.h
         Shaders/Lighting/Abstract/LightType.h
@@ -78,7 +77,6 @@ add_executable(zpg_test main.cpp
         Shaders/Lighting/LightSpot.h
         Shaders/Lighting/Uniforms/LightArrayDirectionalUniform.h
         Shaders/Lighting/Uniforms/LightsArraySpotUniform.h
-        ExtResources/LessonResources/TextureResources/plane_tex.h
         Model/Texture/Controller/TextureController.cpp
         Model/Texture/Controller/TextureController.h
         Model/Texture/Texture.cpp
