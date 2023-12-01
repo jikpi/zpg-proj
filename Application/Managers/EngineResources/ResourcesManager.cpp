@@ -252,6 +252,10 @@ StandardisedModel *ResourcesManager::GetObjectByContextID(unsigned short context
     return this->ShaderLinker.GetObjectByContextID(contextID);
 }
 
+void ResourcesManager::InsertGameLogic(std::unique_ptr<AnyGameLogic> &&gameLogic) {
+    this->GameLogics.push_back(std::move(gameLogic));
+}
+
 void ResourcesManager::MouseCursorClickEvent(float xCursorCoords, float yCursorCoords, int windowHeight, int windowWidth, int button,
                                              int action, int mods) const {
     if (this->ActiveGameLogic == nullptr) {

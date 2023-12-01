@@ -17,6 +17,11 @@ protected:
     Map *map{};
     Camera *CameraMain{};
 
+    bool IsInitialized{};
+    bool IsReady{};
+
+    [[nodiscard]] bool CheckIfCanNextRender() const;
+
     StandardisedModel *ObjectByCursor(float xCursorCoords, float yCursorCoords, int windowHeight);
     glm::vec3 UnprojectCursor(float xCursorCoords, float yCursorCoords, int windowHeight, int windowWidth);
 

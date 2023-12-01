@@ -6,7 +6,6 @@
 #include "../../../../ExtResources/LessonResources/SecondModels/sphere.h"
 #include "../../../../Model/Factory/ModelFactory.h"
 #include "../../../../Transformations/Composite/Factory/TransformationFactory.h"
-#include "../../../../ExtResources/LessonResources/TextureResources/skycube.h"
 
 void
 MapCreator::SolarSystem(std::vector<std::shared_ptr<ShaderHandler>> &shaders, ResourcesManager *mapManager) {
@@ -17,9 +16,6 @@ MapCreator::SolarSystem(std::vector<std::shared_ptr<ShaderHandler>> &shaders, Re
     ShaderHandler *PhongShader = SelectShader(shaders, "Phong");
     ShaderHandler *Skybox = SelectShader(shaders, "Skybox");
 
-    const float *rawmodel1_sphere = sphere;
-    int size = sizeof(sphere) / sizeof(float);
-
     float earthOrbitSpeed = 0.05f;
     float mercuryOrbitSpeed = 0.02f;
     float venusOrbitSpeed = 0.06f;
@@ -29,7 +25,8 @@ MapCreator::SolarSystem(std::vector<std::shared_ptr<ShaderHandler>> &shaders, Re
     mapManager->AddLightToMap(map, std::make_shared<LightPoint>(glm::vec3(0.0f, 0.0f, 0.0f)));
 
     //Sun
-    std::shared_ptr<StandardisedModel> objectSun = ModelFactory::PositionNormal(rawmodel1_sphere, size, "Sun");
+    std::shared_ptr<StandardisedModel> objectSun = mapManager->ModelObjectController.UseAny("sphere.obj",
+                                                                                            "Sun");
     objectSun->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f),
                                     glm::vec3(1.0f, 0.5f, 0.0f),
                                     glm::vec3(1.0f, 0.5f, 0.0f),
@@ -38,7 +35,8 @@ MapCreator::SolarSystem(std::vector<std::shared_ptr<ShaderHandler>> &shaders, Re
     mapManager->AddObjectToMap(map, objectSun);
 
     //Mercury
-    std::shared_ptr<StandardisedModel> objectMercury = ModelFactory::PositionNormal(rawmodel1_sphere, size, "Mercury");
+    std::shared_ptr<StandardisedModel> objectMercury = mapManager->ModelObjectController.UseAny("sphere.obj",
+                                                                                                "Mercury");
     objectMercury->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f),
                                         glm::vec3(0.5f, 0.5f, 0.5f),
                                         glm::vec3(0.5f, 0.5f, 0.5f),
@@ -56,7 +54,8 @@ MapCreator::SolarSystem(std::vector<std::shared_ptr<ShaderHandler>> &shaders, Re
                                                glm::vec3(0.0f, 1.0f, 0.0f)));
 
     //Venus
-    std::shared_ptr<StandardisedModel> objectVenus = ModelFactory::PositionNormal(rawmodel1_sphere, size, "Venus");
+    std::shared_ptr<StandardisedModel> objectVenus = mapManager->ModelObjectController.UseAny("sphere.obj",
+                                                                                              "Venus");
     objectVenus->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(1.0f, 0.5f, 0.0f),
                                       glm::vec3(1.0f, 0.5f, 0.0f), 32.0f));
     objectVenus->SetShaderProgram(PhongShader);
@@ -73,7 +72,8 @@ MapCreator::SolarSystem(std::vector<std::shared_ptr<ShaderHandler>> &shaders, Re
                                                glm::vec3(0.0f, 1.0f, 0.0f)));
 
     //Earth
-    std::shared_ptr<StandardisedModel> objectEarth = ModelFactory::PositionNormal(rawmodel1_sphere, size, "Earth");
+    std::shared_ptr<StandardisedModel> objectEarth = mapManager->ModelObjectController.UseAny("sphere.obj",
+                                                                                              "Earth");
     objectEarth->SetMaterial(Material(
             glm::vec3(0.1f, 0.1f, 0.1f),
             glm::vec3(0.0f, 0.5f, 1.0f),
@@ -91,8 +91,17 @@ MapCreator::SolarSystem(std::vector<std::shared_ptr<ShaderHandler>> &shaders, Re
                                                earthOrbitSpeed,
                                                glm::vec3(0.0f, 1.0f, 0.0f)));
 
+    //Moon
+    std::shared_ptr<StandardisedModel> objectMoon = mapManager->ModelObjectController.UseAny("sphere.obj",
+                                                                                             "Moon");
+    objectMoon->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0.5f, 0.5f, 0.5f),
+                                     glm::vec3(0.5f, 0.5f, 0.5f), 32.0f));
+    objectMoon->SetShaderProgram(PhongShader);
+    mapManager->AddObjectToMap(map, objectMoon);
+
     //Mars
-    std::shared_ptr<StandardisedModel> objectMars = ModelFactory::PositionNormal(rawmodel1_sphere, size, "Mars");
+    std::shared_ptr<StandardisedModel> objectMars = mapManager->ModelObjectController.UseAny("sphere.obj",
+                                                                                             "Mars");
     objectMars->SetMaterial(Material(
             glm::vec3(0.1f, 0.1f, 0.1f),
             glm::vec3(1.0f, 0.5f, 0.0f),

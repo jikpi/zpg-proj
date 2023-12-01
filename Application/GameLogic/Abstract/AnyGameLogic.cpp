@@ -2,6 +2,8 @@
 // Created by lvi on 30.11.23.
 //
 
+#include <stdexcept>
+#include <iostream>
 #include "AnyGameLogic.h"
 
 StandardisedModel *AnyGameLogic::ObjectByCursor(float xCursorCoords, float yCursorCoords, int windowHeight) {
@@ -44,8 +46,28 @@ void AnyGameLogic::InitializeResources(ResourcesManager *resources, Map *t_map, 
     this->Resources = resources;
     this->map = t_map;
     this->CameraMain = camera;
+
+    if (this->Resources == nullptr || this->map == nullptr || this->CameraMain == nullptr) {
+        throw std::runtime_error("ERROR: AnyGameLogic: A resource is null.");
+    }
+
+    this->IsInitialized = true;
 }
 
 std::string AnyGameLogic::GetMapName() const {
     return this->map->GetName();
+}
+
+bool AnyGameLogic::CheckIfCanNextRender() const {
+    if (!this->IsInitialized) {
+        std::cerr << "ERROR: AnyGameLogic: Resources not initialized." << std::endl;
+        return false;
+    }
+
+    if (!this->IsReady) {
+        std::cerr << "ERROR: AnyGameLogic: Resources not ready." << std::endl;
+        return false;
+    }
+
+    return true;
 }

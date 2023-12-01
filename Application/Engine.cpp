@@ -12,15 +12,12 @@
 //Shaders
 #include "../Shaders/ShaderProgram/ShaderHandlerFactory/ShaderHandlerFactory.h"
 
-//Transformations
-#include "../Transformations/Composite/Factory/TransformationFactory.h"
-
 //Models
-#include "../ExtResources/LessonResources/InclLessonModels.h"
 #include "../Shaders/Lighting/LightSpot.h"
 
 //Map creator
 #include "Managers/EngineResources/PremadeMaps/MapCreator.h"
+#include "GameLogic/Solar system/GameLogic_SolarSystem.h"
 
 
 Engine::Engine() = default;
@@ -149,7 +146,11 @@ void Engine::PrintVersionInfo() {
 
 void Engine::TestLaunch() {
     MapCreator::FourSpheres("4 spheres", this->Shaders, this->Resources.get());
+
     MapCreator::SolarSystem(this->Shaders, this->Resources.get());
+//    std::unique_ptr<AnyGameLogic> solarsystemLogic = std::make_unique<GameLogic_SolarSystem>();
+//    solarsystemLogic->InitializeResources(this->Resources.get(), this->CameraMain.get());
+
     MapCreator::Overworld("Overworld", this->Shaders, this->Resources.get());
 }
 

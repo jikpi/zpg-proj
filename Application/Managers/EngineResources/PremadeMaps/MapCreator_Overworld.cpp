@@ -3,7 +3,6 @@
 //
 
 #include "MapCreator.h"
-#include "../../../../ExtResources/LessonResources/InclLessonModels.h"
 #include "../../../../Shaders/Lighting/LightSpot.h"
 #include "../../../../Shaders/Lighting/LightDirectional.h"
 #include "../../../../Model/Factory/ModelFactory.h"

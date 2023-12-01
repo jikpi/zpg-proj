@@ -83,6 +83,8 @@ public:
     }
 
     AnyGameLogic *ActiveGameLogic{};
+    void InsertGameLogic(std::unique_ptr<AnyGameLogic> &&gameLogic);
+
     void
     MouseCursorClickEvent(float xCursorCoords, float yCursorCoords, int windowHeight, int windowWidth, int button, int action,
                           int mods) const;
