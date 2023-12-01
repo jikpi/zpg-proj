@@ -36,6 +36,7 @@ public:
 
     void AddPoint(glm::vec3 point);
     void ClearPoints();
+    int GetPointsCount();
 
 
     void SetStyle(BezierAnimationStyle newStyle);

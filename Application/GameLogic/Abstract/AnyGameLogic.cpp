@@ -34,6 +34,8 @@ glm::vec3 AnyGameLogic::UnprojectCursor(float xCursorCoords, float yCursorCoords
     // Convert from window coordinates to pixel coordinates
     int convertedY = windowHeight - y;
 
+    glReadPixels(x, convertedY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+
     //Unproject
     glm::vec3 screenX = glm::vec3(x, convertedY, depth);
     glm::vec3 unprojected = this->CameraMain->GetUnprojectedCursor(windowWidth, windowHeight, screenX);

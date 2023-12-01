@@ -17,6 +17,10 @@ private:
 
     void LoadMap();
     bool firstLoad{true};
+
+    void CreateUFOat(glm::vec3 coordinates);
+    StandardisedModel* lastUFO{};
+    void AddBezierCoordinateToUFO(glm::vec3 coordinates);
 public:
     GameLogic_SolarSystem();
 

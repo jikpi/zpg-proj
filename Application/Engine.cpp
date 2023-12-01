@@ -460,20 +460,17 @@ void Engine::CursorClick(int button, int action, int mode) {
 //
 //        //Unproject
 //        glm::vec3 screenX = glm::vec3(x, convertedY, depth);
-//        glm::vec3 unprojected = this->CameraMain->GetUnprojectedCursor(this->Width, this->Height, screenX);
+//        glm::vec3 unprojected = Resources->CameraMain->GetUnprojectedCursor(this->Width, this->Height, screenX);
 //
-//        std::cout << "Unprojected: " << unprojected.x << ", " << unprojected.y << ", " << unprojected.z << std::endl;
+//        std::cout << "OG Unprojected: " << unprojected.x << ", " << unprojected.y << ", " << unprojected.z << std::endl;
 //        std::cout << "-------" << std::endl;
-//
-////        Add model at the location
+
+//        Add model at the location
 //        std::shared_ptr<StandardisedModel> spawnedModel = Resources->ModelObjectController.UseAny("Lesson/zombie.obj", "Zombie");
 //        spawnedModel->InsertTransfMove(glm::vec3(unprojected.x, unprojected.y, unprojected.z)).ConsolidateTransf();
 //
 //        spawnedModel->SetDefaultMaterial();
 //        Resources->AddObjectToCurrentMap(spawnedModel);
-//
-//    }
-//
 
 }
 
