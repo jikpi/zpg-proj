@@ -147,6 +147,11 @@ void ResourcesManager::AddObjectToCurrentMap(const std::shared_ptr<StandardisedM
     this->MasterAddObjectToMap(this->ActiveMap, object);
 }
 
+void ResourcesManager::AddObjectToMap(const Map *map, const std::shared_ptr<StandardisedModel> &object) {
+    std::shared_ptr<Map> &mapRef = this->GetMap(map->GetName());
+    this->MasterAddObjectToMap(mapRef, object);
+}
+
 // Lights ############################################################################################################
 
 void ResourcesManager::MasterAddLightToMap(std::shared_ptr<Map> &map, const std::shared_ptr<RenderableLight> &light) {
@@ -171,6 +176,16 @@ void ResourcesManager::AddLightToCurrentMap(const std::shared_ptr<RenderableLigh
 void ResourcesManager::AddLightToMap(const std::string &name, const std::shared_ptr<RenderableLight> &light) {
     std::shared_ptr<Map> &map = this->GetMap(name);
     this->MasterAddLightToMap(map, light);
+}
+
+void ResourcesManager::AddLightToMap(const Map *map, const std::shared_ptr<RenderableLight> &light) {
+    std::shared_ptr<Map> &mapRef = this->GetMap(map->GetName());
+    if(mapRef == nullptr)
+    {
+        std::cerr << "ERROR: ResourcesManager: Map not found while adding light" << std::endl;
+        return;
+    }
+    this->MasterAddLightToMap(mapRef, light);
 }
 
 std::shared_ptr<RenderableLight> &ResourcesManager::GetLightOnMap(int mapIndex, int lightIndex) {
@@ -246,6 +261,11 @@ void ResourcesManager::AddSkyboxToMap(const std::string &name, const std::shared
     map->SetSkybox(skybox);
 }
 
+void ResourcesManager::AddSkyboxToMap(const Map *map, const std::shared_ptr<StandardisedModel> &skybox) {
+    std::shared_ptr<Map> &mapRef = GetMap(map->GetName());
+    mapRef->SetSkybox(skybox);
+}
+
 void ResourcesManager::AddSkyboxToCurrentMap(const std::shared_ptr<StandardisedModel> &skybox) {
     this->ActiveMap->SetSkybox(skybox);
 }
@@ -255,13 +275,22 @@ StandardisedModel *ResourcesManager::GetObjectByContextID(unsigned short context
 }
 
 void ResourcesManager::InsertGameLogic(std::unique_ptr<AnyGameLogic> &&gameLogic, const std::string &mapName) {
-    std::shared_ptr<Map> &map = this->GetMap(mapName);
-    if (map == nullptr) {
-        std::cerr << "ERROR: ResourcesManager: Map not found while inserting logic: " << mapName << std::endl;
-        return;
+
+    if(!gameLogic->SelfCreatingMap()) {
+        std::shared_ptr<Map> &map = this->GetMap(mapName);
+        if (map == nullptr) {
+            std::cerr << "ERROR: ResourcesManager: Map not found while inserting logic: " << mapName << std::endl;
+            return;
+        }
+
+        gameLogic->InitializeResources(this, map.get(), this->CameraMain.get());
+    }
+    else
+    {
+        gameLogic->InitializeResources(this, nullptr, this->CameraMain.get());
     }
 
-    gameLogic->InitializeResources(this, map.get(), this->CameraMain.get());
+
     gameLogic->Reset();
 
     this->GameLogics.push_back(std::move(gameLogic));
@@ -298,7 +327,7 @@ void ResourcesManager::NextRender() const {
 void ResourcesManager::AddShader(const std::shared_ptr<ShaderHandler> &shader) {
     this->Shaders.push_back(shader);
 
-    if(this->CameraMain != nullptr) {
+    if (this->CameraMain != nullptr) {
         this->CameraMain->RegisterCameraObserver(shader);
     } else {
         std::cerr << "FATAL: Resources: No camera available." << std::endl;

@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "GameLogic_SolarSystem.h"
+#include "../../../Transformations/Composite/Factory/TransformationFactory.h"
 
 GameLogic_SolarSystem::GameLogic_SolarSystem() = default;
 
@@ -32,6 +33,14 @@ void GameLogic_SolarSystem::Reset() {
         std::cerr << "ERROR: GameLogic_SolarSystem: GameLogic is not initialized." << std::endl;
         return;
     }
+
+    if(this->firstLoad)
+    {
+        this->firstLoad = false;
+        this->LoadMap();
+    }
+
+
 
     Earth = AnyGameLogic::map->GetObject("Earth").get();
     Moon = AnyGameLogic::map->GetObject("Moon").get();

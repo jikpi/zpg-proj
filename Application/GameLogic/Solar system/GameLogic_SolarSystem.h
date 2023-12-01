@@ -10,10 +10,13 @@
 
 class GameLogic_SolarSystem : public AnyGameLogic {
 private:
-    StandardisedModel* Earth{};
+    StandardisedModel *Earth{};
 
     float moonAngle{};
-    StandardisedModel* Moon{};
+    StandardisedModel *Moon{};
+
+    void LoadMap();
+    bool firstLoad{true};
 public:
     GameLogic_SolarSystem();
 
@@ -22,6 +25,10 @@ public:
     void MouseCursorClickEvent(float xCursorCoords, float yCursorCoords, int windowHeight, int windowWidth, int button,
                                int action, int mods) override;
     void KeyPressEvent(int key, int scancode, int action, int mods) override;
+
+    [[nodiscard]] bool SelfCreatingMap() const override {
+        return true;
+    }
 
 };
 

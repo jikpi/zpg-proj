@@ -148,7 +148,6 @@ void Engine::PrintVersionInfo() {
 void Engine::InitializeRendering() {
     MapCreator::FourSpheres("4 spheres", Resources->Shaders, this->Resources.get());
 
-    MapCreator::SolarSystem(Resources->Shaders, this->Resources.get());
     std::unique_ptr<AnyGameLogic> solarsystemLogic = std::make_unique<GameLogic_SolarSystem>();
     this->Resources->InsertGameLogic(std::move(solarsystemLogic), "Solar system");
 

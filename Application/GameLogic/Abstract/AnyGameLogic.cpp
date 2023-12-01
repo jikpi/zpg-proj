@@ -47,8 +47,12 @@ void AnyGameLogic::InitializeResources(ResourcesManager *resources, Map *t_map, 
     this->map = t_map;
     this->CameraMain = camera;
 
-    if (this->Resources == nullptr || this->map == nullptr || this->CameraMain == nullptr) {
+    if (this->Resources == nullptr || this->CameraMain == nullptr) {
         throw std::runtime_error("ERROR: AnyGameLogic: A resource is null.");
+    }
+
+    if (!this->SelfCreatingMap() && this->map == nullptr) {
+        throw std::runtime_error("ERROR: AnyGameLogic: Map is null.");
     }
 
     this->IsInitialized = true;
@@ -70,4 +74,20 @@ bool AnyGameLogic::CheckIfCanNextRender() const {
     }
 
     return true;
+}
+
+ShaderHandler *AnyGameLogic::SelectShader(std::vector<std::shared_ptr<ShaderHandler>> &shaders, const std::string &shaderName) {
+    for (auto &shader: shaders) {
+        if (shader->Name == shaderName) {
+            return shader.get();
+        }
+    }
+    std::cerr << "ERROR: AnyGameLogic: Shader name \"" << shaderName << "\" not found. Returning any shader." << std::endl;
+
+    if (shaders.empty()) {
+        std::cerr << "FATAL: AnyGameLogic: No shaders available." << std::endl;
+        throw std::runtime_error("No shaders available.");
+    }
+
+    return shaders.at(0).get();
 }

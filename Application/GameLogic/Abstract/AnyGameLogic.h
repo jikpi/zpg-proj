@@ -25,7 +25,7 @@ protected:
     StandardisedModel *ObjectByCursor(float xCursorCoords, float yCursorCoords, int windowHeight);
     glm::vec3 UnprojectCursor(float xCursorCoords, float yCursorCoords, int windowHeight, int windowWidth);
 
-    ShaderHandler* SelectShader(std::vector<std::shared_ptr<ShaderHandler>> &shaders, const std::string &shaderName);
+    static ShaderHandler* SelectShader(std::vector<std::shared_ptr<ShaderHandler>> &shaders, const std::string &shaderName);
 
 public:
 
@@ -42,6 +42,8 @@ public:
     virtual void KeyPressEvent(int key, int scancode, int action, int mods) = 0;
 
     [[nodiscard]] std::string GetMapName() const;
+
+    [[nodiscard]] virtual bool SelfCreatingMap() const = 0;
 };
 
 

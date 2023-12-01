@@ -19,6 +19,10 @@ public:
     void MouseCursorClickEvent(float xCursorCoords, float yCursorCoords, int windowHeight, int windowWidth, int button, int action,
                                int mods) override;
     void KeyPressEvent(int key, int scancode, int action, int mods) override;
+
+    [[nodiscard]] bool SelfCreatingMap() const override {
+        return false;
+    }
 };
 
 #endif //ZPG_TEST_GAMELOGIC_OVERWORLD_H
