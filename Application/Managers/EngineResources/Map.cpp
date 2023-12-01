@@ -89,3 +89,7 @@ std::shared_ptr<RenderableLight> &Map::GetLight(const std::string& lightName) {
     std::cerr << "ERROR: Map: Light with name \"" << lightName << "\" not found. Returning any." << std::endl;
     return MasterGetLight(0);
 }
+
+void Map::RemoveObject(StandardisedModel *object) {
+    throw std::runtime_error("Not implemented");
+}

@@ -347,3 +347,7 @@ void ResourcesManager::AddShader(const std::shared_ptr<ShaderHandler> &shader) {
         throw std::runtime_error("No camera available.");
     }
 }
+
+void ResourcesManager::RemoveObjectFromActiveMap(StandardisedModel *object) {
+    this->ActiveMap->RemoveObject(object);
+}

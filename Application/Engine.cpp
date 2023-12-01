@@ -164,6 +164,7 @@ void Engine::Run() {
         throw std::runtime_error("No camera available.");
     }
 
+
     //Restore window visibility
     glfwSetWindowOpacity(Window, 1.0f);
     glfwSetWindowTitle(Window, "ZPG KOP0269");

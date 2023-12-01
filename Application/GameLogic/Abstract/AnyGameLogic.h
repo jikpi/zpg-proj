@@ -25,6 +25,9 @@ protected:
     StandardisedModel *ObjectByCursor(float xCursorCoords, float yCursorCoords, int windowHeight);
     glm::vec3 UnprojectCursor(float xCursorCoords, float yCursorCoords, int windowHeight, int windowWidth);
 
+    StandardisedModel* ObjectByCenter(int windowHeight, int windowWidth);
+    glm::vec3 UnprojectCenter(int windowHeight, int windowWidth);
+
     static ShaderHandler* SelectShader(std::vector<std::shared_ptr<ShaderHandler>> &shaders, const std::string &shaderName);
 
 public:

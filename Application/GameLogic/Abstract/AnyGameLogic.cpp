@@ -93,3 +93,41 @@ ShaderHandler *AnyGameLogic::SelectShader(std::vector<std::shared_ptr<ShaderHand
 
     return shaders.at(0).get();
 }
+
+StandardisedModel *AnyGameLogic::ObjectByCenter(int windowHeight, int windowWidth) {
+    GLbyte color[4]{};
+    GLfloat depth{};
+    GLuint index{};
+
+    // Center coordinates
+    auto x = windowWidth / 2;
+    auto y = windowHeight / 2;
+
+    // Convert from window coordinates to pixel coordinates
+    int convertedY = windowHeight - y;
+
+    glReadPixels(x, convertedY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
+    glReadPixels(x, convertedY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+    glReadPixels(x, convertedY, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
+
+    return this->Resources->GetObjectByContextID(index);
+}
+
+glm::vec3 AnyGameLogic::UnprojectCenter(int windowHeight, int windowWidth) {
+    GLfloat depth{};
+
+    // Center coordinates
+    auto x = windowWidth / 2;
+    auto y = windowHeight / 2;
+
+    // Convert from window coordinates to pixel coordinates
+    int convertedY = windowHeight - y;
+
+    glReadPixels(x, convertedY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+
+    // Unproject
+    glm::vec3 screenX = glm::vec3(x, convertedY, depth);
+    glm::vec3 unprojected = this->CameraMain->GetUnprojectedCursor(windowWidth, windowHeight, screenX);
+
+    return unprojected;
+}

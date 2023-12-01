@@ -100,6 +100,8 @@ public:
                           int mods) const;
 
     void KeyPressEvent(int key, int scancode, int action, int mods) const;
+
+    void RemoveObjectFromActiveMap(StandardisedModel* object);
 };
 
 
