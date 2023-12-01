@@ -4,7 +4,7 @@ int main() {
 
     std::shared_ptr<Engine> MyEngine = std::make_shared<Engine>();
     MyEngine->InitializeBase();
-    MyEngine->InitializeRendering();
+    MyEngine->LoadStartupMaps();
 
     MyEngine->PrintVersionInfo();
     MyEngine->Run();

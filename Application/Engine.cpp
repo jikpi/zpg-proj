@@ -146,7 +146,7 @@ void Engine::PrintVersionInfo() {
     printf("Move camera with 'wasd' and 'r,f', press 'c' to toggle camera, 'y' to toggle movement method, '1-9' to change the map, 'p' to toggle perspective, 'm' to set random materials for objects.\n");
 }
 
-void Engine::InitializeRendering() {
+void Engine::LoadStartupMaps() {
 
     std::unique_ptr<AnyGameLogic> fourSpheresLogic = std::make_unique<GameLogic_4Spheres>();
     this->Resources->InsertGameLogic(std::move(fourSpheresLogic));
@@ -494,6 +494,6 @@ void Engine::RestartEngine() {
     this->Resources.reset();
 
     this->InitializeBase();
-    this->InitializeRendering();
+    this->LoadStartupMaps();
     this->Run();
 }

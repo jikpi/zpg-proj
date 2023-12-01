@@ -59,7 +59,7 @@ public:
     void KeyPress(int key, int scancode, int action, int mods);
 
 
-    void InitializeRendering();
+    void LoadStartupMaps();
     void RandomMaterialsTest();
 
     bool IsLogicPaused{};
