@@ -146,13 +146,13 @@ void Engine::PrintVersionInfo() {
 }
 
 void Engine::InitializeRendering() {
-    MapCreator::FourSpheres("4 spheres", this->Shaders, this->Resources.get());
+    MapCreator::FourSpheres("4 spheres", Resources->Shaders, this->Resources.get());
 
-    MapCreator::SolarSystem(this->Shaders, this->Resources.get());
+    MapCreator::SolarSystem(Resources->Shaders, this->Resources.get());
     std::unique_ptr<AnyGameLogic> solarsystemLogic = std::make_unique<GameLogic_SolarSystem>();
     this->Resources->InsertGameLogic(std::move(solarsystemLogic), "Solar system");
 
-    MapCreator::Overworld("Overworld", this->Shaders, this->Resources.get());
+    MapCreator::Overworld("Overworld", Resources->Shaders, this->Resources.get());
     std::unique_ptr<AnyGameLogic> overworldLogic = std::make_unique<GameLogic_Overworld>();
     this->Resources->InsertGameLogic(std::move(overworldLogic), "Overworld");
 }
@@ -326,10 +326,6 @@ void Engine::ToggleCameraLock() {
     }
 }
 
-void Engine::AddShader(const std::shared_ptr<ShaderHandler> &shader) {
-    this->Shaders.push_back(shader);
-}
-
 void Engine::ToggleCameraPerspective() {
     if (Resources->CameraMain == nullptr) {
         return;
@@ -393,25 +389,14 @@ void Engine::RequestMapChange(const std::string &name) {
 }
 
 void Engine::LoadAllShaders() {
-    this->Shaders.push_back(ShaderHandlerFactory::Phong());
-    this->Shaders.push_back(ShaderHandlerFactory::Lambert());
-    this->Shaders.push_back(ShaderHandlerFactory::ConstantColored());
-    this->Shaders.push_back(ShaderHandlerFactory::BlinnPhong());
-    this->Shaders.push_back(ShaderHandlerFactory::PhongTexture());
-    this->Shaders.push_back(ShaderHandlerFactory::Skybox());
 
+    this->Resources->AddShader(ShaderHandlerFactory::Phong());
+    this->Resources->AddShader(ShaderHandlerFactory::Lambert());
+    this->Resources->AddShader(ShaderHandlerFactory::ConstantColored());
+    this->Resources->AddShader(ShaderHandlerFactory::BlinnPhong());
+    this->Resources->AddShader(ShaderHandlerFactory::PhongTexture());
+    this->Resources->AddShader(ShaderHandlerFactory::Skybox());
 
-    if (Resources->CameraMain != nullptr) {
-        for (auto &shader: this->Shaders) {
-            Resources->CameraMain->RegisterCameraObserver(shader);
-        }
-    } else {
-        std::cerr << "FATAL: Engine: No camera available." << std::endl;
-        throw std::runtime_error("No camera available.");
-    }
-
-
-    this->Resources->SetFallbackShader(this->Shaders.at(0));
 }
 
 void Engine::SaveCursorCoords(float x, float y) {
@@ -507,7 +492,6 @@ void Engine::ResetLogic() {
 
 void Engine::RestartEngine() {
     this->KillWindow();
-    this->Shaders.clear();
     this->Resources.reset();
 
     this->InitializeBase();

@@ -24,11 +24,10 @@ private:
     int Height{};
     float Ratio{};
 
-    std::vector<std::shared_ptr<ShaderHandler>> Shaders;
-    void LoadAllShaders();
-
     std::unique_ptr<ResourcesManager> Resources;
     std::shared_ptr<MovesetInputManager> MovesetManager;
+
+    void LoadAllShaders();
 
     void UpdateMoveset();
 
@@ -59,8 +58,6 @@ public:
     void CursorClick(int button, int action, int mode);
     void KeyPress(int key, int scancode, int action, int mods);
 
-
-    void AddShader(const std::shared_ptr<ShaderHandler> &shader);
 
     void InitializeRendering();
     void RandomMaterialsTest();

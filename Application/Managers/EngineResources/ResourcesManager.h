@@ -33,6 +33,9 @@ public:
     MapToShaderLinker ShaderLinker;
     void SetFallbackShader(std::shared_ptr<ShaderHandler> &shader);
 
+    std::vector<std::shared_ptr<ShaderHandler>> Shaders;
+    void AddShader(const std::shared_ptr<ShaderHandler> &shader);
+
     TextureController TextureObjectsController;
     ModelController ModelObjectController;
 

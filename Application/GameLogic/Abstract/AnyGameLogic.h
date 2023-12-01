@@ -25,6 +25,8 @@ protected:
     StandardisedModel *ObjectByCursor(float xCursorCoords, float yCursorCoords, int windowHeight);
     glm::vec3 UnprojectCursor(float xCursorCoords, float yCursorCoords, int windowHeight, int windowWidth);
 
+    ShaderHandler* SelectShader(std::vector<std::shared_ptr<ShaderHandler>> &shaders, const std::string &shaderName);
+
 public:
 
     void InitializeResources(ResourcesManager *resources, Map *t_map, Camera *camera);

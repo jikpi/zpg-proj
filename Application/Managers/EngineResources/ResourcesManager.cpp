@@ -294,3 +294,14 @@ void ResourcesManager::NextRender() const {
 
     this->ActiveGameLogic->NextRender();
 }
+
+void ResourcesManager::AddShader(const std::shared_ptr<ShaderHandler> &shader) {
+    this->Shaders.push_back(shader);
+
+    if(this->CameraMain != nullptr) {
+        this->CameraMain->RegisterCameraObserver(shader);
+    } else {
+        std::cerr << "FATAL: Resources: No camera available." << std::endl;
+        throw std::runtime_error("No camera available.");
+    }
+}
