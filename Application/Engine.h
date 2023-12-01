@@ -40,7 +40,7 @@ private:
 public:
     explicit Engine();
 
-    void Initialize();
+    void InitializeBase();
     static void PrintVersionInfo();
     void Run();
     void KillWindow() const;
@@ -62,8 +62,13 @@ public:
 
     void AddShader(const std::shared_ptr<ShaderHandler> &shader);
 
-    void TestLaunch();
+    void InitializeRendering();
     void RandomMaterialsTest();
+
+    bool IsLogicPaused{};
+    void ResetLogic();
+
+    void RestartEngine();
 };
 
 

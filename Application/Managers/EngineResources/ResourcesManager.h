@@ -85,7 +85,8 @@ public:
     }
 
     AnyGameLogic *ActiveGameLogic{};
-    void InsertGameLogic(std::unique_ptr<AnyGameLogic> &&gameLogic);
+    void InsertGameLogic(std::unique_ptr<AnyGameLogic> &&gameLogic, const std::string &mapName);
+    void NextRender() const;
 
     void
     MouseCursorClickEvent(float xCursorCoords, float yCursorCoords, int windowHeight, int windowWidth, int button, int action,

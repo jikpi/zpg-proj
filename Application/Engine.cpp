@@ -18,11 +18,12 @@
 //Map creator
 #include "Managers/EngineResources/PremadeMaps/MapCreator.h"
 #include "GameLogic/Solar system/GameLogic_SolarSystem.h"
+#include "GameLogic/Overworld/GameLogic_Overworld.h"
 
 
 Engine::Engine() = default;
 
-void Engine::Initialize() {
+void Engine::InitializeBase() {
     glfwSetErrorCallback(KeyCallbacks::error_callback);
 
     if (!glfwInit()) {
@@ -97,7 +98,8 @@ void Engine::Initialize() {
     glEnable(GL_STENCIL_TEST);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-
+    //Unpause
+    this->IsLogicPaused = false;
 }
 
 void Engine::InitializeInputHandling() {
@@ -143,14 +145,16 @@ void Engine::PrintVersionInfo() {
     printf("Move camera with 'wasd' and 'r,f', press 'c' to toggle camera, 'y' to toggle movement method, '1-9' to change the map, 'p' to toggle perspective, 'm' to set random materials for objects.\n");
 }
 
-void Engine::TestLaunch() {
+void Engine::InitializeRendering() {
     MapCreator::FourSpheres("4 spheres", this->Shaders, this->Resources.get());
 
     MapCreator::SolarSystem(this->Shaders, this->Resources.get());
-//    std::unique_ptr<AnyGameLogic> solarsystemLogic = std::make_unique<GameLogic_SolarSystem>();
-//    solarsystemLogic->InitializeResources(this->Resources.get(), this->CameraMain.get());
+    std::unique_ptr<AnyGameLogic> solarsystemLogic = std::make_unique<GameLogic_SolarSystem>();
+    this->Resources->InsertGameLogic(std::move(solarsystemLogic), "Solar system");
 
     MapCreator::Overworld("Overworld", this->Shaders, this->Resources.get());
+    std::unique_ptr<AnyGameLogic> overworldLogic = std::make_unique<GameLogic_Overworld>();
+    this->Resources->InsertGameLogic(std::move(overworldLogic), "Overworld");
 }
 
 void Engine::Run() {
@@ -166,15 +170,8 @@ void Engine::Run() {
     this->SetCameraLock(true);
     DebugErrorMessages::PrintGLErrors("Before run errors");
 
-
-    float radius = 1.0f;
-    float angle = 0.0f;
-    float angleIncrement = glm::radians(1.0f);
-
     std::shared_ptr<LightSpot> manyObjectsFlash = std::dynamic_pointer_cast<LightSpot>(
             this->Resources->GetLightOnMap("Overworld", 0));
-
-    std::shared_ptr<StandardisedModel> movingModel = this->Resources->GetObjectOnMap(0, 0);
 
 
     Resources->CameraMain->MoveForwardBackward(0);
@@ -184,30 +181,20 @@ void Engine::Run() {
         //Update camera position
         UpdateMoveset();
 
+        //Clear screen
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         //Decrease map change lock
         if (this->MapChangeFrameLock > 0) {
             this->MapChangeFrameLock--;
         }
 
-        //Clear screen
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-//        angle += angleIncrement;
-//        if (angle > 2 * glm::pi<float>()) {
-//            angle -= 2 * glm::pi<float>();
-//        }
-//
-//        float x = radius * cos(angle);
-//        float z = radius * sin(angle);
-//
-//        spheresSpotLight->SetDirection(glm::vec3(x, 0.0f, z));
-
-        //set many objects spot light to camera location and target
-        manyObjectsFlash->SetPosition(Resources->CameraMain->GetLocation());
-        manyObjectsFlash->SetDirection(Resources->CameraMain->GetTarget() - Resources->CameraMain->GetLocation());
-        Resources->ForceRefreshLightsOnCurrentMap();
+        //Do logic
+        if(!this->IsLogicPaused)
+        {
+            this->Resources->NextRender();
+        }
 
         ////Render skybox
         if (Resources->GetActiveMap()->GetSkybox() != nullptr) {
@@ -219,7 +206,6 @@ void Engine::Run() {
             skyboxShader->RequestRender(*Resources->GetActiveMap()->GetSkybox());
             Resources->GetActiveMap()->GetSkybox()->BindVertexArray();
             glDrawArrays(GL_TRIANGLES, 0, Resources->GetActiveMap()->GetSkybox()->GetRenderingSize());
-
             glDepthMask(GL_TRUE);
             glDepthFunc(GL_LESS);
             glEnable(GL_CULL_FACE);
@@ -232,7 +218,13 @@ void Engine::Run() {
 
             //Render objects for chosen shader
             for (auto &object: set->Objects) {
-                object->DoAnyAnimation(0);
+
+                //Pausing logic also pauses animations/transformations
+                if(!this->IsLogicPaused)
+                {
+                    object->DoAnyAnimation(0);
+                }
+
                 set->Shader->RequestRender(*object);
                 object->BindVertexArray();
 
@@ -503,4 +495,22 @@ void Engine::CursorClick(int button, int action, int mode) {
 
 void Engine::KeyPress(int key, int scancode, int action, int mods) {
     Resources->KeyPressEvent(key, scancode, action, mods);
+}
+
+void Engine::ResetLogic() {
+    if (this->Resources->ActiveGameLogic == nullptr) {
+        return;
+    }
+
+    this->Resources->ActiveGameLogic->Reset();
+}
+
+void Engine::RestartEngine() {
+    this->KillWindow();
+    this->Shaders.clear();
+    this->Resources.reset();
+
+    this->InitializeBase();
+    this->InitializeRendering();
+    this->Run();
 }

@@ -254,8 +254,21 @@ StandardisedModel *ResourcesManager::GetObjectByContextID(unsigned short context
     return this->ShaderLinker.GetObjectByContextID(contextID);
 }
 
-void ResourcesManager::InsertGameLogic(std::unique_ptr<AnyGameLogic> &&gameLogic) {
+void ResourcesManager::InsertGameLogic(std::unique_ptr<AnyGameLogic> &&gameLogic, const std::string &mapName) {
+    std::shared_ptr<Map> &map = this->GetMap(mapName);
+    if (map == nullptr) {
+        std::cerr << "ERROR: ResourcesManager: Map not found while inserting logic: " << mapName << std::endl;
+        return;
+    }
+
+    gameLogic->InitializeResources(this, map.get(), this->CameraMain.get());
+    gameLogic->Reset();
+
     this->GameLogics.push_back(std::move(gameLogic));
+
+    if (this->ActiveMap != nullptr && mapName == this->ActiveMap->GetName()) {
+        this->ActiveGameLogic = this->GameLogics.back().get();
+    }
 }
 
 void ResourcesManager::MouseCursorClickEvent(float xCursorCoords, float yCursorCoords, int windowHeight, int windowWidth, int button,
@@ -272,4 +285,12 @@ void ResourcesManager::KeyPressEvent(int key, int scancode, int action, int mods
     }
 
     this->ActiveGameLogic->KeyPressEvent(key, scancode, action, mods);
+}
+
+void ResourcesManager::NextRender() const {
+    if (this->ActiveGameLogic == nullptr) {
+        return;
+    }
+
+    this->ActiveGameLogic->NextRender();
 }

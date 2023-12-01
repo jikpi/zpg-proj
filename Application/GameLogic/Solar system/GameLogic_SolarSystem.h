@@ -9,6 +9,11 @@
 #include "../Abstract/AnyGameLogic.h"
 
 class GameLogic_SolarSystem : public AnyGameLogic {
+private:
+    StandardisedModel* Earth{};
+
+    float moonAngle{};
+    StandardisedModel* Moon{};
 public:
     GameLogic_SolarSystem();
 

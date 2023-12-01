@@ -40,6 +40,8 @@ public:
     std::shared_ptr<StandardisedModel> &GetObject(int index);
     std::shared_ptr<StandardisedModel> &GetObject(const std::string &name);
 
+    std::shared_ptr<RenderableLight> &GetLight(const std::string& lightName);
+
 
     [[nodiscard]] std::string GetName() const;
 };

@@ -55,7 +55,7 @@ unsigned long Map::GetLightCount() {
 }
 
 std::shared_ptr<RenderableLight> &Map::MasterGetLight(int index) {
-    if(index >= Lights->size()) {
+    if (index >= Lights->size()) {
         std::cerr << "ERROR: Map: Light index not found, map name: " << this->Name << std::endl;
         throw std::runtime_error("ERROR: Map: Light index not found.");
     }
@@ -77,4 +77,15 @@ void Map::SetSkybox(const std::shared_ptr<StandardisedModel> &skybox) {
 
 const std::shared_ptr<StandardisedModel> &Map::GetSkybox() const {
     return this->Skybox;
+}
+
+std::shared_ptr<RenderableLight> &Map::GetLight(const std::string& lightName) {
+    for (auto &light: *Lights) {
+        if (light->Name == lightName) {
+            return light;
+        }
+    }
+
+    std::cerr << "ERROR: Map: Light with name \"" << lightName << "\" not found. Returning any." << std::endl;
+    return MasterGetLight(0);
 }

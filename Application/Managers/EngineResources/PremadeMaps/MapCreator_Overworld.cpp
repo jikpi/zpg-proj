@@ -26,6 +26,7 @@ void MapCreator::Overworld(const std::string &mapName, std::vector<std::shared_p
 
     std::shared_ptr<LightSpot> flashLight = std::make_shared<LightSpot>(glm::vec3(0.0f, 5.0f, 10.0f),
                                                                         glm::vec3(0.0f, -1.0f, 0.0f));
+    flashLight->Name = "Flashlight";
     mapManager->AddLightToMap(map, flashLight);
 //    flashLight->SetColor(glm::vec3(0.0f, 0.0f, 0.0f));
 
