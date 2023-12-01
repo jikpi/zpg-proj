@@ -40,6 +40,8 @@ public:
 
     std::shared_ptr<RenderableLight> &GetLight(const std::string &lightName);
 
+    static void RemoveObject(StandardisedModel* object);
+
 
     [[nodiscard]] std::string GetName() const;
 };

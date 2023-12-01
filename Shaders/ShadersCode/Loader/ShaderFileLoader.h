@@ -24,6 +24,8 @@ public:
     static std::string HardLoadCubemapSkyboxVert();
     static std::string HardLoadCubemapSkyboxFrag();
 
+    static std::string HardLoadCrosshair();
+
 };
 
 

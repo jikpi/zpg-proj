@@ -166,6 +166,10 @@ void main() {
         // Sum the diffuse and specular components
         combinedColor += (Idiffuse + Ispecular) * attn * intensity;
     }
-
+    vec2 screenCenter = vec2(gl_FragCoord.x / 1700.0, gl_FragCoord.y / 900.0);
+    float radius = 0.001;
+    if (distance(screenCenter, vec2(0.5, 0.5)) < radius) {
+        out_frag_Color = vec4(1.0, 1.0, 1.0, 1.0);
+    } else
     out_frag_Color = texture(twoDTexture, toFrag_textureUV) * vec4(combinedColor, 1.0);
 }

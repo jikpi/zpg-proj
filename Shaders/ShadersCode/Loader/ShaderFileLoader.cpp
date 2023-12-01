@@ -61,3 +61,7 @@ std::string ShaderFileLoader::HardLoadMVPNTextureVertex() {
 std::string ShaderFileLoader::HardLoadPhongTextureFragment() {
     return LoadShaderCodeFromFile("../Shaders/ShadersCode/ShaderFiles/PhongTexture.frag");
 }
+
+std::string ShaderFileLoader::HardLoadCrosshair() {
+    return LoadShaderCodeFromFile("../Shaders/ShadersCode/ShaderFiles/Crosshair.frag");
+}

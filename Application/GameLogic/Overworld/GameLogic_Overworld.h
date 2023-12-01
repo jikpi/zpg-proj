@@ -12,9 +12,35 @@
 class GameLogic_Overworld : public AnyGameLogic {
 private:
     LightSpot *flashlight{};
+    LightPoint *gunLight{};
 
     void LoadMap();
     bool firstLoad{true};
+    int zombieNumber = 15;
+
+
+    int remainingFrames = 7200;
+
+    void ShotZombie(StandardisedModel *zombie);
+    int zombieShot = 0;
+
+    bool won = false;
+    void WonCondition();
+
+    int currentHorde = 0;
+    int maxHorde = 100;
+    bool lost = false;
+    void LostCondition();
+
+    int defaultGunLightFrames = 1;
+    int gunLightFrames = 0;
+
+
+    int defaultAnimationFrames = 3;
+    int animationFrames = 0;
+    int nextAnimationTextureIndex = 0;
+    StandardisedModel* animatingPlane{};
+    std::vector<Texture *> animationTextures;
 public:
     GameLogic_Overworld();
     void NextRender() override;

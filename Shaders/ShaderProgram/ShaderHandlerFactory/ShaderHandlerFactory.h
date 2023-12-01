@@ -19,6 +19,8 @@ public:
     static std::shared_ptr<ShaderHandler> PhongTexture();
 
     static std::shared_ptr<ShaderHandler> Skybox();
+
+    static std::shared_ptr<ShaderHandler> Crosshair();
 };
 
 

@@ -102,3 +102,19 @@ std::shared_ptr<ShaderHandler> ShaderHandlerFactory::PhongTexture() {
 
     return shader;
 }
+
+std::shared_ptr<ShaderHandler> ShaderHandlerFactory::Crosshair() {
+    auto vertexGLSLShader = std::make_unique<GLSLShader>(ShaderFileLoader::HardLoadMVPNCleanVertex().c_str(),
+                                                         ShaderType::VERTEX_SHADER);
+    auto fragmentGLSLShader = std::make_unique<GLSLShader>(ShaderFileLoader::HardLoadCrosshair().c_str(),
+                                                           ShaderType::FRAGMENT_SHADER);
+    std::shared_ptr<ShaderHandler> shader = std::make_shared<ShaderHandler>();
+    shader->AttachShaders(std::move(vertexGLSLShader), std::move(fragmentGLSLShader));
+    shader->FinalizeGLSLattachment();
+    shader->Name = "Crosshair";
+    shader->SaveBaseMatrixLocations();
+
+    DebugErrorMessages::PrintGLErrors("Crosshair shader created");
+
+    return shader;
+}

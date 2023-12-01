@@ -146,7 +146,7 @@ void Engine::PrintVersionInfo() {
     printf("Move camera with 'wasd' and 'r,f', press 'c' to toggle camera, 'y' to toggle movement method, '1-9' to change the map, 'p' to toggle perspective, 'm' to set random materials for objects.\n");
 }
 
-void Engine::InitializeRendering() {
+void Engine::LoadStartupMaps() {
 
     std::unique_ptr<AnyGameLogic> fourSpheresLogic = std::make_unique<GameLogic_4Spheres>();
     this->Resources->InsertGameLogic(std::move(fourSpheresLogic));
@@ -163,6 +163,7 @@ void Engine::Run() {
         std::cerr << "FATAL: Engine: No camera available." << std::endl;
         throw std::runtime_error("No camera available.");
     }
+
 
     //Restore window visibility
     glfwSetWindowOpacity(Window, 1.0f);
@@ -460,20 +461,17 @@ void Engine::CursorClick(int button, int action, int mode) {
 //
 //        //Unproject
 //        glm::vec3 screenX = glm::vec3(x, convertedY, depth);
-//        glm::vec3 unprojected = this->CameraMain->GetUnprojectedCursor(this->Width, this->Height, screenX);
+//        glm::vec3 unprojected = Resources->CameraMain->GetUnprojectedCursor(this->Width, this->Height, screenX);
 //
-//        std::cout << "Unprojected: " << unprojected.x << ", " << unprojected.y << ", " << unprojected.z << std::endl;
+//        std::cout << "OG Unprojected: " << unprojected.x << ", " << unprojected.y << ", " << unprojected.z << std::endl;
 //        std::cout << "-------" << std::endl;
-//
-////        Add model at the location
+
+//        Add model at the location
 //        std::shared_ptr<StandardisedModel> spawnedModel = Resources->ModelObjectController.UseAny("Lesson/zombie.obj", "Zombie");
 //        spawnedModel->InsertTransfMove(glm::vec3(unprojected.x, unprojected.y, unprojected.z)).ConsolidateTransf();
 //
 //        spawnedModel->SetDefaultMaterial();
 //        Resources->AddObjectToCurrentMap(spawnedModel);
-//
-//    }
-//
 
 }
 
@@ -494,6 +492,6 @@ void Engine::RestartEngine() {
     this->Resources.reset();
 
     this->InitializeBase();
-    this->InitializeRendering();
+    this->LoadStartupMaps();
     this->Run();
 }

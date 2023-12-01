@@ -30,14 +30,6 @@ void GameLogic_Overworld::LoadMap() {
 //    flashLight->SetColor(glm::vec3(0.0f, 0.0f, 0.0f));
 
 
-    std::shared_ptr<LightDirectional> directionalLight = std::make_shared<LightDirectional>(
-            glm::vec3(0.0f, -1.0f, -1.0f),
-            glm::vec3(1.0f, 1.0f, 1.0f));
-    directionalLight->SetColor(glm::vec3(0.9f, 0.9f, 0.9f));
-
-//    mapManager->AddLightToMap(map, directionalLight);
-
-
     std::dynamic_pointer_cast<LightSpot>(Resources->GetLightOnMap(map, 0))
             ->SetQuadratic(0.0001f)
             .SetIntensity(1.0f);
@@ -63,10 +55,10 @@ void GameLogic_Overworld::LoadMap() {
 
 
     //Zombie
-    for (int i = 0; i < 30; i++) {
+    for (int i = 0; i < zombieNumber; i++) {
         std::string name = "Zombie" + std::to_string(i);
-        float x = (rand() % 100) - 50;
-        float z = (rand() % 100) - 50;
+        float x = (rand() % 50) - 25;
+        float z = (rand() % 50) - 25;
         float rotation = (rand() % 360);
 
         std::shared_ptr<StandardisedModel> zombie = Resources->ModelObjectController.UseAny("Lesson/zombie.obj", name);
@@ -184,6 +176,16 @@ void GameLogic_Overworld::LoadMap() {
 //        mapManager->AddObjectToMap(map, grass);
 //    }
 
+    //Gun light
+    std::shared_ptr<LightPoint> gunLight = std::make_shared<LightPoint>(glm::vec3(0.0f, 0.0f, 0.0f));
+    gunLight->SetIntensity(0.0f);
+    gunLight->SetConstant(1.0f);
+    gunLight->SetLinear(0.1f);
+    gunLight->SetQuadratic(0.01f);
+    Resources->AddLightToMap(map, gunLight);
+    gunLight->Name = "GunLight";
+    this->gunLight = gunLight.get();
+
 
 
     //Skybox
@@ -194,4 +196,12 @@ void GameLogic_Overworld::LoadMap() {
             "starbox");
     starSkybox->SetTexture(starSkyboxTexture);
     Resources->AddSkyboxToMap(map, starSkybox);
+
+    //Load animation texture
+    animationTextures.push_back(Resources->TextureObjectsController.UseTexture("HeyaAnimation/frame1.jpg"));
+    animationTextures.push_back(Resources->TextureObjectsController.UseTexture("HeyaAnimation/frame2.jpg"));
+    animationTextures.push_back(Resources->TextureObjectsController.UseTexture("HeyaAnimation/frame3.jpg"));
+    animationTextures.push_back(Resources->TextureObjectsController.UseTexture("HeyaAnimation/frame4.jpg"));
+    animationTextures.push_back(Resources->TextureObjectsController.UseTexture("HeyaAnimation/frame5.jpg"));
+    animationTextures.push_back(Resources->TextureObjectsController.UseTexture("HeyaAnimation/frame6.jpg"));
 }

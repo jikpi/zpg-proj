@@ -148,4 +148,8 @@ std::shared_ptr<Transformation> BezierAnimation::GetResult() const {
     return std::make_shared<Move>(Result);
 }
 
+int BezierAnimation::GetPointsCount() {
+    return static_cast<int>(Points.size());
+}
+
 
