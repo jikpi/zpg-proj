@@ -180,6 +180,11 @@ void GameLogic_Overworld::WonCondition() {
     animatingPlane = newAnimatingPlane.get();
 
 
+    //put camera to trophy
+    Resources->CameraMain->SetLocation(glm::vec3(10, 1, -15));
+    Resources->CameraMain->SetTarget(glm::vec3(10, 2, -20) + glm::vec3(0, 0, 1));
+
+
 }
 
 void GameLogic_Overworld::ShotZombie(StandardisedModel *zombie) {
