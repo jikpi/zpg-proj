@@ -21,7 +21,7 @@ class Map {
 
     void InsertLight(const std::shared_ptr<RenderableLight> &light);
     unsigned long GetLightCount();
-    std::shared_ptr<RenderableLight> &GetLight(int index);
+    std::shared_ptr<RenderableLight> &MasterGetLight(int index);
     void ChangeLight(int index, const std::shared_ptr<RenderableLight> &light);
     void SetSkybox(const std::shared_ptr<StandardisedModel> &skybox);
     void InsertObject(const std::shared_ptr<StandardisedModel> &object);

@@ -111,10 +111,7 @@ MapCreator::SolarSystem(const std::string &mapName, std::vector<std::shared_ptr<
                                                                          glm::vec3(0.0f, 1.0f, 0.0f)));
 
     //Skybox
-    const float *rawmodel_skycube = skycube;
-    int skycube_size = sizeof(skycube) / sizeof(float);
-    std::shared_ptr<StandardisedModel> starSkybox = ModelFactory::Position(rawmodel_skycube, skycube_size,
-                                                                           "Star skybox");
+    std::shared_ptr<StandardisedModel> starSkybox = mapManager->ModelObjectController.UsePosition("skybox.obj", "Starbox");
 
     starSkybox->SetShaderProgram(Skybox);
     Texture *starSkyboxTexture = mapManager->TextureObjectsController.UseCubemap(

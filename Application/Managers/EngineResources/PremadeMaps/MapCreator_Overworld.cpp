@@ -16,30 +16,6 @@ void MapCreator::Overworld(const std::string &mapName, std::vector<std::shared_p
     mapManager->CreateNewMap(mapName);
     std::shared_ptr<Map> &map = mapManager->GetMap(mapName);
 
-    const float *rawmodel1_sphere = sphere;
-    int size = sizeof(sphere) / sizeof(float);
-
-    const float *rawmodel2_tree = tree;
-    int size2 = sizeof(tree) / sizeof(float);
-
-    const float *rawmodel3_suziSmooth = suziSmooth;
-    int size3 = sizeof(suziSmooth) / sizeof(float);
-
-    const float *rawmodel4_bushes = bushes;
-    int size4 = sizeof(bushes) / sizeof(float);
-
-    const float *rawmodel5_suziFlat = suziFlat;
-    int size5 = sizeof(suziFlat) / sizeof(float);
-
-    const float *rawmodel6_plain = plain;
-    int size6 = sizeof(plain) / sizeof(float);
-
-    const float *rawmodel7_gift = gift;
-    int size7 = sizeof(gift) / sizeof(float);
-
-    const float *rawmodel9_plane_text = plane_tex;
-    int size9 = sizeof(plane_tex) / sizeof(float);
-
 
     ShaderHandler *ConstantShader = SelectShader(shaders, "Constant");
     ShaderHandler *PhongShader = SelectShader(shaders, "Phong");
@@ -47,11 +23,6 @@ void MapCreator::Overworld(const std::string &mapName, std::vector<std::shared_p
     ShaderHandler *LambertShader = SelectShader(shaders, "Lambert");
     ShaderHandler *PhongTextureShader = SelectShader(shaders, "PhongTexture");
     ShaderHandler *SkyboxShader = SelectShader(shaders, "Skybox");
-
-    const float *rawmodels[] = {rawmodel1_sphere, rawmodel2_tree, rawmodel3_suziSmooth, rawmodel4_bushes,
-                                rawmodel5_suziFlat, rawmodel6_plain, rawmodel7_gift};
-    int sizes[] = {size, size2, size3, size4, size5, size6, size7};
-    int totalArraySizes = 7;
 
 
     std::shared_ptr<LightSpot> flashLight = std::make_shared<LightSpot>(glm::vec3(0.0f, 5.0f, 10.0f),
@@ -163,7 +134,7 @@ void MapCreator::Overworld(const std::string &mapName, std::vector<std::shared_p
     bulbToLamp->Insert(std::make_shared<Scale>(glm::vec3(0.42f, 0.17f, 0.3f)));
 
 
-    std::shared_ptr<StandardisedModel> streetLampBulb = ModelFactory::PositionNormal(rawmodel1_sphere, size, "Bulb");
+    std::shared_ptr<StandardisedModel> streetLampBulb = mapManager->ModelObjectController.UseAny("sphere.obj", "Bulb");
     streetLampBulb->SetShaderProgram(ConstantShader);
     streetLampBulb->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f),
                                          glm::vec3(1.0f, 1.0f, 0.0f),
@@ -185,7 +156,7 @@ void MapCreator::Overworld(const std::string &mapName, std::vector<std::shared_p
 
     //Street lamp
     std::shared_ptr<StandardisedModel> streetLamp = mapManager->ModelObjectController.UsePositionNormalTex(
-            "Street_Lamp.obj");
+            "Street_Lamp.obj", "Lamp");
     streetLamp->SetShaderProgram(PhongShader);
     streetLamp->InsertTransfComposite(streetLampComposite);
     streetLamp->ConsolidateTransf();
@@ -217,10 +188,7 @@ void MapCreator::Overworld(const std::string &mapName, std::vector<std::shared_p
 
 
     //Skybox
-    const float *rawmodel_skycube = skycube;
-    int skycube_size = sizeof(skycube) / sizeof(float);
-    std::shared_ptr<StandardisedModel> starSkybox = ModelFactory::Position(rawmodel_skycube, skycube_size,
-                                                                           "Star skybox");
+    std::shared_ptr<StandardisedModel> starSkybox = mapManager->ModelObjectController.UsePosition("skybox.obj", "Starbox");
 
     starSkybox->SetShaderProgram(SkyboxShader);
     Texture *starSkyboxTexture = mapManager->TextureObjectsController.UseCubemap(

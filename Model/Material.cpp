@@ -3,25 +3,26 @@
 //
 
 #include "Material.h"
+#include "../Application/Configuration/AGlobalConfig.h"
 
 Material::Material(glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, float specularShineValue)
         : AmbientColor(ambientColor),
           DiffuseColor(diffuseColor),
           SpecularColor(specularColor),
           ShineValue(specularShineValue),
-          MaterialTexture(nullptr){
+          MaterialTexture(nullptr) {
 }
 
-Material::Material() : Material(glm::vec3(0.01f, 0.01f, 0.01f),
-                                glm::vec3(1.0, 1.0, 1.0),
-                                glm::vec3(0.5f, 0.5f, 0.5f),
-                                100.0f) {
+Material::Material() : Material(DEF_MATERIAL_COLOR_AMBIENT,
+                                DEF_MATERIAL_COLOR_DIFFUSE,
+                                DEF_MATERIAL_COLOR_SPECULAR,
+                                DEF_MATERIAL_SHINEVALUE) {
 }
 
-Material::Material(glm::vec3 diffuseColor) : Material(glm::vec3(0.01f, 0.01f, 0.01f),
-                                                      diffuseColor,
-                                                      glm::vec3(1.0f, 1.0f, 1.0f),
-                                                      250.0f) {
+Material::Material(glm::vec3 diffuseColor) : Material(DEF_MATERIAL_COLOR_AMBIENT,
+                                                      DEF_MATERIAL_COLOR_DIFFUSE,
+                                                      DEF_MATERIAL_COLOR_SPECULAR,
+                                                      DEF_MATERIAL_SHINEVALUE) {
 
 }
 

@@ -173,7 +173,7 @@ void ResourcesManager::AddLightToMap(const std::string &name, const std::shared_
 
 std::shared_ptr<RenderableLight> &ResourcesManager::GetLightOnMap(int mapIndex, int lightIndex) {
     std::shared_ptr<Map> &map = this->GetMap(mapIndex);
-    std::shared_ptr<RenderableLight> &light = map->GetLight(lightIndex);
+    std::shared_ptr<RenderableLight> &light = map->MasterGetLight(lightIndex);
 
     if (map == this->ActiveMap) {
         ShaderLinker.NotifyLightsOnCurrentMapChanged();
@@ -197,7 +197,7 @@ void ResourcesManager::SetFallbackShader(std::shared_ptr<ShaderHandler> &shader)
 
 std::shared_ptr<RenderableLight> &ResourcesManager::GetLightOnMap(const std::string &mapName, int lightIndex) {
     std::shared_ptr<Map> &map = this->GetMap(mapName);
-    std::shared_ptr<RenderableLight> &light = map->GetLight(lightIndex);
+    std::shared_ptr<RenderableLight> &light = map->MasterGetLight(lightIndex);
 
     if (map == this->ActiveMap) {
         ShaderLinker.NotifyLightsOnCurrentMapChanged();
@@ -207,7 +207,7 @@ std::shared_ptr<RenderableLight> &ResourcesManager::GetLightOnMap(const std::str
 }
 
 std::shared_ptr<RenderableLight> &ResourcesManager::GetLightOnMap(std::shared_ptr<Map> &map, int lightIndex) {
-    std::shared_ptr<RenderableLight> &light = map->GetLight(lightIndex);
+    std::shared_ptr<RenderableLight> &light = map->MasterGetLight(lightIndex);
 
     if (map == this->ActiveMap) {
         ShaderLinker.NotifyLightsOnCurrentMapChanged();

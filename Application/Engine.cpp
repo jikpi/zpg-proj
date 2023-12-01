@@ -171,9 +171,6 @@ void Engine::Run() {
     float angle = 0.0f;
     float angleIncrement = glm::radians(1.0f);
 
-    std::shared_ptr<LightSpot> spheresSpotLight = std::dynamic_pointer_cast<LightSpot>(
-            this->Resources->GetLightOnMap("4 spheres", 0));
-
     std::shared_ptr<LightSpot> manyObjectsFlash = std::dynamic_pointer_cast<LightSpot>(
             this->Resources->GetLightOnMap("Overworld", 0));
 
@@ -197,22 +194,22 @@ void Engine::Run() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-        angle += angleIncrement;
-        if (angle > 2 * glm::pi<float>()) {
-            angle -= 2 * glm::pi<float>();
-        }
-
-        float x = radius * cos(angle);
-        float z = radius * sin(angle);
-
-        spheresSpotLight->SetDirection(glm::vec3(x, 0.0f, z));
+//        angle += angleIncrement;
+//        if (angle > 2 * glm::pi<float>()) {
+//            angle -= 2 * glm::pi<float>();
+//        }
+//
+//        float x = radius * cos(angle);
+//        float z = radius * sin(angle);
+//
+//        spheresSpotLight->SetDirection(glm::vec3(x, 0.0f, z));
 
         //set many objects spot light to camera location and target
         manyObjectsFlash->SetPosition(this->CameraMain->GetLocation());
         manyObjectsFlash->SetDirection(this->CameraMain->GetTarget() - this->CameraMain->GetLocation());
         Resources->ForceRefreshLightsOnCurrentMap();
 
-        ////NextRender skybox
+        ////Render skybox
         if (Resources->GetActiveMap()->GetSkybox() != nullptr) {
             ShaderHandler *skyboxShader = Resources->GetActiveMap()->GetSkybox()->GetShaderProgram();
             glDepthMask(GL_FALSE);
@@ -229,7 +226,7 @@ void Engine::Run() {
             ShaderHandler::StopProgram();
         }
 
-        ////NextRender each shader
+        ////Render each shader
         for (auto &set: this->Resources->ShaderLinker) {
             set->Shader->UseProgram();
 
