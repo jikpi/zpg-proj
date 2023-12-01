@@ -25,7 +25,13 @@ void GameLogic_Overworld::Reset() {
         return;
     }
 
-    flashlight = dynamic_cast<LightSpot *>(map->GetLight("Flashlight").get());
+    if (this->firstLoad) {
+        this->firstLoad = false;
+        this->LoadMap();
+    }
+
+
+//    flashlight = dynamic_cast<LightSpot *>(map->GetLight("Flashlight").get());
 
 
     if (flashlight == nullptr) {
@@ -36,6 +42,7 @@ void GameLogic_Overworld::Reset() {
 
     this->IsReady = true;
 }
+
 
 void
 GameLogic_Overworld::MouseCursorClickEvent(float xCursorCoords, float yCursorCoords, int windowHeight, int windowWidth, int button,

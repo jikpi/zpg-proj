@@ -180,8 +180,7 @@ void ResourcesManager::AddLightToMap(const std::string &name, const std::shared_
 
 void ResourcesManager::AddLightToMap(const Map *map, const std::shared_ptr<RenderableLight> &light) {
     std::shared_ptr<Map> &mapRef = this->GetMap(map->GetName());
-    if(mapRef == nullptr)
-    {
+    if (mapRef == nullptr) {
         std::cerr << "ERROR: ResourcesManager: Map not found while adding light" << std::endl;
         return;
     }
@@ -193,6 +192,17 @@ std::shared_ptr<RenderableLight> &ResourcesManager::GetLightOnMap(int mapIndex, 
     std::shared_ptr<RenderableLight> &light = map->MasterGetLight(lightIndex);
 
     if (map == this->ActiveMap) {
+        ShaderLinker.NotifyLightsOnCurrentMapChanged();
+    }
+
+    return light;
+}
+
+std::shared_ptr<RenderableLight> &ResourcesManager::GetLightOnMap(const Map *map, int lightIndex) {
+    std::shared_ptr<Map> &mapRef = this->GetMap(map->GetName());
+    std::shared_ptr<RenderableLight> &light = mapRef->MasterGetLight(lightIndex);
+
+    if (mapRef == this->ActiveMap) {
         ShaderLinker.NotifyLightsOnCurrentMapChanged();
     }
 
@@ -276,17 +286,20 @@ StandardisedModel *ResourcesManager::GetObjectByContextID(unsigned short context
 
 void ResourcesManager::InsertGameLogic(std::unique_ptr<AnyGameLogic> &&gameLogic, const std::string &mapName) {
 
-    if(!gameLogic->SelfCreatingMap()) {
+    if (!gameLogic->SelfCreatingMap()) {
         std::shared_ptr<Map> &map = this->GetMap(mapName);
         if (map == nullptr) {
             std::cerr << "ERROR: ResourcesManager: Map not found while inserting logic: " << mapName << std::endl;
             return;
         }
 
+        if (mapName.empty()) {
+            std::cerr << "ERROR: ResourcesManager: No map name with logic that doesn't handle its own map." << std::endl;
+            return;
+        }
+
         gameLogic->InitializeResources(this, map.get(), this->CameraMain.get());
-    }
-    else
-    {
+    } else {
         gameLogic->InitializeResources(this, nullptr, this->CameraMain.get());
     }
 

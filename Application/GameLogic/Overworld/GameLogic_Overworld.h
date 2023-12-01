@@ -12,6 +12,9 @@
 class GameLogic_Overworld : public AnyGameLogic {
 private:
     LightSpot *flashlight{};
+
+    void LoadMap();
+    bool firstLoad{true};
 public:
     GameLogic_Overworld();
     void NextRender() override;
@@ -21,7 +24,7 @@ public:
     void KeyPressEvent(int key, int scancode, int action, int mods) override;
 
     [[nodiscard]] bool SelfCreatingMap() const override {
-        return false;
+        return true;
     }
 };
 

@@ -102,6 +102,10 @@ add_executable(zpg_test main.cpp
         Application/GameLogic/Overworld/GameLogic_Overworld.cpp
         Application/GameLogic/Overworld/GameLogic_Overworld.h
         "Application/GameLogic/Solar system/GameLogic_SolarSystem_LoadMap.cpp"
+        Application/GameLogic/Overworld/GameLogic_Overworld_LoadMap.cpp
+        "Application/GameLogic/4 Spheres/GameLogic_4Spheres.cpp"
+        "Application/GameLogic/4 Spheres/GameLogic_4Spheres.h"
+        Application/GameLogic/Abstract/GameLogic_4Spheres_LoadMap.cpp
 )
 
 target_include_directories(zpg_test PRIVATE ${ASSIMP_INCLUDE_DIRS})

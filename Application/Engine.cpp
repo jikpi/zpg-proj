@@ -19,6 +19,7 @@
 #include "Managers/EngineResources/PremadeMaps/MapCreator.h"
 #include "GameLogic/Solar system/GameLogic_SolarSystem.h"
 #include "GameLogic/Overworld/GameLogic_Overworld.h"
+#include "GameLogic/4 Spheres/GameLogic_4Spheres.h"
 
 
 Engine::Engine() = default;
@@ -146,14 +147,15 @@ void Engine::PrintVersionInfo() {
 }
 
 void Engine::InitializeRendering() {
-    MapCreator::FourSpheres("4 spheres", Resources->Shaders, this->Resources.get());
+
+    std::unique_ptr<AnyGameLogic> fourSpheresLogic = std::make_unique<GameLogic_4Spheres>();
+    this->Resources->InsertGameLogic(std::move(fourSpheresLogic));
 
     std::unique_ptr<AnyGameLogic> solarsystemLogic = std::make_unique<GameLogic_SolarSystem>();
-    this->Resources->InsertGameLogic(std::move(solarsystemLogic), "Solar system");
+    this->Resources->InsertGameLogic(std::move(solarsystemLogic));
 
-    MapCreator::Overworld("Overworld", Resources->Shaders, this->Resources.get());
     std::unique_ptr<AnyGameLogic> overworldLogic = std::make_unique<GameLogic_Overworld>();
-    this->Resources->InsertGameLogic(std::move(overworldLogic), "Overworld");
+    this->Resources->InsertGameLogic(std::move(overworldLogic));
 }
 
 void Engine::Run() {
@@ -190,8 +192,7 @@ void Engine::Run() {
         }
 
         //Do logic
-        if(!this->IsLogicPaused)
-        {
+        if (!this->IsLogicPaused) {
             this->Resources->NextRender();
         }
 
@@ -219,8 +220,7 @@ void Engine::Run() {
             for (auto &object: set->Objects) {
 
                 //Pausing logic also pauses animations/transformations
-                if(!this->IsLogicPaused)
-                {
+                if (!this->IsLogicPaused) {
                     object->DoAnyAnimation(0);
                 }
 

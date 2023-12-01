@@ -68,6 +68,7 @@ public:
     std::shared_ptr<RenderableLight> &GetLightOnMap(int mapIndex, int lightIndex);
     std::shared_ptr<RenderableLight> &GetLightOnMap(const std::string &mapName, int lightIndex);
     std::shared_ptr<RenderableLight> &GetLightOnMap(std::shared_ptr<Map> &map, int lightIndex);
+    std::shared_ptr<RenderableLight> &GetLightOnMap(const Map *map, int lightIndex);
 
     void ChangeLightOnMap(int mapIndex, int lightIndex, const std::shared_ptr<RenderableLight> &light);
     void ChangeLightOnMap(const std::string &mapName, int lightIndex, const std::shared_ptr<RenderableLight> &light);
@@ -91,7 +92,7 @@ public:
     }
 
     AnyGameLogic *ActiveGameLogic{};
-    void InsertGameLogic(std::unique_ptr<AnyGameLogic> &&gameLogic, const std::string &mapName);
+    void InsertGameLogic(std::unique_ptr<AnyGameLogic> &&gameLogic, const std::string &mapName = "");
     void NextRender() const;
 
     void
