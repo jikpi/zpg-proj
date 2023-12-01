@@ -12,6 +12,7 @@
 #include "../../../Model/Texture/Controller/TextureController.h"
 #include "../../../Model/Controller/ModelController.h"
 #include "../../GameLogic/Abstract/AnyGameLogic.h"
+#include "../../../Shaders/Camera/Camera.h"
 
 class AnyGameLogic;
 
@@ -27,6 +28,7 @@ private:
     std::vector<std::unique_ptr<AnyGameLogic>> GameLogics;
 public:
     void Initialize(bool addDefaultMap);
+    std::unique_ptr<Camera> CameraMain;
     void ForceRefreshMaps();
     MapToShaderLinker ShaderLinker;
     void SetFallbackShader(std::shared_ptr<ShaderHandler> &shader);

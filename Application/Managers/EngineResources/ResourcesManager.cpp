@@ -15,6 +15,8 @@ void ResourcesManager::Initialize(bool addDefaultMap) {
         MapCacheIndex = 0;
     }
 
+    this->CameraMain = std::make_unique<Camera>();
+
 }
 
 void ResourcesManager::ForceRefreshMaps() {

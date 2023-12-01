@@ -11,7 +11,6 @@
 #include <iostream>
 #include "../Shaders/ShaderProgram/ShaderHandler.h"
 #include "InputHandler/MovesetInputManager.h"
-#include "../Shaders/Camera/Camera.h"
 #include "Managers/ShaderLinking/MapToShaderLinker.h"
 #include "Managers/EngineResources/ResourcesManager.h"
 #include "GameLogic/Abstract/AnyGameLogic.h"
@@ -29,7 +28,6 @@ private:
     void LoadAllShaders();
 
     std::unique_ptr<ResourcesManager> Resources;
-    std::unique_ptr<Camera> CameraMain;
     std::shared_ptr<MovesetInputManager> MovesetManager;
 
     void UpdateMoveset();

@@ -88,8 +88,7 @@ void Engine::Initialize() {
     this->Resources->Initialize(false);
 
     //Camera
-    this->CameraMain = std::make_unique<Camera>();
-    this->CameraMain->SetAspectRatio(this->Ratio);
+    Resources->CameraMain->SetAspectRatio(this->Ratio);
 
     //Shaders
     LoadAllShaders();
@@ -126,8 +125,8 @@ void Engine::NotifyWindowResize(int newWidth, int newHeight) {
     this->Ratio = newWidth / (float) newHeight;
     glViewport(0, 0, newWidth, newHeight);
 
-    if (this->CameraMain != nullptr) {
-        this->CameraMain->SetAspectRatio(this->Ratio);
+    if (Resources->CameraMain != nullptr) {
+        Resources->CameraMain->SetAspectRatio(this->Ratio);
     }
 }
 
@@ -155,7 +154,7 @@ void Engine::TestLaunch() {
 }
 
 void Engine::Run() {
-    if (this->CameraMain == nullptr) {
+    if (Resources->CameraMain == nullptr) {
         std::cerr << "FATAL: Engine: No camera available." << std::endl;
         throw std::runtime_error("No camera available.");
     }
@@ -178,7 +177,7 @@ void Engine::Run() {
     std::shared_ptr<StandardisedModel> movingModel = this->Resources->GetObjectOnMap(0, 0);
 
 
-    this->CameraMain->MoveForwardBackward(0);
+    Resources->CameraMain->MoveForwardBackward(0);
     this->Resources->ChangeMap(0);
     this->Resources->ForceRefreshMaps();
     while (!glfwWindowShouldClose(Window)) {
@@ -186,7 +185,7 @@ void Engine::Run() {
         UpdateMoveset();
 
         //Decrease map change lock
-        if(this->MapChangeFrameLock > 0){
+        if (this->MapChangeFrameLock > 0) {
             this->MapChangeFrameLock--;
         }
 
@@ -206,8 +205,8 @@ void Engine::Run() {
 //        spheresSpotLight->SetDirection(glm::vec3(x, 0.0f, z));
 
         //set many objects spot light to camera location and target
-        manyObjectsFlash->SetPosition(this->CameraMain->GetLocation());
-        manyObjectsFlash->SetDirection(this->CameraMain->GetTarget() - this->CameraMain->GetLocation());
+        manyObjectsFlash->SetPosition(Resources->CameraMain->GetLocation());
+        manyObjectsFlash->SetDirection(Resources->CameraMain->GetTarget() - Resources->CameraMain->GetLocation());
         Resources->ForceRefreshLightsOnCurrentMap();
 
         ////Render skybox
@@ -270,14 +269,14 @@ void Engine::KillWindow() const {
 }
 
 void Engine::CameraLookHorizontal(double x) {
-    if (this->CameraMain != nullptr) {
-        this->CameraMain->LookSphericalSide(x);
+    if (Resources->CameraMain != nullptr) {
+        Resources->CameraMain->LookSphericalSide(x);
     }
 }
 
 void Engine::CameraLookVertical(double y) {
-    if (this->CameraMain != nullptr) {
-        this->CameraMain->LookSphericalVertical(y);
+    if (Resources->CameraMain != nullptr) {
+        Resources->CameraMain->LookSphericalVertical(y);
     }
 }
 
@@ -290,7 +289,7 @@ void Engine::UpdateMoveset() {
         return;
     }
 
-    if (this->CameraMain == nullptr) {
+    if (Resources->CameraMain == nullptr) {
         return;
     }
 
@@ -298,37 +297,37 @@ void Engine::UpdateMoveset() {
     float reading;
     reading = this->MovesetManager->ReadForward();
     if (reading != 0) {
-        this->CameraMain->MoveForwardBackward(reading);
+        Resources->CameraMain->MoveForwardBackward(reading);
     }
 
     reading = this->MovesetManager->ReadSide();
     if (reading != 0) {
-        this->CameraMain->MoveSideToSide(reading);
+        Resources->CameraMain->MoveSideToSide(reading);
     }
 
     reading = this->MovesetManager->ReadVertical();
     if (reading != 0) {
-        this->CameraMain->MoveUpDown(reading);
+        Resources->CameraMain->MoveUpDown(reading);
     }
 }
 
 void Engine::SetCameraLock(bool lock) {
 
-    if (this->CameraMain == nullptr) {
+    if (Resources->CameraMain == nullptr) {
         return;
     }
 
     if (lock) {
         glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        this->CameraMain->UnlockSet(true);
+        Resources->CameraMain->UnlockSet(true);
     } else {
         glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        this->CameraMain->UnlockSet(false);
+        Resources->CameraMain->UnlockSet(false);
     }
 }
 
 void Engine::ToggleCameraLock() {
-    if (this->CameraMain->UnlockState()) {
+    if (Resources->CameraMain->UnlockState()) {
         this->SetCameraLock(false);
     } else {
         this->SetCameraLock(true);
@@ -340,26 +339,26 @@ void Engine::AddShader(const std::shared_ptr<ShaderHandler> &shader) {
 }
 
 void Engine::ToggleCameraPerspective() {
-    if (this->CameraMain == nullptr) {
+    if (Resources->CameraMain == nullptr) {
         return;
     }
 
-    if (this->CameraMain->GetPerspectiveProjection()) {
-        this->CameraMain->SetPerspectiveProjection(false);
+    if (Resources->CameraMain->GetPerspectiveProjection()) {
+        Resources->CameraMain->SetPerspectiveProjection(false);
     } else {
-        this->CameraMain->SetPerspectiveProjection(true);
+        Resources->CameraMain->SetPerspectiveProjection(true);
     }
 }
 
 void Engine::ToggleCameraYDirection() {
-    if (this->CameraMain == nullptr) {
+    if (Resources->CameraMain == nullptr) {
         return;
     }
 
-    if (this->CameraMain->GetFollowYDirection()) {
-        this->CameraMain->SetFollowYDirection(false);
+    if (Resources->CameraMain->GetFollowYDirection()) {
+        Resources->CameraMain->SetFollowYDirection(false);
     } else {
-        this->CameraMain->SetFollowYDirection(true);
+        Resources->CameraMain->SetFollowYDirection(true);
     }
 }
 
@@ -382,7 +381,7 @@ void Engine::RandomMaterialsTest() {
 }
 
 void Engine::RequestMapChange(int index) {
-    if(this->MapChangeFrameLock > 0){
+    if (this->MapChangeFrameLock > 0) {
         return;
     }
 
@@ -392,7 +391,7 @@ void Engine::RequestMapChange(int index) {
 }
 
 void Engine::RequestMapChange(const std::string &name) {
-    if(this->MapChangeFrameLock > 0){
+    if (this->MapChangeFrameLock > 0) {
         return;
     }
 
@@ -410,9 +409,9 @@ void Engine::LoadAllShaders() {
     this->Shaders.push_back(ShaderHandlerFactory::Skybox());
 
 
-    if (this->CameraMain != nullptr) {
+    if (Resources->CameraMain != nullptr) {
         for (auto &shader: this->Shaders) {
-            this->CameraMain->RegisterCameraObserver(shader);
+            Resources->CameraMain->RegisterCameraObserver(shader);
         }
     } else {
         std::cerr << "FATAL: Engine: No camera available." << std::endl;
