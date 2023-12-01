@@ -99,6 +99,8 @@ add_executable(zpg_test main.cpp
         Model/Animation/BezierAnimation.h
         Application/GameLogic/Abstract/AnyGameLogic.cpp
         Application/GameLogic/Abstract/AnyGameLogic.h
+        "Application/GameLogic/Solar system/GameLogic_SolarSystem.cpp"
+        "Application/GameLogic/Solar system/GameLogic_SolarSystem.h"
 )
 
 target_include_directories(zpg_test PRIVATE ${ASSIMP_INCLUDE_DIRS})

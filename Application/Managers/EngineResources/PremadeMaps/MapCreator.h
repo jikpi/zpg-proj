@@ -21,7 +21,7 @@ public:
     static void
     FourSpheres(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, ResourcesManager *mapManager);
     static void
-    SolarSystem(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, ResourcesManager *mapManager);
+    SolarSystem(std::vector<std::shared_ptr<ShaderHandler>> &shaders, ResourcesManager *mapManager);
     static void
     Overworld(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, ResourcesManager *mapManager);
 

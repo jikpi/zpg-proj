@@ -149,7 +149,7 @@ void Engine::PrintVersionInfo() {
 
 void Engine::TestLaunch() {
     MapCreator::FourSpheres("4 spheres", this->Shaders, this->Resources.get());
-    MapCreator::SolarSystem("Solar system", this->Shaders, this->Resources.get());
+    MapCreator::SolarSystem(this->Shaders, this->Resources.get());
     MapCreator::Overworld("Overworld", this->Shaders, this->Resources.get());
 }
 

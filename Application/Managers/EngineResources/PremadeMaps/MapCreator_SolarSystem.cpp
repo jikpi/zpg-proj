@@ -9,9 +9,9 @@
 #include "../../../../ExtResources/LessonResources/TextureResources/skycube.h"
 
 void
-MapCreator::SolarSystem(const std::string &mapName, std::vector<std::shared_ptr<ShaderHandler>> &shaders, ResourcesManager *mapManager) {
-    mapManager->CreateNewMap(mapName);
-    std::shared_ptr<Map> &map = mapManager->GetMap(mapName);
+MapCreator::SolarSystem(std::vector<std::shared_ptr<ShaderHandler>> &shaders, ResourcesManager *mapManager) {
+    mapManager->CreateNewMap("Solar system");
+    std::shared_ptr<Map> &map = mapManager->GetMap("Solar system");
 
     ShaderHandler *ConstantShader = SelectShader(shaders, "Constant");
     ShaderHandler *PhongShader = SelectShader(shaders, "Phong");
