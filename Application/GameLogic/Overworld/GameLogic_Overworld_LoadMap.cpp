@@ -196,4 +196,12 @@ void GameLogic_Overworld::LoadMap() {
             "starbox");
     starSkybox->SetTexture(starSkyboxTexture);
     Resources->AddSkyboxToMap(map, starSkybox);
+
+    //Load animation texture
+    animationTextures.push_back(Resources->TextureObjectsController.UseTexture("HeyaAnimation/frame1.jpg"));
+    animationTextures.push_back(Resources->TextureObjectsController.UseTexture("HeyaAnimation/frame2.jpg"));
+    animationTextures.push_back(Resources->TextureObjectsController.UseTexture("HeyaAnimation/frame3.jpg"));
+    animationTextures.push_back(Resources->TextureObjectsController.UseTexture("HeyaAnimation/frame4.jpg"));
+    animationTextures.push_back(Resources->TextureObjectsController.UseTexture("HeyaAnimation/frame5.jpg"));
+    animationTextures.push_back(Resources->TextureObjectsController.UseTexture("HeyaAnimation/frame6.jpg"));
 }

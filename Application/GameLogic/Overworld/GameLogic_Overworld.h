@@ -34,6 +34,13 @@ private:
 
     int defaultGunLightFrames = 1;
     int gunLightFrames = 0;
+
+
+    int defaultAnimationFrames = 3;
+    int animationFrames = 0;
+    int nextAnimationTextureIndex = 0;
+    StandardisedModel* animatingPlane{};
+    std::vector<Texture *> animationTextures;
 public:
     GameLogic_Overworld();
     void NextRender() override;

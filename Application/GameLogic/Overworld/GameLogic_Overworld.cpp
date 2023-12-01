@@ -69,6 +69,19 @@ void GameLogic_Overworld::NextRender() {
                                                                          glm::vec3(0.0f, 1.0f, 0.0f)));
     }
 
+    if(won) {
+        if (animationFrames > 0) {
+            animationFrames--;
+        } else {
+            animationFrames = defaultAnimationFrames;
+            animatingPlane->SetTexture(animationTextures.at(nextAnimationTextureIndex));
+            nextAnimationTextureIndex++;
+            if(nextAnimationTextureIndex >= animationTextures.size()) {
+                nextAnimationTextureIndex = 0;
+            }
+        }
+    }
+
 }
 
 void GameLogic_Overworld::Reset() {
@@ -156,6 +169,17 @@ void GameLogic_Overworld::WonCondition() {
     Resources->AddObjectToMap(map, trophy);
 
 
+    //add plane next to trophy
+    std::shared_ptr<StandardisedModel> newAnimatingPlane = Resources->ModelObjectController.UseAny("Lesson/planeSingleTex.obj", "Heye");
+    newAnimatingPlane->SetShaderProgram(SelectShader(Resources->Shaders, "PhongTexture"));
+    newAnimatingPlane->SetTexture(animationTextures.at(0));
+    newAnimatingPlane->InsertTransfMove(glm::vec3(10, 0, -20))
+            .InsertTransfScale(glm::vec3(0.5f, 0.5f, 0.5f)).InsertTransfRotate(90, glm::vec3(1, 0, 0))
+            .ConsolidateTransf();
+    Resources->AddObjectToMap(map, newAnimatingPlane);
+    animatingPlane = newAnimatingPlane.get();
+
+
 }
 
 void GameLogic_Overworld::ShotZombie(StandardisedModel *zombie) {
@@ -187,7 +211,7 @@ GameLogic_Overworld::MouseCursorClickEvent(float xCursorCoords, float yCursorCoo
 
         //enable gun light
         gunLightFrames = defaultGunLightFrames;
-        gunLight->SetColor(glm::vec3(1.0f, 1.0f, 1.0f));
+        gunLight->SetColor(glm::vec3( 1.0f, 1.0f, 0.0f));
         gunLight->SetPosition(Resources->CameraMain->GetLocation());
 
 
@@ -196,15 +220,15 @@ GameLogic_Overworld::MouseCursorClickEvent(float xCursorCoords, float yCursorCoo
             return;
         }
 
-        //check if name of model begins with "Zombie"
         if (model->Name().find("Zombie") == 0) {
             ShotZombie(model);
         }
 
     }
 
-    //force win with right click
+//    //force win with right click
 //    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+//        won = true;
 //        WonCondition();
 //    }
 
