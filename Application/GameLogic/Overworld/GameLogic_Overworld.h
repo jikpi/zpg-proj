@@ -24,6 +24,8 @@ private:
     void ShotZombie(StandardisedModel *zombie);
     int zombieShot = 0;
 
+    void ShootAnimation();
+
     bool won = false;
     void WonCondition();
 
@@ -41,6 +43,9 @@ private:
     int nextAnimationTextureIndex = 0;
     StandardisedModel* animatingPlane{};
     std::vector<Texture *> animationTextures;
+
+    StandardisedModel* gunModel{};
+    void PortGunToCamera();
 public:
     GameLogic_Overworld();
     void NextRender() override;

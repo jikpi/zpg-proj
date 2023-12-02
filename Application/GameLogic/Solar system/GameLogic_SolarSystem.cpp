@@ -65,6 +65,7 @@ void GameLogic_SolarSystem::AddBezierCoordinateToUFO(glm::vec3 coordinates) {
         lastUFO->ClearTransf();
         lastUFO->ResetTransf();
         lastUFO->InsertTransfScale(glm::vec3(0.05f, 0.05f, 0.05f)).ConsolidateTransf();
+        lastUFO->InsertTransfRotate(1.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     }
 }
 
@@ -79,6 +80,7 @@ void GameLogic_SolarSystem::CreateUFOat(glm::vec3 coordinates) {
 
     objectUFO->InsertTransfMove(coordinates).InsertTransfScale(glm::vec3(0.05f, 0.05f, 0.05f))
             .ConsolidateTransf();
+
     Resources->AddObjectToMap(map, objectUFO);
 
     std::unique_ptr<AnyAnimation> animation1 = std::make_unique<BezierAnimation>(0.001f);

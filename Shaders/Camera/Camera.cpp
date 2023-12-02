@@ -255,6 +255,32 @@ glm::vec3 Camera::GetUnprojectedCursor(int width, int height, glm::vec3 screenX)
     return unprojected;
 }
 
+glm::vec3 Camera::GetForwardDirection() const {
+    glm::vec3 forward = glm::normalize(Target - Location);
+    return forward;
+}
+
+glm::vec3 Camera::GetRightDirection() const {
+    glm::vec3 forward = GetForwardDirection();
+    glm::vec3 right = glm::normalize(glm::cross(forward, Up));
+    return right;
+}
+
+glm::vec3 Camera::GetUpDirection() const {
+    glm::vec3 forward = GetForwardDirection();
+    glm::vec3 right = GetRightDirection();
+    glm::vec3 up = glm::normalize(glm::cross(right, forward));
+    return up;
+}
+
+Camera::CameraDirection Camera::GetCameraDirection() const {
+    CameraDirection direction{};
+    direction.Forward = glm::normalize(Target - Location);
+    direction.Right = glm::normalize(glm::cross(direction.Forward, Up));
+    direction.Up = glm::normalize(glm::cross(direction.Right, direction.Forward));
+    return direction;
+}
+
 
 
 

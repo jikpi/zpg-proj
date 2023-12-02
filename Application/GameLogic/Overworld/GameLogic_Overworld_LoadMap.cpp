@@ -186,6 +186,26 @@ void GameLogic_Overworld::LoadMap() {
     gunLight->Name = "GunLight";
     this->gunLight = gunLight.get();
 
+    //Gun
+    std::shared_ptr<StandardisedModel> gun = Resources->ModelObjectController.UseAny("Pistol.fbx", "Gun");
+    Resources->AddObjectToMap(map, gun);
+    this->gunModel = gun.get();
+
+    gunModel->SetShaderProgram(PhongShader);
+
+    gunModel->InsertTransfMove(glm::vec3(0.0f, 10.0f, 0.0f))
+            .InsertTransfScale(glm::vec3(0.8f, 0.8f, 0.8f))
+            .InsertTransfRotate(90, glm::vec3(0.0f, 1.0f, 0.0f))
+            .ConsolidateTransf();
+
+    Material selectedMaterial = gunModel->GetMaterial();
+    selectedMaterial.DiffuseColor = glm::vec3(0.3f, 0.3f, 0.3f);
+
+    for(auto &child: gunModel->ChildObjects){
+        selectedMaterial = child->GetMaterial();
+        selectedMaterial.DiffuseColor = glm::vec3(0.3f, 0.3f, 0.3f);
+        child->SetMaterial(selectedMaterial);
+    }
 
 
     //Skybox

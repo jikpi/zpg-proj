@@ -94,6 +94,19 @@ public:
     glm::mat4 GetProjectionMatrix();
 
     glm::vec3 GetUnprojectedCursor(int width, int height, glm::vec3 screenX);
+
+
+    struct CameraDirection {
+        glm::vec3 Forward;
+        glm::vec3 Right;
+        glm::vec3 Up;
+    };
+
+    [[nodiscard]] CameraDirection GetCameraDirection() const;
+
+    [[nodiscard]] glm::vec3 GetForwardDirection() const;
+    [[nodiscard]] glm::vec3 GetRightDirection() const;
+    [[nodiscard]] glm::vec3 GetUpDirection() const;
 };
 
 

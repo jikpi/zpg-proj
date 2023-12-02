@@ -138,6 +138,12 @@ void KeyCallbacks::key_callback(GLFWwindow *window, int key, int scancode, int a
         }
     }
 
+    //Key event
+    if (!Engines.expired()) {
+        auto engine = Engines.lock();
+        engine->KeyPress(key, scancode, action, mods);
+    }
+
 }
 
 void KeyCallbacks::window_focus_callback(GLFWwindow *window, int focused) {

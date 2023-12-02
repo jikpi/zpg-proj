@@ -69,18 +69,21 @@ void GameLogic_Overworld::NextRender() {
                                                                          glm::vec3(0.0f, 1.0f, 0.0f)));
     }
 
-    if(won) {
+    if (won) {
         if (animationFrames > 0) {
             animationFrames--;
         } else {
             animationFrames = defaultAnimationFrames;
             animatingPlane->SetTexture(animationTextures.at(nextAnimationTextureIndex));
             nextAnimationTextureIndex++;
-            if(nextAnimationTextureIndex >= animationTextures.size()) {
+            if (nextAnimationTextureIndex >= animationTextures.size()) {
                 nextAnimationTextureIndex = 0;
             }
         }
     }
+
+    //Port gun to camera
+    PortGunToCamera();
 
 }
 
@@ -170,7 +173,8 @@ void GameLogic_Overworld::WonCondition() {
 
 
     //add plane next to trophy
-    std::shared_ptr<StandardisedModel> newAnimatingPlane = Resources->ModelObjectController.UseAny("Lesson/planeSingleTex.obj", "Heye");
+    std::shared_ptr<StandardisedModel> newAnimatingPlane = Resources->ModelObjectController.UseAny("Lesson/planeSingleTex.obj",
+                                                                                                   "Heye");
     newAnimatingPlane->SetShaderProgram(SelectShader(Resources->Shaders, "PhongTexture"));
     newAnimatingPlane->SetTexture(animationTextures.at(0));
     newAnimatingPlane->InsertTransfMove(glm::vec3(10, 0, -20))
@@ -205,20 +209,27 @@ void GameLogic_Overworld::ShotZombie(StandardisedModel *zombie) {
     }
 }
 
+void GameLogic_Overworld::ShootAnimation() {
+    // Jerk camera up
+    Resources->CameraMain->LookSphericalVertical(1.5f);
+    // Enable gun light
+    gunLightFrames = defaultGunLightFrames;
+    gunLight->SetColor(glm::vec3(1.0f, 1.0f, 0.0f));
+    // Calculate light position
+    glm::vec3 cameraPosition = Resources->CameraMain->GetLocation();
+    glm::vec3 cameraForward = Resources->CameraMain->GetForwardDirection();
+    float lightDistance = 3.0f;
+    glm::vec3 lightPosition = cameraPosition + cameraForward * lightDistance;
+    gunLight->SetPosition(lightPosition);
+}
+
 
 void
 GameLogic_Overworld::MouseCursorClickEvent(float xCursorCoords, float yCursorCoords, int windowHeight, int windowWidth, int button,
                                            int action, int mods) {
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        //jerk camera up
-        Resources->CameraMain->LookSphericalVertical(1.5f);
-
-        //enable gun light
-        gunLightFrames = defaultGunLightFrames;
-        gunLight->SetColor(glm::vec3( 1.0f, 1.0f, 0.0f));
-        gunLight->SetPosition(Resources->CameraMain->GetLocation());
-
+        ShootAnimation();
 
         StandardisedModel *model = AnyGameLogic::ObjectByCenter(windowHeight, windowWidth);
         if (model == nullptr) {
@@ -239,6 +250,39 @@ GameLogic_Overworld::MouseCursorClickEvent(float xCursorCoords, float yCursorCoo
 
 }
 
-void GameLogic_Overworld::KeyPressEvent(int key, int scancode, int action, int mods) {
+void GameLogic_Overworld::PortGunToCamera() {
+    if (gunModel == nullptr || CameraMain == nullptr) {
+        return;
+    }
 
+    gunModel->ClearTransf();
+    gunModel->ResetTransf();
+
+    // Get camera information
+    glm::vec3 cameraPosition = CameraMain->GetLocation();
+    Camera::CameraDirection cameraDirection = CameraMain->GetCameraDirection();
+
+    // Define the relative position of the gun
+    glm::vec3 gunOffset = glm::vec3(0.5f, -0.5f, 1.0f);
+    glm::vec3 gunPosition = cameraPosition
+                            + cameraDirection.Forward * gunOffset.z
+                            + cameraDirection.Right * gunOffset.x
+                            + cameraDirection.Up * gunOffset.y;
+
+    // Align gun's orientation with the camera
+    glm::quat gunRotationQuat = glm::quatLookAt(-cameraDirection.Forward, cameraDirection.Up);
+
+    // Convert quaternion to axis-angle
+    glm::vec3 rotationAxis = glm::axis(gunRotationQuat);
+    float rotationAngle = glm::degrees(glm::angle(gunRotationQuat));
+
+    // Apply transformations
+    gunModel->InsertTransfMove(gunPosition);
+    gunModel->InsertTransfRotate(rotationAngle, rotationAxis);
+    gunModel->InsertTransfRotate(90, glm::vec3(-1, 0, 0));
+    gunModel->InsertTransfScale(glm::vec3(0.1f, 0.1f, 0.1f));
+    gunModel->ConsolidateTransf();
+}
+
+void GameLogic_Overworld::KeyPressEvent(int key, int scancode, int action, int mods) {
 }
