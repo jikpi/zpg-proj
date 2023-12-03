@@ -136,13 +136,14 @@ void GameLogic_Overworld::LoadMap() {
     streetLampBulb->ConsolidateTransf();
     Resources->AddObjectToMap(map, streetLampBulb);
 
-    //Light
+    //Street lamp Light
     std::shared_ptr<LightPoint> streetLampLight = std::make_shared<LightPoint>(glm::vec3(-1.0f, 3.0f, -20.0f));
     streetLampLight->SetIntensity(1.0f);
     streetLampLight->SetConstant(1.0f);
     streetLampLight->SetLinear(0.1f);
     streetLampLight->SetQuadratic(0.01f);
     Resources->AddLightToMap(map, streetLampLight);
+    this->bulbLight = streetLampLight.get();
 
 
     //Street lamp

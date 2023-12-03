@@ -191,6 +191,16 @@ void GameLogic_Overworld::WonCondition() {
 
 }
 
+void GameLogic_Overworld::ShotBulb(StandardisedModel *bulb) {
+    bulb->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f),
+                               glm::vec3(0.1f, 0.1f, 0.1f),
+                               glm::vec3(1.0f, 1.0f, 1.0f),
+                               32.0f));
+
+    this->bulbLight->SetColor(glm::vec3(0.0f, 0.0f, 0.0f));
+
+}
+
 void GameLogic_Overworld::ShotZombie(StandardisedModel *zombie) {
     std::cout << "Zombie shot " << ++zombieShot << " of " << zombieNumber << std::endl;
     zombie->SetMaterial(Material(glm::vec3(0.1f, 0.1f, 0.1f),
@@ -238,6 +248,10 @@ GameLogic_Overworld::MouseCursorClickEvent(float xCursorCoords, float yCursorCoo
 
         if (model->Name().find("Zombie") == 0) {
             ShotZombie(model);
+        }
+
+        if (model->Name().find("Bulb") == 0) {
+            ShotBulb(model);
         }
 
     }

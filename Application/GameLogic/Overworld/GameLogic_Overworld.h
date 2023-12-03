@@ -21,6 +21,8 @@ private:
 
     int remainingFrames = 7200;
 
+    LightPoint *bulbLight{};
+    void ShotBulb(StandardisedModel *bulb);
     void ShotZombie(StandardisedModel *zombie);
     int zombieShot = 0;
 
