@@ -97,6 +97,9 @@ void BezierAnimation::DoAnimation(float t) {
 
     int numSegments = (numPoints - 1) / 3;
 
+    //map TArg to the number of segments
+    //ensure that the segment index stays within the bounds of the available segments
+    //max value is numSegments - 1
     int currentSegment = std::min(static_cast<int>(this->tArg * static_cast<float>(numSegments)), numSegments - 1);
 
     float localT = (tArg * static_cast<float>(numSegments)) - static_cast<float>(currentSegment);
@@ -144,7 +147,6 @@ void BezierAnimation::SetSmoothTDiff(float newSmoothTDiff) {
 }
 
 std::shared_ptr<Transformation> BezierAnimation::GetResult() const {
-//    std::cout << "BezierAnimation::GetResult: " << Result.x << " " << Result.y << " " << Result.z << std::endl;
     return std::make_shared<Move>(Result);
 }
 

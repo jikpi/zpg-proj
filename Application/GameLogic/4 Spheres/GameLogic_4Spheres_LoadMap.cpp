@@ -3,7 +3,7 @@
 //
 
 
-#include "../4 Spheres/GameLogic_4Spheres.h"
+#include "GameLogic_4Spheres.h"
 #include "../../../Shaders/Lighting/LightDirectional.h"
 
 void GameLogic_4Spheres::LoadMap() {
@@ -52,31 +52,6 @@ void GameLogic_4Spheres::LoadMap() {
 
 
     ////Objects transformations
-
-//    objectSphere1->InsertTransfMove(glm::vec3(-2.0f, 0.0f, 0.0f)).
-//            InsertTransfRotate(90, glm::vec3(-1.0f, 0, 0)).ConsolidateTransf();
-//    std::unique_ptr<AnyAnimation> animation1 = std::make_unique<BezierAnimation>(0.001f);
-//    auto *bezierAnim = dynamic_cast<BezierAnimation *>(animation1.get());
-//    ////Bezier points
-//    std::vector<glm::vec3> controlPoints = {
-//            glm::vec3(0, 0, 0),     // First segment
-//            glm::vec3(2, 2, 0),
-//            glm::vec3(-4, 4, 0),
-//            glm::vec3(6, 0, 0),     // Second segment
-////            glm::vec3(8, -10, 0),
-////            glm::vec3(10, 4, 0),
-////            glm::vec3(12, 0, 0),    // Third segment
-////            glm::vec3(14, 20, 20),
-////            glm::vec3(16, 25, 15),
-////            glm::vec3(18, 15, 10),
-////            glm::vec3(20, 10, 5)
-//    };
-//    for (const auto &point: controlPoints) {
-//        bezierAnim->AddPoint(point);
-//    }
-//    bezierAnim->SetStyle(BezierAnimation::BezierAnimationStyle::RoundAround);
-//    objectSphere1->InsertAnimation(std::move(animation1));
-//    objectSphere1->InsertTransfRotate(1, glm::vec3(0.0f, 1, 0));
 
     objectSphere1->InsertTransfMove(glm::vec3(1.5f, 0.0f, 1.5f)).ConsolidateTransf();
     objectSphere2->InsertTransfMove(glm::vec3(-1.5f, 0.0f, 1.5f)).ConsolidateTransf();
