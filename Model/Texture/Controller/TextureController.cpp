@@ -84,6 +84,8 @@ std::unique_ptr<Texture> TextureController::LoadTexture(const std::string &path)
 
 
 std::unique_ptr<Texture> TextureController::LoadCubeMap(const std::string &path) {
+    //Loads a cubemap texture from 6 individual texture faces, or 1 single texture for all 6
+
     GLuint textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
