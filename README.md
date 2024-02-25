@@ -1,5 +1,6 @@
 # ZPG Project
 Project for the class ZPG at University.
+A simple game engine written in C++, with the use of OpenGL and other libraries.
 
 ![1](/screenshots/1.png)
 ![2](/screenshots/2.png)
